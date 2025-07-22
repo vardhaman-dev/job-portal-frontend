@@ -1,0 +1,548 @@
+<template>
+  <div class="landing-page">
+    <header class="navbar">
+      <div class="logo">💼 JobHub</div>
+      <nav class="nav-links">
+        <a href="#">Home</a>
+        <a href="#">Jobs</a>
+        <a href="#">Employers</a>
+      </nav>
+      <div class="auth-buttons">
+        <router-link to="/login" class="sign-in">Sign In</router-link>
+        <a href="#" class="sign-up">Sign Up</a>
+      </div>
+    </header>
+
+    <section class="hero">
+      <h1 class="tagline">Your Dream Job is Just a Click Away <span class="handwritten">Explore. Apply. Succeed.</span></h1>
+      <p>
+        Unlock your next big opportunity - thousands of jobs, zero stress. Start your career adventure with JobHub today!
+      </p>
+
+      <div class="search-box">
+        <input type="text" placeholder="🔍 Job title or keyword" />
+        <input type="text" placeholder="📍 City, state, or remote" />
+        <button>Search Jobs</button>
+      </div>
+
+      <div class="stats">
+        <div><strong>50,000+</strong><br />Active Jobs</div>
+        <div><strong>15,000+</strong><br />Companies</div>
+        <div><strong>2M+</strong><br />Job Seekers</div>
+      </div>
+    </section>
+
+    <section class="categories">
+      <h2>Browse Jobs by <span>Category</span></h2>
+      <p>
+        Explore opportunities across various industries and find the perfect role that
+        matches your skills and interests.
+      </p>
+
+      <div class="category-grid">
+        <div class="category-card">
+          <div class="icon">💻</div>
+          <h3>Information Technology</h3>
+          <p class="count">12,500+ jobs</p>
+          <small>Software, Web Development, Data Science</small>
+        </div>
+        <div class="category-card">
+          <div class="icon">📈</div>
+          <h3>Marketing & Sales</h3>
+          <p class="count">8,300+ jobs</p>
+          <small>Digital Marketing, Sales, Business Development</small>
+        </div>
+        <div class="category-card">
+          <div class="icon">💰</div>
+          <h3>Finance & Accounting</h3>
+          <p class="count">6,700+ jobs</p>
+          <small>Accounting, Financial Analysis, Investment</small>
+        </div>
+        <div class="category-card">
+          <div class="icon">👥</div>
+          <h3>Human Resources</h3>
+          <p class="count">4,200+ jobs</p>
+          <small>HR Management, Recruitment, Training</small>
+        </div>
+        <div class="category-card">
+          <div class="icon">📦</div>
+          <h3>Business & Consulting</h3>
+          <p class="count">3,800+ jobs</p>
+          <small>Strategy, Operations, Management</small>
+        </div>
+        <div class="category-card">
+          <div class="icon">🎨</div>
+          <h3>Design & Creative</h3>
+          <p class="count">2,900+ jobs</p>
+          <small>UI/UX, Graphics, Content Creation</small>
+        </div>
+        <div class="category-card">
+          <div class="icon">🛡️</div>
+          <h3>Legal & Compliance</h3>
+          <p class="count">1,500+ jobs</p>
+          <small>Legal Affairs, Compliance, Risk</small>
+        </div>
+        <div class="category-card">
+          <div class="icon">⚕️</div>
+          <h3>Healthcare & Medical</h3>
+          <p class="count">5,200+ jobs</p>
+          <small>Medical, Nursing, Healthcare Admin</small>
+        </div>
+      </div>
+    </section>
+        <section class="how-it-works">
+      <h2>How It Works</h2>
+      <p class="subtitle">
+        Get started with your job search in three simple steps. Our streamlined process<br />
+        makes finding your next opportunity easier than ever.
+      </p>
+
+      <div class="steps">
+        <div class="step">
+          <div class="step-icon blue">👤➕</div>
+          <div class="step-number">1</div>
+          <h3>Create Profile</h3>
+          <p>Sign up and build your professional profile with your skills, experience, and preferences.</p>
+        </div>
+
+        <div class="step">
+          <div class="step-icon green">🔍</div>
+          <div class="step-number">2</div>
+          <h3>Search & Apply</h3>
+          <p>Browse through thousands of jobs, filter by your preferences, and apply with one click.</p>
+        </div>
+
+        <div class="step">
+          <div class="step-icon purple">✅</div>
+          <div class="step-number">3</div>
+          <h3>Get Hired</h3>
+          <p>Connect with employers, attend interviews, and land your dream job with our support.</p>
+        </div>
+      </div>
+
+      <div class="features">
+        <div class="feature-item">
+          <strong>Quick Setup</strong>
+          <small>Create your profile in under 5 minutes</small>
+        </div>
+        <div class="feature-item">
+          <strong>Smart Matching</strong>
+          <small>AI-powered job recommendations</small>
+        </div>
+        <div class="feature-item">
+          <strong>24/7 Support</strong>
+          <small>Get help whenever you need it</small>
+        </div>
+      </div>
+    </section>
+
+    <footer class="footer">
+      <div class="footer-top">
+        <div class="footer-brand">
+          <div class="footer-logo">💼 <strong>JobHub</strong></div>
+          <p>Connecting talented professionals with amazing opportunities worldwide.</p>
+          <div class="social-icons">
+            <a href="#"><i class="fab fa-facebook-f"></i></a>
+            <a href="#"><i class="fab fa-twitter"></i></a>
+            <a href="#"><i class="fab fa-linkedin-in"></i></a>
+            <a href="#"><i class="fab fa-instagram"></i></a>
+          </div>
+        </div>
+
+        <div class="footer-links">
+          <div>
+            <h4>For Job Seekers</h4>
+            <a href="#">Browse Jobs</a>
+            <a href="#">Career Advice</a>
+            <a href="#">Resume Builder</a>
+            <a href="#">Salary Guide</a>
+          </div>
+          <div>
+            <h4>For Employers</h4>
+            <a href="#">Post a Job</a>
+            <a href="#">Find Candidates</a>
+            <a href="#">Employer Branding</a>
+            <a href="#">Pricing</a>
+          </div>
+          <div>
+            <h4>Company</h4>
+            <a href="#">About Us</a>
+            <a href="#">Contact</a>
+            <a href="#">Privacy Policy</a>
+            <a href="#">Terms of Service</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        © 2025 JobHub. All rights reserved.
+      </div>
+    </footer>
+
+  </div>
+</template>
+
+<style scoped>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+
+.landing-page {
+  font-family: 'Inter', 'Segoe UI', sans-serif;
+  color: #2a2a2a;
+  background: linear-gradient(to bottom, #f9fbfd, #fff);
+  line-height: 1.6;
+}
+
+/* Navbar */
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  padding: 20px 60px;
+  align-items: center;
+  background-color: #fff;
+  border-bottom: 1px solid #eaecef;
+}
+
+.logo {
+  font-weight: 700;
+  color: #2d6cff;
+  font-size: 24px;
+}
+
+.nav-links a {
+  margin: 0 20px;
+  color: #333;
+  font-weight: 500;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+.nav-links a:hover {
+  color: #2d6cff;
+}
+
+.auth-buttons .sign-in {
+  margin-right: 15px;
+  font-weight: 600;
+  color: #333;
+  text-decoration: none;
+}
+.auth-buttons .sign-in:hover {
+  color: #2d6cff;
+}
+
+.auth-buttons .sign-up {
+  background-color: #2d6cff;
+  color: white;
+  padding: 8px 20px;
+  border-radius: 6px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background 0.3s;
+}
+.auth-buttons .sign-up:hover {
+  background-color: #1c4fcf;
+}
+
+/* Hero */
+.hero {
+  text-align: center;
+  padding: 90px 20px 70px;
+}
+.hero h1 {
+  font-size: 44px;
+  font-weight: 700;
+}
+.hero h1 span {
+  color: #2d6cff;
+}
+.hero p {
+  margin-top: 20px;
+  color: #555;
+  font-size: 18px;
+}
+
+/* Search */
+.search-box {
+  margin-top: 35px;
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.search-box input {
+  padding: 14px 20px;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  width: 260px;
+  font-size: 15px;
+}
+.search-box button {
+  background-color: #2d6cff;
+  color: white;
+  padding: 14px 24px;
+  border: none;
+  border-radius: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+.search-box button:hover {
+  background-color: #1c4fcf;
+}
+
+/* Stats */
+.stats {
+  display: flex;
+  justify-content: center;
+  gap: 60px;
+  margin-top: 50px;
+  font-size: 17px;
+  color: #444;
+}
+.stats strong {
+  font-size: 24px;
+  color: #2d6cff;
+}
+
+/* Categories */
+.categories {
+  text-align: center;
+  padding: 70px 30px;
+  background-color: #f3f6fa;
+}
+.categories h2 {
+  font-size: 30px;
+  font-weight: 700;
+  margin-bottom: 12px;
+}
+.categories h2 span {
+  color: #2d6cff;
+}
+.categories p {
+  font-size: 16px;
+  color: #666;
+}
+
+.category-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 32px;
+  margin-top: 50px;
+}
+.category-card {
+  background: white;
+  border-radius: 16px;
+  padding: 32px 22px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+  transition: transform 0.2s ease;
+  text-align: center;
+}
+.category-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.08);
+}
+.category-card .icon {
+  font-size: 30px;
+  margin-bottom: 14px;
+}
+.category-card h3 {
+  font-size: 18px;
+  font-weight: 600;
+  color: #1d2b53;
+  margin-bottom: 6px;
+}
+.category-card .count {
+  color: #2d6cff;
+  font-weight: 700;
+}
+.category-card small {
+  color: #888;
+  font-size: 13px;
+}
+
+/* How it works */
+.how-it-works {
+  padding: 80px 30px;
+  text-align: center;
+  background-color: #ffffff;
+}
+.how-it-works h2 {
+  font-size: 30px;
+  color: #2d6cff;
+  margin-bottom: 10px;
+}
+.how-it-works .subtitle {
+  font-size: 16px;
+  color: #666;
+  margin-bottom: 50px;
+}
+
+.steps {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 40px;
+  margin-bottom: 50px;
+}
+.step {
+  background: #fff;
+  border-radius: 14px;
+  padding: 30px 25px;
+  max-width: 300px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+  text-align: center;
+}
+.step-icon {
+  font-size: 36px;
+  margin-bottom: 12px;
+  display: inline-block;
+  padding: 20px;
+  border-radius: 50%;
+  color: white;
+}
+.step-number {
+  background-color: #2d6cff;
+  color: white;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 28px;
+  margin: 12px auto;
+}
+.step h3 {
+  font-size: 18px;
+  margin: 12px 0;
+}
+.step p {
+  font-size: 14px;
+  color: #555;
+}
+
+.tagline {
+  opacity: 0;
+  transform: scale(0.8);
+  animation: zoomIn 0.6s ease-out forwards;
+  animation-delay: 0.2s;
+}
+
+@keyframes zoomIn {
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.features {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  text-align: center;
+  gap: 80px;
+  margin-top: 40px;
+  flex-wrap: wrap;
+}
+
+.feature-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-width: 200px;
+}
+
+.feature-item strong {
+  color: #1565c0; /* professional blue */
+  font-weight: 600;
+  font-size: 1.1rem;
+  margin-bottom: 8px;
+}
+
+.feature-item small {
+  color: #555;
+  font-size: 0.9rem;
+  line-height: 1.3;
+}
+
+.handwritten {
+  font-family: 'Satisfy', cursive;
+  font-size: 30px;
+  color: #2d6cff; /* Keep the same blue or adjust */
+  display: inline-block;
+  margin-top: 10px;
+  letter-spacing: 1px;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.05);
+  font-size: larger;
+}
+
+.footer {
+  background: #2d6cff;
+  color: white;
+  padding: 60px 40px 20px;
+  margin-top: 80px;
+}
+
+.footer-top {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 40px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  padding-bottom: 40px;
+}
+
+.footer-brand {
+  max-width: 300px;
+}
+.footer-logo {
+  font-size: 20px;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+.footer-brand p {
+  font-size: 14px;
+  line-height: 1.6;
+  color: #e0e0e0;
+}
+.social-icons {
+  margin-top: 15px;
+}
+.social-icons a {
+  margin-right: 10px;
+  color: white;
+  font-size: 16px;
+  transition: color 0.2s ease;
+}
+.social-icons a:hover {
+  color: #cfd8ff;
+}
+
+.footer-links {
+  display: flex;
+  gap: 50px;
+  flex-wrap: wrap;
+}
+.footer-links h4 {
+  margin-bottom: 10px;
+  font-size: 16px;
+  font-weight: 600;
+}
+.footer-links a {
+  display: block;
+  margin-bottom: 8px;
+  color: #e0e0e0;
+  font-size: 14px;
+  text-decoration: none;
+}
+.footer-links a:hover {
+  color: white;
+}
+
+.footer-bottom {
+  text-align: center;
+  font-size: 13px;
+  padding-top: 20px;
+  color: #cbdfff;
+}
+
+
+</style>

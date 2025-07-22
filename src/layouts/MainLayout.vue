@@ -1,6 +1,7 @@
 <template>
   <q-layout view="lHh Lpr lFf">
-    <q-header elevated>
+    <!-- Header -->
+    <q-header elevated class="bg-primary text-white">
       <q-toolbar>
         <q-btn
           flat
@@ -12,23 +13,34 @@
         />
 
         <q-toolbar-title>
-          Quasar App
+          Job Portal
         </q-toolbar-title>
 
-        <div>Quasar v{{ $q.version }}</div>
+        <q-space />
+
+        <q-btn
+          v-if="isLoggedIn"
+          color="white"
+          flat
+          label="Logout"
+          @click="logoutUser"
+        />
+
+        <div class="q-ml-md text-caption">
+          Quasar v{{ $q.version }}
+        </div>
       </q-toolbar>
     </q-header>
 
+    <!-- Drawer -->
     <q-drawer
       v-model="leftDrawerOpen"
       show-if-above
       bordered
     >
       <q-list>
-        <q-item-label
-          header
-        >
-          Essential Links
+        <q-item-label header>
+          Navigation
         </q-item-label>
 
         <EssentialLink
@@ -39,6 +51,7 @@
       </q-list>
     </q-drawer>
 
+    <!-- Main Page Content -->
     <q-page-container>
       <router-view />
     </q-page-container>
@@ -47,56 +60,54 @@
 
 <script setup>
 import { ref } from 'vue'
+import { useRouter } from 'vue-router'
 import EssentialLink from 'components/EssentialLink.vue'
+
+const router = useRouter()
+
+const leftDrawerOpen = ref(false)
+const isLoggedIn = ref(true) // temporary: assume user is logged in
+
+function toggleLeftDrawer() {
+  leftDrawerOpen.value = !leftDrawerOpen.value
+}
+
+function logoutUser() {
+  // TODO: remove auth info if using localStorage or cookies
+  isLoggedIn.value = false
+  router.push('/login')
+}
 
 const linksList = [
   {
-    title: 'Docs',
-    caption: 'quasar.dev',
-    icon: 'school',
-    link: 'https://quasar.dev'
+    title: 'Home',
+    caption: 'Back to homepage',
+    icon: 'home',
+    link: '/'
   },
   {
-    title: 'Github',
-    caption: 'github.com/quasarframework',
-    icon: 'code',
-    link: 'https://github.com/quasarframework'
+    title: 'Jobs',
+    caption: 'View job listings',
+    icon: 'work',
+    link: '/jobs'
   },
   {
-    title: 'Discord Chat Channel',
-    caption: 'chat.quasar.dev',
-    icon: 'chat',
-    link: 'https://chat.quasar.dev'
+    title: 'Companies',
+    caption: 'Browse companies',
+    icon: 'business',
+    link: '/companies'
   },
   {
-    title: 'Forum',
-    caption: 'forum.quasar.dev',
-    icon: 'record_voice_over',
-    link: 'https://forum.quasar.dev'
-  },
-  {
-    title: 'Twitter',
-    caption: '@quasarframework',
-    icon: 'rss_feed',
-    link: 'https://twitter.quasar.dev'
-  },
-  {
-    title: 'Facebook',
-    caption: '@QuasarFramework',
-    icon: 'public',
-    link: 'https://facebook.quasar.dev'
-  },
-  {
-    title: 'Quasar Awesome',
-    caption: 'Community Quasar projects',
-    icon: 'favorite',
-    link: 'https://awesome.quasar.dev'
+    title: 'Profile',
+    caption: 'Your account',
+    icon: 'person',
+    link: '/profile'
   }
 ]
-
-const leftDrawerOpen = ref(false)
-
-function toggleLeftDrawer () {
-  leftDrawerOpen.value = !leftDrawerOpen.value
-}
 </script>
+
+<style scoped>
+.q-toolbar-title {
+  font-weight: 600;
+}
+</style>
