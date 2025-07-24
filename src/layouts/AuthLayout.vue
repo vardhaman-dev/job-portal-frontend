@@ -2,12 +2,8 @@
   <q-layout view="hHh lpR fFf" class="bg-grey-2">
 
     <!-- Optional: Header for Auth Pages -->
-    <q-header elevated class="bg-white text-primary">
-      <q-toolbar>
-        <q-btn flat dense icon="work" @click="$router.push('/')" />
-        <q-toolbar-title>JobHub</q-toolbar-title>
-      </q-toolbar>
-    </q-header>
+    <HeaderPage layout="auth" />
+
 
     <!-- Main Auth Page Container -->
     <q-page-container>
