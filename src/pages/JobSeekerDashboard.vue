@@ -8,7 +8,13 @@
           <p class="subtext">Ready to find your next opportunity? Let’s explore what’s available for you.</p>
         </div>
         <div class="action-buttons">
-          <q-btn icon="person" label="Complete Profile" unelevated class="q-px-md primary-btn" />
+          <q-btn
+            icon="person"
+            label="Complete Profile"
+            unelevated
+            class="q-px-md primary-btn"
+            @click="showProfileModal = true"
+          />
           <q-btn icon="upload_file" label="Build your Resume" class="q-px-md primary-btn" />
         </div>
       </div>
@@ -102,13 +108,18 @@
         </div>
       </div>
     </div>
+
+    <!-- Complete Profile Modal Component -->
+    <CompleteProfileModal v-model="showProfileModal" />
   </q-page>
 </template>
 
 <script setup>
 import JobSeekerSidebar from 'components/JobSeekerSidebar.vue';
+import CompleteProfileModal from 'components/CompleteProfileModal.vue';
 import { ref, computed } from 'vue';
 
+const showProfileModal = ref(false)
 const userName = 'John';
 
 const jobs = ref([
@@ -152,7 +163,7 @@ const jobs = ref([
     posted: '2 days ago',
     type: 'Full-time'
    },
-    {
+  {
     id: 5,
     title: 'Data Analyst',
     company: 'InsightSphere',
@@ -161,8 +172,8 @@ const jobs = ref([
     skills: ['SQL', 'Python', 'Power BI', 'Tableau'],
     posted: '1 day ago',
     type: 'Part-time'
-    },
-    {
+  },
+  {
     id: 6,
     title: 'Mobile App Developer',
     company: 'AppVantage',
@@ -171,8 +182,7 @@ const jobs = ref([
     skills: ['Flutter', 'Dart', 'Firebase', 'REST APIs'],
     posted: '3 days ago',
     type: 'Remote'
-    }
-
+  }
 ]);
 
 const currentPage = ref(1);
@@ -184,6 +194,7 @@ const paginatedJobs = computed(() => {
   return jobs.value.slice(start, start + perPage);
 });
 </script>
+
 
 <style scoped>
 .dashboard-container {
