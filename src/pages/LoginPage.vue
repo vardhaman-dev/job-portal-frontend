@@ -133,14 +133,20 @@
 
 <script setup>
 import { ref } from 'vue'
+import { useRouter } from 'vue-router'
 
 const email = ref('')
 const password = ref('')
 const rememberMe = ref(false)
 const showPassword = ref(false)
 
+const router = useRouter()
+
 const handleLogin = () => {
   console.log('Login:', email.value, password.value)
+  if(email.value && password.value) {
+    router.push('/dashboard')
+  }
 }
 </script>
 

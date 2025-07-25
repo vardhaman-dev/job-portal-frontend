@@ -42,6 +42,18 @@ const routes = [
     ]
   },
   {
+    path: '/dashboard',
+    component: () => import('layouts/MainLayout.vue'),
+    children: [
+      {
+        path: '',
+        name: 'JobSeekerDashboard',
+        component: () => import('pages/JobSeekerDashboard.vue'),
+        meta: {requiresAuth: true}
+      }
+    ]
+  },
+  {
     path: '/:catchAll(.*)*',
     component: () => import('pages/ErrorNotFound.vue')
   }
