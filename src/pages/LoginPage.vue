@@ -1,12 +1,12 @@
 <template>
-  <q-page class="flex flex-center bg-grey-1">
+  <q-page class="flex flex-center q-pa-md bg-grey-1 dark:bg-dark">
     <q-card
-      class="q-pa-xl q-mx-sm"
+      class="q-pa-xl q-mx-sm shadow-10"
       style="width: 100%; max-width: 450px; border-radius: 16px;"
     >
-      <!-- Back to Home -->
+      <!-- Back -->
       <div
-        class="q-mb-lg row items-center text-grey-6 cursor-pointer"
+        class="q-mb-lg row items-center text-grey-6 dark:text-grey-4 cursor-pointer"
         @click="$router.push('/')"
         style="font-size: 14px;"
       >
@@ -19,8 +19,8 @@
         <q-avatar size="72px" class="bg-blue-1 q-mb-sm">
           <q-icon name="work" size="38px" color="#1565c0" />
         </q-avatar>
-        <div class="text-h5 text-weight-bold text-grey-9">Welcome Back</div>
-        <div class="text-subtitle2 text-grey-6">Sign in to your JobHub account</div>
+        <div class="text-h5 text-weight-bold text-dark dark:text-white">Welcome Back</div>
+        <div class="text-subtitle2 text-grey-6 dark:text-grey-5">Sign in to your JobHub account</div>
       </div>
 
       <!-- Form -->
@@ -31,7 +31,7 @@
           label="Email address"
           v-model="email"
           type="email"
-          class="bg-grey-2"
+          class="bg-grey-2 dark:bg-grey-9"
           borderless
         />
 
@@ -41,7 +41,7 @@
           label="Password"
           v-model="password"
           :type="showPassword ? 'text' : 'password'"
-          class="bg-grey-2"
+          class="bg-grey-2 dark:bg-grey-9"
           borderless
         >
           <template #append>
@@ -67,7 +67,7 @@
           />
         </div>
 
-        <!-- Sign In Button -->
+        <!-- Submit Button -->
         <q-btn
           label="Sign In"
           class="full-width bg-custom-blue"
@@ -84,7 +84,7 @@
           <q-separator class="col" />
         </div>
 
-        <!-- Social Buttons -->
+        <!-- Social Login -->
         <q-btn
           outline
           class="full-width q-mb-sm"
@@ -107,17 +107,17 @@
           no-caps
           size="md"
         >
-        <img
-          src="https://www.svgrepo.com/show/452234/linkedin.svg"
-          alt="LinkedIn"
-          style="width: 20px; margin-right: 8px;"
-        />
-        Continue with LinkedIn
-      </q-btn>
-    </q-form>
+          <img
+            src="https://www.svgrepo.com/show/452234/linkedin.svg"
+            alt="LinkedIn"
+            style="width: 20px; margin-right: 8px;"
+          />
+          Continue with LinkedIn
+        </q-btn>
+      </q-form>
 
       <!-- Sign Up -->
-      <div class="q-mt-lg text-center text-grey-8">
+      <div class="q-mt-lg text-center text-grey-8 dark:text-grey-5">
         Don’t have an account?
         <span
           class="custom-blue cursor-pointer text-weight-medium"
@@ -129,6 +129,7 @@
     </q-card>
   </q-page>
 </template>
+
 
 
 <script setup>
@@ -151,21 +152,18 @@ const handleLogin = () => {
 </script>
 
 <style scoped>
-.q-card {
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
-  transition: box-shadow 0.3s ease;
-}
-
-.q-card:hover {
-  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
-}
-
 .custom-blue {
   color: #1565c0 !important;
 }
-
 .bg-custom-blue {
   background-color: #1565c0 !important;
   color: white !important;
+}
+.q-card {
+  transition: box-shadow 0.3s ease, transform 0.3s ease;
+}
+.q-card:hover {
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
 }
 </style>

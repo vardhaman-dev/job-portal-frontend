@@ -4,7 +4,7 @@
     <AppHeader />
     
     <section class="hero">
-      <h1 class="tagline">Your Dream Job is Just a Click Away <span class="handwritten">Explore. Apply. Succeed.</span></h1>
+      <h1 class="tagline">Your Dream Job is Just a Click Away <br/><span class="handwritten">Explore. Apply. Succeed.</span></h1>
       <p>
         Unlock your next big opportunity - thousands of jobs, zero stress. Start your career adventure with JobHub today!
       </p>

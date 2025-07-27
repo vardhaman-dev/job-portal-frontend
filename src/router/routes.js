@@ -14,7 +14,9 @@ const routes = [
         path: 'employers',
         name: 'Employers',
         component: () => import('pages/EmployerHomePage.vue')
-      }
+      },
+       {path: '/resume-builder',
+        component: () => import('../components/resume-builder.vue') }
     ]
   },
 
@@ -51,11 +53,6 @@ const routes = [
         component: () => import('pages/JobSeekerDashboard.vue'),
         meta: {requiresAuth: true}
       },
-      {
-        path: 'bookmarks',
-        name: 'BookmarkedJobs',
-        component: () => import('pages/BookmarkedJobsPage.vue')
-      }
     ]
   },
   {

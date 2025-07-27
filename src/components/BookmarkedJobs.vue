@@ -1,9 +1,8 @@
 <template>
-  <q-page class="q-pa-md">
+  <div>
     <h5 class="text-primary q-mb-md">Bookmarked Jobs</h5>
-
     <q-card
-      v-for="job in bookmarkedJobs"
+      v-for="job in jobs"
       :key="job.id"
       flat
       bordered
@@ -35,51 +34,33 @@
             🕒 {{ job.posted }} • {{ job.type }}
           </div>
         </div>
-        <q-btn label="Remove" color="negative" flat @click="removeBookmark(job.id)" />
+        <q-btn label="Remove" color="negative" flat @click="$emit('remove', job.id)" />
       </div>
     </q-card>
-  </q-page>
+  </div>
 </template>
 
 <script setup>
-import { ref } from 'vue'
-
-// Simulated bookmarks (can replace with Pinia or Vuex in future)
-const bookmarkedJobs = ref([
-  {
-    id: 2,
-    title: 'Data Scientist',
-    company: 'AI Solutions',
-    location: 'Boston, MA',
-    salary: '$110k - $140k',
-    skills: ['Python', 'Machine Learning', 'SQL', 'TensorFlow'],
-    posted: '1 day ago',
-    type: 'Full-time'
-  },
-  {
-    id: 4,
-    title: 'Frontend Developer',
-    company: 'PixelCrafters',
-    location: 'Austin, TX',
-    salary: '$90k - $120k',
-    skills: ['Vue.js', 'JavaScript', 'HTML', 'CSS', 'Quasar'],
-    posted: '2 days ago',
-    type: 'Full-time'
-  }
-])
-
-function removeBookmark(id) {
-  bookmarkedJobs.value = bookmarkedJobs.value.filter(job => job.id !== id)
-}
+defineProps(['jobs']);
+defineEmits(['remove']);
 </script>
 
 <style scoped>
 .job-card {
-  border-radius: 12px;
+  border-radius: 14px;
   transition: all 0.3s ease;
+  border: 1px solid #e3f2fd;
+  background: white;
 }
 .job-card:hover {
-  box-shadow: 0 6px 20px rgba(21, 101, 192, 0.15);
+  transform: scale(1.015);
+  box-shadow: 0 6px 20px rgba(21, 101, 192, 0.12);
   border-color: #1565c0;
+}
+.q-chip {
+  border-radius: 12px;
+  background-color: #e3f2fd;
+  font-size: 13px;
+  font-weight: 500;
 }
 </style>
