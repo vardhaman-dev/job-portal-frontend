@@ -15,7 +15,7 @@
             class="q-px-md primary-btn"
             @click="showProfileModal = true"
           />
-          <q-btn icon="upload_file" label="Build your Resume" class="q-px-md primary-btn" />
+     <q-btn icon="upload_file" label="Build your Resume"  class="q-px-md primary-btn"  @click="goToResume"/>
         </div>
       </div>
 
@@ -118,10 +118,15 @@
 import JobSeekerSidebar from 'components/JobSeekerSidebar.vue';
 import CompleteProfileModal from 'components/CompleteProfileModal.vue';
 import { ref, computed } from 'vue';
+import { useRouter } from 'vue-router';
 
 const showProfileModal = ref(false)
 const userName = 'John';
+const router = useRouter();
 
+const goToResume = () => {
+  router.push('/resume-builder');
+};
 const jobs = ref([
   {
     id: 1,
