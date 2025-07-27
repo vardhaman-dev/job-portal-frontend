@@ -302,12 +302,62 @@ function resetForm() {
 <style scoped>
 .profile-card {
   width: 100%;
-  max-width: 600px;
+  max-width: 640px;
   border-radius: 16px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 10px 25px rgba(47, 128, 237, 0.2); /* blue glow */
+  background: linear-gradient(to bottom right, #f9fbff, #eef3fb);
+  border: 1px solid #d0e2ff;
 }
 
-.q-card-section {
-  transition: opacity 0.5s, transform 0.5s;
+/* For Avatar hover */
+.q-avatar:hover {
+  box-shadow: 0 0 0 4px rgba(47, 128, 237, 0.2);
+  transition: box-shadow 0.3s ease;
 }
+
+/* Step Titles */
+.text-subtitle1 {
+  font-size: 1.25rem;
+  color: #2F80ED;
+}
+
+/* Step Tracker Text */
+.text-caption span {
+  transition: color 0.3s ease, font-weight 0.3s ease;
+}
+
+/* Progress bar */
+.q-linear-progress {
+  background-color: #d8eafe;
+}
+
+.q-linear-progress__track {
+  background-color: #d8eafe;
+}
+
+/* Button Hover Effects */
+.q-btn:hover {
+  filter: brightness(1.05);
+}
+
+/* Skill Chips */
+.q-chip {
+  background-color: #e3f0ff;
+  color: #2F80ED;
+  font-weight: 500;
+}
+
+/* Resume uploader style */
+.q-uploader {
+  border: 1px dashed #2F80ED;
+  background-color: #f5faff;
+}
+
+/* Cards inside form (Education & Experience) */
+.q-card[flat][bordered] {
+  border: 1px solid #c9defa;
+  background-color: #f9fbff;
+  border-radius: 8px;
+}
+
 </style>

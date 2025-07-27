@@ -21,7 +21,7 @@
           <!-- DASHBOARD SECTION -->
           <template v-if="selectedSection === 'dashboard'">
             <q-card flat bordered class="q-pa-md q-mb-md search-box">
-              <div class="text-h6 q-mb-sm">Find Your Next Job</div>
+              <div class="text-h6 q-mb-sm">Find Your Next Opportunity</div>
               <q-input
                 rounded
                 dense
