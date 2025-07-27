@@ -1,18 +1,8 @@
+<!-- src/pages/HomePage.vue -->
 <template>
   <div class="landing-page">
-    <header class="navbar">
-      <div class="logo">💼 JobHub</div>
-      <nav class="nav-links">
-        <router-link to="/" exact-active-class="active-link">Home</router-link>
-        <JobsDropDown/>
-        <router-link to="/employers" exact-active-class="active-link">Employers</router-link>
-      </nav>
-      <div class="auth-buttons">
-        <router-link to="/login" class="sign-in">Sign In</router-link>
-        <router-link link to="/create-account" class="sign-up">Sign Up</router-link>
-      </div>
-    </header>
-
+    <AppHeader />
+    
     <section class="hero">
       <h1 class="tagline">Your Dream Job is Just a Click Away <span class="handwritten">Explore. Apply. Succeed.</span></h1>
       <p>
@@ -136,58 +126,21 @@
       </div>
     </section>
 
-    <footer class="footer">
-      <div class="footer-top">
-        <div class="footer-brand">
-          <div class="footer-logo">💼 <strong>JobHub</strong></div>
-          <p>Connecting talented professionals with amazing opportunities worldwide.</p>
-          <div class="social-icons">
-            <a href="#"><i class="fab fa-facebook-f"></i></a>
-            <a href="#"><i class="fab fa-twitter"></i></a>
-            <a href="#"><i class="fab fa-linkedin-in"></i></a>
-            <a href="#"><i class="fab fa-instagram"></i></a>
-          </div>
-        </div>
-
-        <div class="footer-links">
-          <div>
-            <h4>For Job Seekers</h4>
-            <a href="#">Browse Jobs</a>
-            <a href="#">Career Advice</a>
-            <a href="#">Resume Builder</a>
-            <a href="#">Salary Guide</a>
-          </div>
-          <div>
-            <h4>For Employers</h4>
-            <a href="#">Post a Job</a>
-            <a href="#">Find Candidates</a>
-            <a href="#">Employer Branding</a>
-            <a href="#">Pricing</a>
-          </div>
-          <div>
-            <h4>Company</h4>
-            <a href="#">About Us</a>
-            <a href="#">Contact</a>
-            <a href="#">Privacy Policy</a>
-            <a href="#">Terms of Service</a>
-          </div>
-        </div>
-      </div>
-
-      <div class="footer-bottom">
-        © 2025 JobHub. All rights reserved.
-      </div>
-    </footer>
-
+    <!-- Add other homepage sections here -->
+    
+    <AppFooter />
   </div>
 </template>
 
 <script>
-import JobsDropDown from '../components/JobsDropDown.vue';
+import AppHeader from '../components/HeaderPart.vue';
+import AppFooter from '../components/FooterPart.vue';
 
 export default {
+  name: 'HomePage',
   components: {
-    JobsDropDown
+    AppHeader,
+    AppFooter
   }
 }
 </script>

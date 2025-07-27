@@ -1,17 +1,6 @@
 <template>
   <div class="landing-page">
-    <header class="navbar">
-      <div class="logo">💼 JobHub</div>
-      <nav class="nav-links">
-        <router-link to="/" exact-active-class="active-link">Home</router-link>
-        <JobsDropdown />
-        <router-link to="/employers" exact-active-class="active-link">Employers</router-link>
-      </nav>
-      <div class="auth-buttons">
-        <router-link to="/login" class="sign-in">Sign In</router-link>
-        <router-link to="/create-account" class="sign-up">Sign Up</router-link>
-      </div>
-    </header>
+    <AppHeader/>
 
     <section class="employer-hero">
       <div class="hero-text">
@@ -135,51 +124,19 @@
         </div>
       </div>
     </section>
-
-
-    <footer class="footer">
-      <div class="footer-top">
-        <div class="footer-brand">
-          <div class="footer-logo">💼 <strong>JobHub</strong></div>
-          <p>Empowering employers to connect with top-tier professionals globally.</p>
-        </div>
-
-        <div class="footer-links">
-          <div>
-            <h4>For Employers</h4>
-            <a href="#">Post a Job</a>
-            <a href="#">Find Candidates</a>
-            <a href="#">Employer Branding</a>
-            <a href="#">Pricing</a>
-          </div>
-          <div>
-            <h4>For Job Seekers</h4>
-            <a href="#">Browse Jobs</a>
-            <a href="#">Career Advice</a>
-          </div>
-          <div>
-            <h4>Company</h4>
-            <a href="#">About Us</a>
-            <a href="#">Contact</a>
-            <a href="#">Privacy Policy</a>
-          </div>
-        </div>
-      </div>
-
-      <div class="footer-bottom">
-        © 2025 JobHub. All rights reserved.
-      </div>
-    </footer>
+      <AppFooter/>
   </div>
 </template>
 
 <script>
-import JobsDropdown from '../components/JobsDropDown.vue';
+import AppHeader from '../components/HeaderPart.vue';
+import AppFooter from '../components/FooterPart.vue';
 
 export default {
   name: 'EmployerHomePage',
   components: {
-    JobsDropdown
+    AppHeader,
+    AppFooter
   }
 };
 </script>

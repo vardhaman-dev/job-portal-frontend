@@ -50,6 +50,11 @@ const routes = [
         name: 'JobSeekerDashboard',
         component: () => import('pages/JobSeekerDashboard.vue'),
         meta: {requiresAuth: true}
+      },
+      {
+        path: 'bookmarks',
+        name: 'BookmarkedJobs',
+        component: () => import('pages/BookmarkedJobsPage.vue')
       }
     ]
   },
