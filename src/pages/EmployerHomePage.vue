@@ -1,13 +1,25 @@
 <template>
   <div class="landing-page">
-    <AppHeader/>
+    <header class="navbar">
+      <div class="logo">💼 JobHub</div>
+      <nav class="nav-links">
+        <router-link to="/" exact-active-class="active-link">Home</router-link>
+        <JobsDropdown />
+        <router-link to="/employers" exact-active-class="active-link">Employers</router-link>
+      </nav>
+      <div class="auth-buttons">
+        <router-link to="/login" class="sign-in">Sign In</router-link>
+        <router-link to="/create-account" class="sign-up">Sign Up</router-link>
+      </div>
+    </header>
 
     <section class="employer-hero">
       <div class="hero-text">
         <h1 class="tagline">Hire the Best Talent <span class="handwritten">Faster</span></h1>
         <p>Connect with over <strong>500,000</strong> pre‑screened professionals. Use AI-powered matching to find your perfect candidate in days, not months.</p>
         <div class="hero-buttons">
-          <button class="btn primary">Post a Job Now</button>
+          <button class="btn primary" @click="goToEmployerLogin">Post a Job Now</button>
+
           <button class="btn outline">Explore Talent Pool</button>
         </div>
         <div class="hero-stats">
@@ -83,63 +95,59 @@
       </div>
     </section>
 
-    <section class="testimonials">
-      <h2>Trusted by Leading Companies</h2>
-      <p>See what our clients say about their hiring success with JobHub.</p>
-      <div class="testimonial-cards">
-        <div class="testimonial-card">
-          <div class="stars">⭐⭐⭐⭐⭐</div>
-          <p><em>"JobHub helped us fill 15 positions in just 2 months. The quality of candidates exceeded our expectations."</em></p>
-          <div class="person">
-            <img src="https://img.icons8.com/color/48/company.png" alt="avatar" />
-            <div>
-              <strong>Sarah Johnson</strong><br />
-              <small>Head of Talent Acquisition<br /><a href="#">TechCorp Inc.</a></small>
-            </div>
-          </div>
+
+    <footer class="footer">
+      <div class="footer-top">
+        <div class="footer-brand">
+          <div class="footer-logo">💼 <strong>JobHub</strong></div>
+          <p>Empowering employers to connect with top-tier professionals globally.</p>
         </div>
 
-        <div class="testimonial-card">
-          <div class="stars">⭐⭐⭐⭐⭐</div>
-          <p><em>"The AI matching system is incredibly accurate. We’ve seen a 40% improvement in candidate fit."</em></p>
-          <div class="person">
-            <img src="https://img.icons8.com/color/48/rocket.png" alt="avatar" />
-            <div>
-              <strong>Michael Chen</strong><br />
-              <small>CTO<br /><a href="#">InnovateLabs</a></small>
-            </div>
+        <div class="footer-links">
+          <div>
+            <h4>For Employers</h4>
+            <a href="#">Post a Job</a>
+            <a href="#">Find Candidates</a>
+            <a href="#">Employer Branding</a>
+            <a href="#">Pricing</a>
           </div>
-        </div>
-
-        <div class="testimonial-card">
-          <div class="stars">⭐⭐⭐⭐⭐</div>
-          <p><em>"From posting to hiring, JobHub streamlined our entire recruitment process. Highly recommended!"</em></p>
-          <div class="person">
-            <img src="https://img.icons8.com/color/48/businesswoman.png" alt="avatar" />
-            <div>
-              <strong>Emma Davis</strong><br />
-              <small>HR Director<br /><a href="#">GrowthStart</a></small>
-            </div>
+          <div>
+            <h4>For Job Seekers</h4>
+            <a href="#">Browse Jobs</a>
+            <a href="#">Career Advice</a>
+          </div>
+          <div>
+            <h4>Company</h4>
+            <a href="#">About Us</a>
+            <a href="#">Contact</a>
+            <a href="#">Privacy Policy</a>
           </div>
         </div>
       </div>
-    </section>
-      <AppFooter/>
+
+      <div class="footer-bottom">
+        © 2025 JobHub. All rights reserved.
+      </div>
+    </footer>
   </div>
 </template>
 
 <script>
-import AppHeader from '../components/HeaderPart.vue';
-import AppFooter from '../components/FooterPart.vue';
+import JobsDropdown from '../components/JobsDropDown.vue';
 
 export default {
   name: 'EmployerHomePage',
   components: {
-    AppHeader,
-    AppFooter
+    JobsDropdown
+  },
+  methods: {
+    goToEmployerLogin() {
+      this.$router.push('/employer-login');
+    }
   }
 };
 </script>
+
 
 <style scoped>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
@@ -194,7 +202,7 @@ export default {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 40px 60px;
+  padding: 80px 60px;
 }
 
 .employer-hero h1 {
@@ -261,7 +269,7 @@ export default {
 
 .why-choose {
   text-align: center;
-  padding: 40px 60px;
+  padding: 80px 60px;
 }
 
 .why-choose h2 {
@@ -374,7 +382,7 @@ export default {
 
 .how-it-works {
   text-align: center;
-  padding: 40px 60px;
+  padding: 80px 60px;
 }
 
 .how-it-works h2 {
@@ -424,7 +432,7 @@ export default {
 .employer-features {
   background: #f8f9fc;
   text-align: center;
-  padding: 40px 60px;
+  padding: 80px 60px;
 }
 
 .employer-features h2 {
@@ -455,79 +463,6 @@ export default {
   font-size: 30px;
   color: #2d6cff;
   margin-bottom: 15px;
-}
-
-.testimonials {
-  text-align: center;
-  padding: 40px 60px;
-  background: #fff;
-}
-
-.testimonials h2 {
-  font-size: 28px;
-  margin-bottom: 10px;
-}
-
-.testimonials p {
-  color: #555;
-  margin-bottom: 40px;
-}
-
-.testimonial-cards {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 30px;
-}
-
-.testimonial-card {
-  background: #fff;
-  border-radius: 12px;
-  padding: 25px 30px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
-  text-align: left;
-  position: relative;
-}
-
-.testimonial-card .stars {
-  color: #f4c150;
-  font-size: 18px;
-  margin-bottom: 12px;
-}
-
-.testimonial-card em {
-  color: #444;
-  font-style: italic;
-}
-
-.person {
-  display: flex;
-  align-items: center;
-  margin-top: 20px;
-  gap: 12px;
-}
-
-.person img {
-  width: 40px;
-  height: 40px;
-}
-
-.person strong {
-  color: #111;
-  font-weight: 700;
-}
-
-.person small {
-  color: #555;
-  line-height: 1.2;
-}
-
-.person a {
-  color: #2d6cff;
-  text-decoration: none;
-}
-
-.person a:hover {
-  text-decoration: underline;
 }
 
 </style>
