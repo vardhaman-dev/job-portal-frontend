@@ -55,6 +55,15 @@ const routes = [
       },
     ]
   },
+{
+  path: '/employer-login',
+  component: () => import('pages/EmployerLogin.vue')
+},
+{
+  path: '/employer-portal',
+  component: () => import('pages/EmployerPortal.vue')
+},
+
   {
     path: '/:catchAll(.*)*',
     component: () => import('pages/ErrorNotFound.vue')
