@@ -34,6 +34,7 @@
               v-model="firstName"
               class="bg-grey-2"
               borderless
+              :rules="[val => !!val || 'First name is required']"
             />
           </div>
           <div class="col">
@@ -44,6 +45,7 @@
               v-model="lastName"
               class="bg-grey-2"
               borderless
+              :rules="[val => !!val || 'Last name is required']"
             />
           </div>
         </div>
@@ -56,6 +58,7 @@
           type="email"
           class="bg-grey-2"
           borderless
+          :rules="[val => /.+@.+\..+/.test(val) || 'Valid email is required']"
         />
 
         <q-input
@@ -66,6 +69,7 @@
           type="password"
           class="bg-grey-2"
           borderless
+          :rules="[val => val.length >= 8 || 'Password must be at least 8 characters']"
         />
 
         <q-input
@@ -76,9 +80,14 @@
           type="password"
           class="bg-grey-2"
           borderless
+          :rules="[val => val === password || 'Passwords do not match']"
         />
 
-        <q-checkbox v-model="agree" label="I agree to the Terms and Conditions & Privacy Policy" />
+        <q-checkbox
+          v-model="agree"
+          label="I agree to the Terms and Conditions & Privacy Policy"
+          :rules="[val => val === true || 'You must agree to the terms']"
+        />
         <q-checkbox v-model="subscribe" label="Subscribe to our newsletter for job updates" />
 
         <q-btn
@@ -88,6 +97,7 @@
           rounded
           class="full-width bg-custom-blue"
           size="lg"
+          :loading="creatingAccount"
         />
 
         <!-- Divider -->
@@ -128,6 +138,28 @@
           Continue with LinkedIn
         </q-btn>
       </q-form>
+      <q-form v-if="otpSent" @submit.prevent="verifyOtp" class="q-gutter-md q-mt-md">
+        <q-input
+          filled
+          dense
+          label="Enter OTP"
+          v-model="otp"
+          type="text"
+          maxlength="6"
+          class="bg-grey-2"
+          ref="otpInput"
+          borderless
+          :rules="[val => val.length === 6 || 'OTP must be 6 digits']"
+        />
+        <q-btn
+          label="Verify OTP"
+          type="submit"
+          color="primary"
+          unelevated
+          class="full-width"
+          :loading="verifying"
+        />
+      </q-form>
 
       <!-- Sign In Link -->
       <div class="q-mt-lg text-center text-grey-8">
@@ -144,37 +176,115 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { ref, nextTick } from 'vue';
+import { useRouter } from 'vue-router';
+import { useQuasar } from 'quasar';
 
-const firstName = ref('')
-const lastName = ref('')
-const email = ref('')
-const password = ref('')
-const confirmPassword = ref('')
-const agree = ref(false)
-const subscribe = ref(false)
+const $q = useQuasar();
+const router = useRouter();
 
-const router = useRouter()
+const firstName = ref('');
+const lastName = ref('');
+const email = ref('');
+const password = ref('');
+const confirmPassword = ref('');
+const agree = ref(false);
+const subscribe = ref(false);
+const otpSent = ref(false);
+const otp = ref('');
+const verifying = ref(false);
+const creatingAccount = ref(false);
+const otpInput = ref(null);
 
 function goHome() {
-  router.push('/')
+  router.push('/');
 }
 
-function createAccount() {
+async function createAccount() {
   if (!agree.value) {
-    alert('You must agree to the terms to proceed.')
-    return
+    $q.notify({ type: 'negative', message: 'You must agree to the terms to proceed.' });
+    return;
   }
+  if (password.value !== confirmPassword.value) {
+    $q.notify({ type: 'negative', message: 'Passwords do not match.' });
+    return;
+  }
+  creatingAccount.value = true;
+  try {
+    const response = await fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000'}/api/auth/signup`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        firstName: firstName.value.trim(),
+        lastName: lastName.value.trim(),
+        email: email.value.trim(),
+        password: password.value,
+      }),
+    });
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    const data = await response.json();
+    if (data.success) {
+      otpSent.value = true;
+      $q.notify({ type: 'positive', message: 'OTP sent to your email. Please check your inbox.' });
+      await nextTick();
+      otpInput.value?.focus();
+    } else {
+      $q.notify({ type: 'negative', message: data.message || 'Failed to send OTP.' });
+    }
+  } catch (error) {
+    console.error('Error in createAccount:', error);
+    let message = 'An error occurred while sending OTP. Please try again later.';
+    if (error.message.includes('NetworkError')) {
+      message = 'Network error: Please check your internet connection.';
+    } else if (error.message.includes('404')) {
+      message = 'API endpoint not found. Please contact support.';
+    } else if (error.message.includes('500')) {
+      message = 'Server error: Unable to send OTP. Try again later.';
+    }
+    $q.notify({ type: 'negative', message });
+  } finally {
+    creatingAccount.value = false;
+  }
+}
 
-  console.log({
-    firstName: firstName.value,
-    lastName: lastName.value,
-    email: email.value,
-    password: password.value,
-    confirmPassword: confirmPassword.value,
-    subscribe: subscribe.value
-  })
+async function verifyOtp() {
+  if (!otp.value || otp.value.length !== 6) {
+    $q.notify({ type: 'negative', message: 'Please enter a valid 6-digit OTP.' });
+    return;
+  }
+  verifying.value = true;
+  try {
+    const response = await fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000'}/api/auth/verify-otp`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: email.value.trim(), otp: otp.value }),
+    });
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    const data = await response.json();
+    if (data.success) {
+      $q.notify({ type: 'positive', message: 'Account created successfully! Redirecting to login...' });
+      router.push('/login');
+    } else {
+      $q.notify({ type: 'negative', message: data.message || 'OTP verification failed.' });
+    }
+  } catch (error) {
+    console.error('Error in verifyOtp:', error);
+    let message = 'An error occurred while verifying OTP. Please try again later.';
+    if (error.message.includes('NetworkError')) {
+      message = 'Network error: Please check your internet connection.';
+    } else if (error.message.includes('404')) {
+      message = 'API endpoint not found. Please contact support.';
+    } else if (error.message.includes('500')) {
+      message = 'Server error: Unable to verify OTP. Try again later.';
+    }
+    $q.notify({ type: 'negative', message });
+  } finally {
+    verifying.value = false;
+  }
 }
 </script>
 
