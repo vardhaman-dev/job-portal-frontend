@@ -30,12 +30,14 @@
       </p>
 
       <div class="category-grid">
+        <q-card class="category-card cursor-pointer" @click="gotoCategory('Technology')">
         <div class="category-card">
           <div class="icon">💻</div>
           <h3>Information Technology</h3>
           <p class="count">12,500+ jobs</p>
           <small>Software, Web Development, Data Science</small>
         </div>
+        </q-card>
         <div class="category-card">
           <div class="icon">📈</div>
           <h3>Marketing & Sales</h3>
@@ -135,15 +137,28 @@
 <script>
 import AppHeader from '../components/HeaderPart.vue';
 import AppFooter from '../components/FooterPart.vue';
+import { useRouter } from 'vue-router';
 
 export default {
   name: 'HomePage',
   components: {
     AppHeader,
     AppFooter
+  },
+  setup() {
+    const router = useRouter();
+
+    function gotoCategory(category) {
+      router.push({ name: 'JobListing', params: { category } });
+    }
+
+    return {
+      gotoCategory
+    };
   }
-}
+};
 </script>
+
 
 <style scoped>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');

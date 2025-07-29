@@ -16,9 +16,15 @@ const routes = [
         component: () => import('pages/EmployerHomePage.vue')
       },
       {
+<<<<<<< HEAD
         path: 'post-job', // ✅ this is the new route
         name: 'PostNewJob',
         component: () => import('components/PostNewJob.vue')
+=======
+        path: 'job-listing',               
+        name: 'JobListing',
+        component: () => import('pages/JobListing.vue')
+>>>>>>> 4088a5a05852be32dfdce16158721306edf097a8
       },
        {path: '/resume-builder',
         component: () => import('../components/resume-builder.vue') }
