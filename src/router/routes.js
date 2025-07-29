@@ -15,6 +15,11 @@ const routes = [
         name: 'Employers',
         component: () => import('pages/EmployerHomePage.vue')
       },
+      {
+        path: 'post-job', // ✅ this is the new route
+        name: 'PostNewJob',
+        component: () => import('components/PostNewJob.vue')
+      },
        {path: '/resume-builder',
         component: () => import('../components/resume-builder.vue') }
     ]
