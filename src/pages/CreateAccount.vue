@@ -1,8 +1,15 @@
 <template>
   <q-page class="flex flex-center bg-grey-1">
-    <q-card class="q-pa-xl q-mx-sm" style="width: 100%; max-width: 450px; border-radius: 16px;">
+    <q-card
+      class="q-pa-xl q-mx-sm"
+      style="width: 100%; max-width: 500px; border-radius: 16px;"
+    >
       <!-- Back to Home -->
-      <div class="q-mb-lg row items-center text-grey-6 cursor-pointer" @click="goHome" style="font-size: 14px;">
+      <div
+        class="q-mb-lg row items-center text-grey-6 cursor-pointer"
+        @click="goBack"
+        style="font-size: 14px;"
+      >
         <q-icon name="arrow_back" size="20px" class="q-mr-sm" />
         <span class="text-weight-medium">Back to Home</span>
       </div>
@@ -12,65 +19,174 @@
         <q-avatar size="72px" class="bg-blue-1 q-mb-sm">
           <q-icon name="work" size="38px" color="#1565c0" />
         </q-avatar>
-        <div class="text-h5 text-weight-bold text-grey-9">Create Account</div>
-        <div class="text-subtitle2 text-grey-6">Join JobHub and start your journey</div>
+        <div class="text-h5 text-weight-bold text-grey-9">Create Your Account</div>
+        <div class="text-subtitle2 text-grey-6">Join our community of job seekers</div>
       </div>
+      <!-- Error Message -->
+      <q-banner
+        v-if="authStore.error"
+        class="bg-red-1 text-red q-mb-md"
+        rounded
+      >
+        {{ authStore.error }}
+        <template v-slot:action>
+          <q-btn flat color="red" icon="close" @click="authStore.clearError()" />
+        </template>
+      </q-banner>
 
-      <!-- Signup Form -->
-      <q-form @submit.prevent="createAccount" class="q-gutter-md">
+      <!-- Form -->
+      <q-form @submit.prevent="handleSubmit" class="q-gutter-md">
+        <!-- Name Fields -->
         <div class="row q-col-gutter-sm">
           <div class="col">
-            <q-input filled dense label="First name" v-model="firstName" class="bg-grey-2" borderless
-              :rules="[val => !!val || 'First name is required']" />
+            <q-input
+              filled
+              dense
+              label="First name"
+              v-model="formData.firstName"
+              class="bg-grey-2"
+              borderless
+              :rules="[val => !!val || 'First name is required']"
+              :disable="authStore.loading"
+            />
           </div>
           <div class="col">
-            <q-input filled dense label="Last name" v-model="lastName" class="bg-grey-2" borderless
-              :rules="[val => !!val || 'Last name is required']" />
+            <q-input
+              filled
+              dense
+              label="Last name"
+              v-model="formData.lastName"
+              class="bg-grey-2"
+              borderless
+              :rules="[val => !!val || 'Last name is required']"
+              :disable="authStore.loading"
+            />
           </div>
         </div>
 
-        <q-input filled dense label="Email address" v-model="email" type="email" class="bg-grey-2" borderless
-          :rules="[val => /.+@.+\..+/.test(val) || 'Valid email is required']" />
+        <!-- Email -->
+        <q-input
+          filled
+          dense
+          label="Email address"
+          v-model="formData.email"
+          type="email"
+          class="bg-grey-2"
+          borderless
+          :rules="[
+            val => !!val || 'Email is required',
+            val => /.+@.+\..+/.test(val) || 'Please enter a valid email'
+          ]"
+          lazy-rules
+          :disable="authStore.loading"
+        />
 
-        <q-input filled dense label="Create password" v-model="password" type="password" class="bg-grey-2" borderless
-          :rules="[val => val.length >= 8 || 'Password must be at least 8 characters']" />
+        <!-- Phone -->
+        <q-input
+          filled
+          dense
+          label="Phone number"
+          v-model="formData.phone"
+          class="bg-grey-2"
+          borderless
+          mask="(###) ### - ####"
+          :rules="[val => !!val || 'Phone number is required']"
+          :disable="authStore.loading"
+        >
+          <template v-slot:prepend>
+            <q-icon name="phone" />
+          </template>
+        </q-input>
 
-        <q-input filled dense label="Confirm password" v-model="confirmPassword" type="password" class="bg-grey-2"
-          borderless :rules="[val => val === password || 'Passwords do not match']" />
+        <!-- Password -->
+        <q-input
+          filled
+          dense
+          label="Password"
+          v-model="formData.password"
+          :type="showPassword ? 'text' : 'password'"
+          class="bg-grey-2"
+          borderless
+          :rules="[
+            val => !!val || 'Password is required',
+            val => val.length >= 8 || 'Password must be at least 8 characters'
+          ]"
+          lazy-rules
+          :disable="authStore.loading"
+        >
+          <template #append>
+            <q-icon
+              :name="showPassword ? 'visibility_off' : 'visibility'"
+              class="cursor-pointer"
+              @click="showPassword = !showPassword"
+              color="grey-6"
+            />
+          </template>
+        </q-input>
 
-        <q-checkbox v-model="agree" label="I agree to the Terms and Conditions & Privacy Policy"
-          :rules="[val => val === true || 'You must agree to the terms']" />
-        <q-checkbox v-model="subscribe" label="Subscribe to our newsletter for job updates" />
+        <!-- Confirm Password -->
+        <q-input
+          filled
+          dense
+          label="Confirm Password"
+          v-model="formData.confirmPassword"
+          :type="showConfirmPassword ? 'text' : 'password'"
+          class="bg-grey-2 q-mb-sm"
+          borderless
+          :rules="[
+            val => !!val || 'Please confirm your password',
+            val => val === formData.password || 'Passwords do not match'
+          ]"
+          lazy-rules
+          :disable="authStore.loading"
+        >
+          <template #append>
+            <q-icon
+              :name="showConfirmPassword ? 'visibility_off' : 'visibility'"
+              class="cursor-pointer"
+              @click="showConfirmPassword = !showConfirmPassword"
+              color="grey-6"
+            />
+          </template>
+        </q-input>
 
-        <q-btn label="Create Account" type="submit" unelevated rounded class="full-width bg-custom-blue" size="lg"
-          :loading="creatingAccount" />
+        <!-- Terms and Conditions -->
+        <q-checkbox
+          v-model="formData.termsAccepted"
+          label="I agree to the Terms of Service and Privacy Policy"
+          class="q-mt-md"
+          :rules="[val => !!val || 'You must accept the terms and conditions']"
+          :disable="authStore.loading"
+        />
 
-        <!-- Social Buttons (optional) -->
-        <div class="row items-center q-my-md no-wrap">
-          <q-separator class="col" />
-          <div class="q-px-sm text-grey-6 text-caption">or continue with</div>
-          <q-separator class="col" />
-        </div>
-
-        <q-btn outline class="full-width q-mb-sm" color="grey-8" no-caps size="md">
-          <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google"
-            style="width: 20px; margin-right: 8px;" />
-          Continue with Google
-        </q-btn>
-
-        <q-btn outline class="full-width" color="grey-9" no-caps size="md">
-          <img src="https://www.svgrepo.com/show/452234/linkedin.svg" alt="LinkedIn"
-            style="width: 20px; margin-right: 8px;" />
-          Continue with LinkedIn
+        <!-- Submit Button -->
+        <q-btn
+          label="Create Account"
+          type="submit"
+          class="full-width bg-custom-blue text-white"
+          size="lg"
+          :loading="authStore.loading"
+          unelevated
+        >
+          <template v-slot:loading>
+            <q-spinner-oval class="on-left" />
+            Creating Account...
+          </template>
         </q-btn>
       </q-form>
 
-      <!-- Sign In Link -->
-      <div class="q-mt-lg text-center text-grey-8">
-        Already have an account?
-        <span class="custom-blue cursor-pointer text-weight-medium" @click="$router.push('/login')">
-          Sign In
-        </span>
+      <!-- Login Link -->
+      <div class="text-center q-mt-lg">
+        <span class="text-grey-7">Already have an account? </span>
+        <q-btn
+          flat
+          label="Sign In"
+          class="q-pa-none text-weight-medium"
+          style="color: #1565c0;"
+          @click="goToLogin"
+          :disable="authStore.loading"
+        />
+>>>>>>> Stashed changes
       </div>
     </q-card>
   </q-page>
@@ -80,87 +196,95 @@
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { useQuasar } from 'quasar';
+import { useAuthStore } from 'src/stores/auth.store';
 
 const $q = useQuasar();
 const router = useRouter();
+const authStore = useAuthStore();
 
-const firstName = ref('');
-const lastName = ref('');
-const email = ref('');
-const password = ref('');
-const confirmPassword = ref('');
-const agree = ref(false);
-const subscribe = ref(false);
-const creatingAccount = ref(false);
+// Form data
+const formData = ref({
+  firstName: '',
+  lastName: '',
+  email: '',
+  phone: '',
+  password: '',
+  confirmPassword: '',
+  termsAccepted: false
+});
 
-function goHome() {
-  router.push('/');
-}
+const showPassword = ref(false);
+const showConfirmPassword = ref(false);
 
-function createAccount() {
-  if (!agree.value) {
-    $q.notify({ type: 'negative', message: 'You must agree to the terms to proceed.' });
-    return;
-  }
+// Handle form submission
+const handleSubmit = async () => {
+  try {
+    const result = await authStore.register({
+      firstName: formData.value.firstName,
+      lastName: formData.value.lastName,
+      email: formData.value.email,
+      phone: formData.value.phone.replace(/\D/g, ''), // Remove non-digit characters
+      password: formData.value.password
+    });
 
-  if (password.value !== confirmPassword.value) {
-    $q.notify({ type: 'negative', message: 'Passwords do not match.' });
-    return;
-  }
+    if (result.success) {
+      // Show success message
+      $q.notify({
+        type: 'positive',
+        message: 'Account created successfully! Redirecting...',
+        position: 'top',
+        timeout: 2000
+      });
 
-  creatingAccount.value = true;
-
-  setTimeout(() => {
-    const users = JSON.parse(localStorage.getItem('users') || '[]');
-
-    const existingUser = users.find(u => u.email.toLowerCase() === email.value.trim().toLowerCase());
-    if (existingUser) {
-      $q.notify({ type: 'negative', message: 'Email already registered.' });
-      creatingAccount.value = false;
-      return;
+      // Redirect to login page with email pre-filled
+      setTimeout(() => {
+        router.push({
+          path: '/login',
+          query: {
+            registered: 'true',
+            email: formData.value.email
+          }
+        });
+      }, 2000);
     }
+  } catch (error) {
+    console.error('Registration error:', error);
+  }
+};
 
-    const newUser = {
-      firstName: firstName.value.trim(),
-      lastName: lastName.value.trim(),
-      email: email.value.trim(),
-      password: password.value,
-      subscribed: subscribe.value,
-    };
+// Navigation methods
+const goBack = () => {
+  router.push('/');
+};
 
-    users.push(newUser);
-    localStorage.setItem('users', JSON.stringify(users));
-
-    const loggedInUser = {
-      name: `${newUser.firstName} ${newUser.lastName}`,
-      email: newUser.email,
-    };
-
-    localStorage.setItem('loggedInUser', JSON.stringify(loggedInUser));
-
-    $q.notify({ type: 'positive', message: 'Account created successfully!' });
-    router.push('/');
-    creatingAccount.value = false;
-  }, 800); // simulate delay
-}
+const goToLogin = () => {
+  router.push('/login');
+};
 </script>
 
 <style scoped>
-.q-card {
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
-  transition: box-shadow 0.3s ease;
-}
-
-.q-card:hover {
-  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
-}
-
-.custom-blue {
-  color: #1565c0 !important;
-}
-
 .bg-custom-blue {
-  background-color: #1565c0 !important;
+  background: #1565c0 !important;
   color: white !important;
+}
+
+:deep(.q-field--filled .q-field__control) {
+  border-radius: 8px !important;
+}
+
+:deep(.q-field--disabled) {
+  opacity: 0.7;
+}
+
+:deep(.q-field--filled .q-field__control:before) {
+  border: 1px solid rgba(0, 0, 0, 0.12);
+}
+
+:deep(.q-field--filled .q-field__control:hover:before) {
+  border-color: #1565c0;
+}
+
+:deep(.q-checkbox__inner) {
+  font-size: 14px;
 }
 </style>
