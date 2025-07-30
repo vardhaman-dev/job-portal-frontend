@@ -16,11 +16,6 @@ const routes = [
         component: () => import('pages/EmployerHomePage.vue')
       },
       {
-        path: 'job-listing',               
-        name: 'JobListing',
-        component: () => import('pages/JobListing.vue')
-      },
-      {
         path: 'job/:id', 
         name: 'JobDescription',
         component: () => import('pages/JobDescriptionPage.vue'),
