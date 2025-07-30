@@ -21,6 +21,11 @@ const routes = [
         component: () => import('pages/JobDescriptionPage.vue'),
         props: true 
       },
+      {
+        path: 'post-job',
+        name: 'PostNewJob',
+        component: () => import('components/PostNewJob.vue')
+      },
        {path: '/resume-builder',
         component: () => import('../components/resume-builder.vue') }
     ]
