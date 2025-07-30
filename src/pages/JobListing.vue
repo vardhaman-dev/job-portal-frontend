@@ -11,13 +11,15 @@
       <div class="col-9">
         <div class="row justify-between items-center q-mb-md">
           <q-input
-            filled dense
+            filled
+            dense
             v-model="search"
             placeholder="Search within results..."
             class="col-6"
           />
           <q-select
-            filled dense
+            filled
+            dense
             v-model="sortBy"
             :options="['Relevance', 'Newest', 'Salary: High to Low', 'Salary: Low to High']"
             label="Sort by"
@@ -27,77 +29,51 @@
 
         <!-- Animated Job Cards -->
         <transition-group name="fade-slide" tag="div">
-<q-card
-  v-for="job in filteredJobs"
-  :key="job.id"
-  class="q-mb-md job-card row items-center no-wrap"
->
-  <q-card-section class="col row items-center no-wrap q-pa-md">
-    <!-- Icon / Logo Placeholder -->
-    <q-avatar size="48px" class="bg-grey-3 text-grey-8 q-mr-md">
-      <q-icon name="business" size="28px" />
-    </q-avatar>
+          <router-link
+            v-for="job in filteredJobs"
+            :key="job.id"
+            :to="`/job/${job.id}`"
+            class="full-width no-underline"
+          >
+            <q-card class="q-mb-md job-card row items-center no-wrap">
+              <q-card-section class="col row items-center no-wrap q-pa-md">
+                <!-- Icon / Logo Placeholder -->
+                <q-avatar size="48px" class="bg-grey-3 text-grey-8 q-mr-md">
+                  <q-icon name="business" size="28px" />
+                </q-avatar>
 
-    <!-- Job Details -->
-    <div class="col">
-      <div class="text-subtitle1 text-weight-medium">{{ job.title }}</div>
-      <div class="text-caption text-grey-7">{{ job.company }}</div>
+                <!-- Job Details -->
+                <div class="col">
+                  <div class="text-subtitle1 text-weight-medium">{{ job.title }}</div>
+                  <div class="text-caption text-grey-7">{{ job.company }}</div>
 
-      <div class="row items-center text-caption text-grey-8 q-mt-xs q-gutter-sm">
-        <div class="row items-center">
-          <q-icon name="place" size="16px" class="q-mr-xs" />
-          {{ job.location }}
-        </div>
-        <div class="row items-center">
-          <q-icon name="attach_money" size="16px" class="q-mr-xs" />
-          {{ job.salary }}
-        </div>
-        <div class="row items-center">
-          <q-icon name="schedule" size="16px" class="q-mr-xs" />
-          {{ job.duration }}
-        </div>
-      </div>
+                  <div class="row items-center text-caption text-grey-8 q-mt-xs q-gutter-sm">
+                    <div class="row items-center">
+                      <q-icon name="place" size="16px" class="q-mr-xs" />
+                      {{ job.location }}
+                    </div>
+                    <div class="row items-center">
+                      <q-icon name="attach_money" size="16px" class="q-mr-xs" />
+                      {{ job.salary }}
+                    </div>
+                    <div class="row items-center">
+                      <q-icon name="schedule" size="16px" class="q-mr-xs" />
+                      {{ job.duration }}
+                    </div>
+                  </div>
 
-      <div class="q-mt-sm">
-        <q-badge
-          v-if="job.mode === 'Remote'"
-          color="green"
-          label="Remote"
-          class="q-mr-sm"
-        />
-        <q-badge
-          v-if="job.mode === 'Hybrid'"
-          color="blue"
-          label="Hybrid"
-          class="q-mr-sm"
-        />
-        <q-badge
-          v-if="job.mode === 'Work from Office'"
-          color="purple"
-          label="Work from Office"
-        />
-      </div>
-    </div>
-
-    <!-- Apply Now Button -->
-    <div class="q-ml-auto">
-      <q-btn
-        label="Apply Now"
-        class="apply-btn"
-        unelevated
-        no-caps
-        style="background-color: #1565c0; color: white"
-      />
-    </div>
-  </q-card-section>
-</q-card>
-
+                  <div class="q-mt-sm">
+                    <q-badge v-if="job.mode === 'Remote'" color="green" label="Remote" class="q-mr-sm" />
+                    <q-badge v-if="job.mode === 'Hybrid'" color="blue" label="Hybrid" class="q-mr-sm" />
+                    <q-badge v-if="job.mode === 'Work from Office'" color="purple" label="Work from Office" />
+                  </div>
+                </div>
+              </q-card-section>
+            </q-card>
+          </router-link>
         </transition-group>
 
-        <div
-          v-if="filteredJobs.length === 0"
-          class="q-mt-md text-grey text-center"
-        >
+        <div v-if="filteredJobs.length === 0" class="q-mt-md text-grey text-center">
           No jobs found matching your filters.
         </div>
       </div>
@@ -111,11 +87,11 @@ import { useRoute } from 'vue-router';
 import AppHeader from '../components/HeaderPart.vue';
 import JobSidebar from '../components/JobSidebar.vue';
 
-const route = useRoute()
-const category = computed(() => route.params.category?.toLowerCase().trim() || '')
+const route = useRoute();
+const category = computed(() => route.params.category?.toLowerCase().trim() || '');
 
-const search = ref('')
-const sortBy = ref('Relevance')
+const search = ref('');
+const sortBy = ref('Relevance');
 
 const filters = ref({
   workMode: [],
@@ -124,7 +100,7 @@ const filters = ref({
   salaryMax: 200000,
   roleCategory: [],
   duration: ''
-})
+});
 
 const jobList = ref([
   {
@@ -167,14 +143,14 @@ const jobList = ref([
     duration: 'Internship',
     category: 'Technology'
   }
-])
+]);
 
 const filteredJobs = computed(() => {
-  const cat = category.value
+  const cat = category.value;
 
   return jobList.value.filter(job => {
-    const jobSalary = parseInt(job.salary.replace(/\D/g, '')) || 0
-    const jobCat = job.category?.toLowerCase().trim() || ''
+    const jobSalary = parseInt(job.salary.replace(/\D/g, '')) || 0;
+    const jobCat = job.category?.toLowerCase().trim() || '';
 
     return (
       (!cat || jobCat === cat) &&
@@ -184,9 +160,9 @@ const filteredJobs = computed(() => {
       (filters.value.roleCategory.length === 0 || filters.value.roleCategory.includes(job.category)) &&
       (!filters.value.duration || filters.value.duration === job.duration) &&
       (search.value === '' || job.title.toLowerCase().includes(search.value.toLowerCase()))
-    )
-  })
-})
+    );
+  });
+});
 
 function clearFilters() {
   filters.value = {
@@ -196,7 +172,7 @@ function clearFilters() {
     salaryMax: 200000,
     roleCategory: [],
     duration: ''
-  }
+  };
 }
 </script>
 
@@ -221,17 +197,6 @@ function clearFilters() {
 .animated-job-card:hover {
   transform: translateY(-4px);
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
-}
-
-.apply-btn {
-  font-weight: 600;
-  border-radius: 8px;
-  transition: background-color 0.3s ease;
-  text-transform: none;
-}
-
-.apply-btn:hover {
-  background-color: #1565c0 !important;
 }
 
 /* Fade-slide animation */
@@ -266,10 +231,8 @@ function clearFilters() {
   box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
 }
 
-.apply-btn {
-  font-weight: 600;
-  border-radius: 8px;
-  min-width: 110px;
-  padding: 8px 16px;
+.no-underline {
+  text-decoration: none;
+  color: inherit;
 }
 </style>

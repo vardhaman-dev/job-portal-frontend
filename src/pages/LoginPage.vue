@@ -144,11 +144,24 @@ const showPassword = ref(false)
 const router = useRouter()
 
 const handleLogin = () => {
-  console.log('Login:', email.value, password.value)
-  if(email.value && password.value) {
-    router.push('/dashboard')
+  const users = JSON.parse(localStorage.getItem('users') || '[]');
+  const matchedUser = users.find(
+    u => u.email === email.value.trim() && u.password === password.value
+  );
+
+  if (matchedUser) {
+    const user = {
+      name: `${matchedUser.firstName} ${matchedUser.lastName}`,
+      email: matchedUser.email
+    };
+    localStorage.setItem('loggedInUser', JSON.stringify(user));
+    router.push('/');
+  } else {
+    console.warn('Invalid credentials');
+    alert('Invalid email or password');
   }
-}
+};
+
 </script>
 
 <style scoped>

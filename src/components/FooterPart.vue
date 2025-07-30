@@ -44,7 +44,7 @@
 </template>
 
 <style scoped>
-.footer { background: #2d6cff; color: white; padding: 60px 40px 20px; margin-top: 80px; }
+.footer { background: #1565c0; color: white; padding: 60px 40px 20px; margin-top: 80px; }
 .footer-top { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 40px; border-bottom: 1px solid rgba(255, 255, 255, 0.2); padding-bottom: 40px; }
 .footer-brand { max-width: 300px; }
 .footer-logo { font-size: 20px; font-weight: bold; margin-bottom: 10px; }

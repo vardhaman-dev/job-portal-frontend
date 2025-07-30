@@ -1,8 +1,12 @@
 <template>
   <div class="dashboard-header row items-center justify-between q-pa-lg">
     <div>
-      <h5 class="welcome-text handwritten">Welcome back, {{ userName }}!</h5>
-      <p class="subtext">Ready to find your next opportunity? Let’s explore what’s available for you.</p>
+      <h5 class="welcome-text handwritten">
+        {{ welcomeMessage }}
+      </h5>
+      <p class="subtext">
+        Ready to find your next opportunity? Let’s explore what’s available for you.
+      </p>
     </div>
     <div class="action-buttons">
       <q-btn
@@ -23,16 +27,41 @@
 </template>
 
 <script setup>
-defineProps(['userName']);
-defineEmits(['open-profile', 'go-resume']);
+import { ref, onMounted } from 'vue';
+
+const welcomeMessage = ref('Welcome!');
+
+onMounted(() => {
+  let userName = 'User';
+  const loginType = localStorage.getItem('loginType'); // optional; you can set this if needed
+
+  const userData = localStorage.getItem('loggedInUser');
+  if (userData) {
+    try {
+      const user = JSON.parse(userData);
+      userName = user.name || 'User';
+    } catch (e) {
+      console.error('Error parsing loggedInUser', e);
+    }
+  }
+
+  if (loginType === 'signup') {
+    welcomeMessage.value = `Welcome ${userName}!`;
+  } else if (loginType === 'login') {
+    welcomeMessage.value = `Welcome back, ${userName}!`;
+  } else {
+    welcomeMessage.value = `Welcome ${userName}!`;
+  }
+});
+
 </script>
 
 <style scoped>
 .dashboard-header {
-  background: white; /* Changed from gradient to plain white */
-  border-radius: 12px; /* Optional: slightly reduced rounding */
-  box-shadow: none; /* Removed glassy shadow */
-  border: 1px solid #e0e0e0; /* Light gray border for card-like look */
+  background: white;
+  border-radius: 12px;
+  box-shadow: none;
+  border: 1px solid #e0e0e0;
   padding: 30px;
   margin-bottom: 24px;
 }
@@ -84,5 +113,4 @@ defineEmits(['open-profile', 'go-resume']);
 .primary-btn:hover {
   background-color: #0d47a1;
 }
-
 </style>

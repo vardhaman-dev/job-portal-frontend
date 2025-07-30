@@ -182,7 +182,7 @@ export default {
 
 .logo {
   font-weight: 700;
-  color: #2d6cff;
+  color: #1565c0;
   font-size: 24px;
 }
 
@@ -194,7 +194,7 @@ export default {
   transition: color 0.2s;
 }
 .nav-links a:hover {
-  color: #2d6cff;
+  color: #1565c0;
 }
 
 .auth-buttons .sign-in {
@@ -204,11 +204,11 @@ export default {
   text-decoration: none;
 }
 .auth-buttons .sign-in:hover {
-  color: #2d6cff;
+  color: #1565c0;
 }
 
 .auth-buttons .sign-up {
-  background-color: #2d6cff;
+  background-color: #1565c0;
   color: white;
   padding: 8px 20px;
   border-radius: 6px;
@@ -230,7 +230,7 @@ export default {
   font-weight: 700;
 }
 .hero h1 span {
-  color: #2d6cff;
+  color: #1565c0;
 }
 .hero p {
   margin-top: 20px;
@@ -254,7 +254,7 @@ export default {
   font-size: 15px;
 }
 .search-box button {
-  background-color: #2d6cff;
+  background-color: #1565c0;
   color: white;
   padding: 14px 24px;
   border: none;
@@ -278,7 +278,7 @@ export default {
 }
 .stats strong {
   font-size: 24px;
-  color: #2d6cff;
+  color: #1565c0;
 }
 
 /* Categories */
@@ -293,7 +293,7 @@ export default {
   margin-bottom: 12px;
 }
 .categories h2 span {
-  color: #2d6cff;
+  color: #1565c0;
 }
 .categories p {
   font-size: 16px;
@@ -329,7 +329,7 @@ export default {
   margin-bottom: 6px;
 }
 .category-card .count {
-  color: #2d6cff;
+  color: #1565c0;
   font-weight: 700;
 }
 .category-card small {
@@ -345,7 +345,7 @@ export default {
 }
 .how-it-works h2 {
   font-size: 30px;
-  color: #2d6cff;
+  color: #1565c0;
   margin-bottom: 10px;
 }
 .how-it-works .subtitle {
@@ -378,7 +378,7 @@ export default {
   color: white;
 }
 .step-number {
-  background-color: #2d6cff;
+  background-color: #1565c0;
   color: white;
   width: 28px;
   height: 28px;
@@ -444,7 +444,7 @@ export default {
 .handwritten {
   font-family: 'Satisfy', cursive;
   font-size: 30px;
-  color: #2d6cff; /* Keep the same blue or adjust */
+  color: #1565c0; /* Keep the same blue or adjust */
   display: inline-block;
   margin-top: 10px;
   letter-spacing: 1px;
@@ -453,7 +453,7 @@ export default {
 }
 
 .footer {
-  background: #2d6cff;
+  background: #1565c0;
   color: white;
   padding: 60px 40px 20px;
   margin-top: 80px;
@@ -524,7 +524,7 @@ export default {
 
 .nav-links .active-link {
   position: relative;
-  color: #2d6cff;
+  color: #1565c0;
   font-weight: 700;
   transition: color 0.3s ease;
 }
@@ -536,7 +536,7 @@ export default {
   left: 0;
   width: 100%;
   height: 2px;
-  background-color: #2d6cff;
+  background-color: #1565c0;
   animation: slideIn 0.3s ease-out forwards;
 }
 
