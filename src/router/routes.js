@@ -16,13 +16,7 @@ const routes = [
         component: () => import('pages/EmployerHomePage.vue')
       },
       {
-        path: 'job/:id', 
-        name: 'JobDescription',
-        component: () => import('pages/JobDescriptionPage.vue'),
-        props: true 
-      },
-      {
-        path: 'post-job',
+        path: 'post-job', 
         name: 'PostNewJob',
         component: () => import('components/PostNewJob.vue')
       },
