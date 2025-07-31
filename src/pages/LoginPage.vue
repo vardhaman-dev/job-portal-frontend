@@ -7,7 +7,7 @@
       <!-- Back -->
       <div
         class="q-mb-lg row items-center text-grey-6 dark:text-grey-4 cursor-pointer"
-        @click="$router.push('/')"
+        @click="goBack"
         style="font-size: 14px;"
       >
         <q-icon name="arrow_back" size="20px" class="q-mr-sm" />
@@ -23,26 +23,58 @@
         <div class="text-subtitle2 text-grey-6 dark:text-grey-5">Sign in to your JobHub account</div>
       </div>
 
+      <!-- Error Message -->
+      <q-banner
+        v-if="authStore.error"
+        class="bg-red-1 text-red q-mb-md"
+        rounded
+      >
+        {{ authStore.error }}
+        <template v-slot:action>
+          <q-btn flat color="red" icon="close" @click="authStore.clearError()" />
+        </template>
+      </q-banner>
+
+      <!-- Success Message (for redirects after registration) -->
+      <q-banner
+        v-if="$route.query.registered"
+        class="bg-green-1 text-green q-mb-md"
+        rounded
+      >
+        Registration successful! Please log in with your credentials.
+      </q-banner>
+
       <!-- Form -->
-      <q-form @submit="handleLogin" class="q-gutter-md">
+      <q-form @submit.prevent="handleLogin" class="q-gutter-md">
+        <!-- Email Input -->
         <q-input
           filled
           dense
           label="Email address"
-          v-model="email"
+          v-model="formData.email"
           type="email"
           class="bg-grey-2 dark:bg-grey-9"
           borderless
+          :rules="[
+            val => !!val || 'Email is required',
+            val => /.+@.+\..+/.test(val) || 'Please enter a valid email'
+          ]"
+          lazy-rules
+          :disable="authStore.loading"
         />
 
+        <!-- Password Input -->
         <q-input
           filled
           dense
           label="Password"
-          v-model="password"
+          v-model="formData.password"
           :type="showPassword ? 'text' : 'password'"
           class="bg-grey-2 dark:bg-grey-9"
           borderless
+          :rules="[val => !!val || 'Password is required']"
+          lazy-rules
+          :disable="authStore.loading"
         >
           <template #append>
             <q-icon
@@ -54,9 +86,14 @@
           </template>
         </q-input>
 
-        <!-- Options -->
+        <!-- Remember Me & Forgot Password -->
         <div class="row items-center justify-between q-mt-sm">
-          <q-checkbox v-model="rememberMe" label="Remember me" size="sm" />
+          <q-checkbox
+            v-model="formData.rememberMe"
+            label="Remember me"
+            size="sm"
+            :disable="authStore.loading"
+          />
           <q-btn
             flat
             label="Forgot Password?"
@@ -64,6 +101,7 @@
             size="sm"
             class="q-pa-none"
             @click="$router.push('/forgot-password')"
+            :disable="authStore.loading"
           />
         </div>
 
@@ -75,7 +113,13 @@
           rounded
           type="submit"
           size="lg"
-        />
+          :loading="authStore.loading"
+        >
+          <template v-slot:loading>
+            <q-spinner-oval class="on-left" />
+            Signing in...
+          </template>
+        </q-btn>
 
         <!-- Divider -->
         <div class="row items-center q-my-md no-wrap">
@@ -84,13 +128,14 @@
           <q-separator class="col" />
         </div>
 
-        <!-- Social Login -->
+        <!-- Social Login (optional) -->
         <q-btn
           outline
           class="full-width q-mb-sm"
           color="grey-8"
           no-caps
           size="md"
+          :disable="authStore.loading"
         >
           <img
             src="https://www.svgrepo.com/show/475656/google-color.svg"
@@ -99,84 +144,122 @@
           />
           Continue with Google
         </q-btn>
-
-        <q-btn
-          outline
-          class="full-width"
-          color="grey-9"
-          no-caps
-          size="md"
-        >
-          <img
-            src="https://www.svgrepo.com/show/452234/linkedin.svg"
-            alt="LinkedIn"
-            style="width: 20px; margin-right: 8px;"
-          />
-          Continue with LinkedIn
-        </q-btn>
       </q-form>
 
-      <!-- Sign Up -->
-      <div class="q-mt-lg text-center text-grey-8 dark:text-grey-5">
-        Don’t have an account?
-        <span
-          class="custom-blue cursor-pointer text-weight-medium"
-          @click="$router.push('/create-account')"
-        >
-          Sign Up
-        </span>
+      <!-- Sign Up Link -->
+      <div class="text-center q-mt-lg">
+        <span class="text-grey-7">Don't have an account? </span>
+        <q-btn
+          flat
+          label="Sign Up"
+          class="q-pa-none text-weight-medium"
+          style="color: #1565c0;"
+          @click="goToSignup"
+          :disable="authStore.loading"
+        />
       </div>
     </q-card>
   </q-page>
 </template>
 
-
-
 <script setup>
-import { ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { ref, onMounted } from 'vue';
+import { useRouter, useRoute } from 'vue-router';
+import { useQuasar } from 'quasar';
+import { useAuthStore } from 'src/stores/auth.store';
 
-const email = ref('')
-const password = ref('')
-const rememberMe = ref(false)
-const showPassword = ref(false)
+const $q = useQuasar();
+const router = useRouter();
+const route = useRoute();
+const authStore = useAuthStore();
 
-const router = useRouter()
+// Form data
+const formData = ref({
+  email: '',
+  password: '',
+  rememberMe: false
+});
 
-const handleLogin = () => {
-  const users = JSON.parse(localStorage.getItem('users') || '[]');
-  const matchedUser = users.find(
-    u => u.email === email.value.trim() && u.password === password.value
-  );
+const showPassword = ref(false);
 
-  if (matchedUser) {
-    const user = {
-      name: `${matchedUser.firstName} ${matchedUser.lastName}`,
-      email: matchedUser.email
-    };
-    localStorage.setItem('loggedInUser', JSON.stringify(user));
-    router.push('/');
-  } else {
-    console.warn('Invalid credentials');
-    alert('Invalid email or password');
+// Check for registration success message on component mount
+onMounted(() => {
+  // If redirected from registration with success
+  if (route.query.registered === 'true' && route.query.email) {
+    formData.value.email = route.query.email;
+    $q.notify({
+      type: 'positive',
+      message: 'Registration successful! Please log in with your credentials.',
+      position: 'top',
+      timeout: 5000
+    });
+
+    // Clean up the URL
+    const cleanUrl = window.location.pathname;
+    window.history.replaceState({}, document.title, cleanUrl);
+  }
+
+  // Auto-focus email field if empty
+  if (!formData.value.email) {
+    const emailInput = document.querySelector('input[type="email"]');
+    if (emailInput) emailInput.focus();
+  }
+});
+
+// Handle form submission
+const handleLogin = async () => {
+  try {
+    const result = await authStore.login({
+      email: formData.value.email,
+      password: formData.value.password
+    });
+
+    if (result.success) {
+      // Show success message
+      $q.notify({
+        type: 'positive',
+        message: 'Login successful!',
+        position: 'top',
+        timeout: 2000
+      });
+
+      // Redirect to dashboard or intended URL
+      const redirectTo = authStore.returnUrl || '/';
+      router.push(redirectTo);
+
+      // Clear return URL after redirect
+      authStore.setReturnUrl(null);
+    }
+  } catch (error) {
+    console.error('Login error:', error);
   }
 };
 
+// Navigation methods
+const goBack = () => {
+  router.push('/');
+};
+
+const goToSignup = () => {
+  router.push('/create-account');
+};
 </script>
 
 <style scoped>
 .custom-blue {
   color: #1565c0 !important;
 }
+
 .bg-custom-blue {
-  background-color: #1565c0 !important;
+  background: #1565c0 !important;
   color: white !important;
 }
-.q-card {
-  transition: box-shadow 0.3s ease, transform 0.3s ease;
+
+:deep(.q-field--filled .q-field__control) {
+  border-radius: 8px !important;
 }
-.q-card:hover {
-  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.1);
-  transform: translateY(-2px);
+
+:deep(.q-field--disabled) {
+  opacity: 0.7;
 }
 </style>
