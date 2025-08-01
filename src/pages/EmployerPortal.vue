@@ -1,4 +1,6 @@
 <template>
+  <div class="employer-portal">
+     <AppHeader />
   <div class="page-wrapper row no-wrap">
     <div class="sidebar">
       <div class="sidebar-section logo-section flex items-center q-gutter-sm q-pa-md">
@@ -101,13 +103,18 @@
       </q-card>
     </div>
   </div>
+</div>
 </template>
 
 <script setup>
 import { ref, computed, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
+<<<<<<< HEAD
 import { useQuasar } from 'quasar';
 import VueApexCharts from 'vue3-apexcharts';
+=======
+import AppHeader from 'src/components/HeaderPart.vue';
+>>>>>>> dbb409b630bb491c185a7703cab2a0c3eefda511
 
 const apexchart = VueApexCharts;
 const router = useRouter();
