@@ -1,14 +1,33 @@
 <template>
   <div class="joblistingpage">
     <AppHeader />
-    <q-page class="row q-pa-md job-page-wrapper">
-      <!-- Sidebar -->
-      <div class="col-3 q-pr-md">
-        <JobSidebar :filters="filters" :clearFilters="clearFilters" />
-      </div>
 
-      <!-- Main Job Listings -->
+    <!-- 🔹 Horizontal Summary Cards -->
+    <!-- <div class="row q-col-gutter-md q-px-md q-pt-md no-wrap scroll-area">
+      <q-card
+        v-for="job in jobList"
+        :key="job.id"
+        class="summary-card q-pa-sm cursor-pointer"
+        flat
+        bordered
+      >
+        <q-card-section class="row items-center no-wrap">
+          <q-avatar size="40px" class="bg-grey-3 text-grey-8 q-mr-sm">
+            <q-icon name="work" />
+          </q-avatar>
+          <div>
+            <div class="text-subtitle2">{{ job.title }}</div>
+            <div class="text-caption text-grey-7">{{ job.company }}</div>
+          </div>
+        </q-card-section>
+      </q-card>
+    </div> -->
+
+    <!-- 🔸 Job Listings Section -->
+    <q-page class="row q-pa-md job-page-wrapper">
       <div class="col-9">
+
+        <!-- Search + Sort -->
         <div class="row justify-between items-center q-mb-md">
           <q-input
             filled
@@ -27,7 +46,19 @@
           />
         </div>
 
-        <!-- Animated Job Cards -->
+        <!-- Filters + Clear Button -->
+        <!-- <div class="q-mb-md">
+          <FilterBar :filters="filters" @update:filters="val => filters = val" />
+          <q-btn
+            label="Clear Filters"
+            color="primary"
+            class="q-mt-sm q-px-md"
+            unelevated
+            @click="clearFilters"
+          />
+        </div> -->
+        <JobFilters />
+        <!-- Job Cards -->
         <transition-group name="fade-slide" tag="div">
           <router-link
             v-for="job in filteredJobs"
@@ -37,12 +68,10 @@
           >
             <q-card class="q-mb-md job-card row items-center no-wrap">
               <q-card-section class="col row items-center no-wrap q-pa-md">
-                <!-- Icon / Logo Placeholder -->
                 <q-avatar size="48px" class="bg-grey-3 text-grey-8 q-mr-md">
                   <q-icon name="business" size="28px" />
                 </q-avatar>
 
-                <!-- Job Details -->
                 <div class="col">
                   <div class="text-subtitle1 text-weight-medium">{{ job.title }}</div>
                   <div class="text-caption text-grey-7">{{ job.company }}</div>
@@ -73,6 +102,7 @@
           </router-link>
         </transition-group>
 
+        <!-- No Jobs Found Message -->
         <div v-if="filteredJobs.length === 0" class="q-mt-md text-grey text-center">
           No jobs found matching your filters.
         </div>
@@ -85,13 +115,14 @@
 import { ref, computed } from 'vue';
 import { useRoute } from 'vue-router';
 import AppHeader from '../components/HeaderPart.vue';
-import JobSidebar from '../components/JobSidebar.vue';
+import JobFilters from '../components/FilterBar.vue';
 
 const route = useRoute();
 const category = computed(() => route.params.category?.toLowerCase().trim() || '');
 
 const search = ref('');
 const sortBy = ref('Relevance');
+
 
 const filters = ref({
   workMode: [],
@@ -164,16 +195,16 @@ const filteredJobs = computed(() => {
   });
 });
 
-function clearFilters() {
-  filters.value = {
-    workMode: [],
-    salaryRange: [0, 200000],
-    salaryMin: 0,
-    salaryMax: 200000,
-    roleCategory: [],
-    duration: ''
-  };
-}
+// function clearFilters() {
+//   filters.value = {
+//     workMode: [],
+//     salaryRange: [0, 200000],
+//     salaryMin: 0,
+//     salaryMax: 200000,
+//     roleCategory: [],
+//     duration: ''
+//   };
+// }
 </script>
 
 <style scoped>
@@ -187,19 +218,35 @@ function clearFilters() {
   margin: 0 auto;
 }
 
-.animated-job-card {
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+.scroll-area {
+  overflow-x: auto;
+  white-space: nowrap;
+}
+
+.summary-card {
+  min-width: 220px;
+  max-width: 240px;
+  flex: 0 0 auto;
+  border-radius: 12px;
+  transition: box-shadow 0.2s ease;
+}
+
+.summary-card:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+}
+
+.job-card {
   border-radius: 12px;
   background-color: #fff;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.08);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-.animated-job-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+.job-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
 }
 
-/* Fade-slide animation */
 .fade-slide-enter-active,
 .fade-slide-leave-active {
   transition: all 0.4s ease;
@@ -217,18 +264,6 @@ function clearFilters() {
 
 .q-badge {
   font-size: 12px;
-}
-
-.job-card {
-  border-radius: 12px;
-  background-color: #fff;
-  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.08);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.job-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
 }
 
 .no-underline {

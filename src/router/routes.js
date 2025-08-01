@@ -26,6 +26,12 @@ const routes = [
         name: 'PostNewJob',
         component: () => import('components/PostNewJob.vue')
       },
+      {
+        path: 'jobs/:category',
+        name: 'JobListing',
+        component: () => import('pages/JobListing.vue'),
+        props: true
+      },
        {path: '/resume-builder',
         component: () => import('../components/resume-builder.vue') }
     ]

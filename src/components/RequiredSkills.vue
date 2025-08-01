@@ -72,11 +72,12 @@ defineProps({ job: Object })
   border-radius: 16px;
   background-color: #ffffff;
   border: 1px solid #e0e0e0;
-  transition: box-shadow 0.3s ease, transform 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 1); /* base shadow */
+  transition: box-shadow 0.3s ease, transform 0.2s ease;
 }
 
 .skill-card:hover {
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1); /* hover shadow */
   transform: translateY(-2px);
 }
 
@@ -104,19 +105,6 @@ defineProps({ job: Object })
 .section-list li {
   margin-bottom: 4px;
   list-style: disc;
-}
-
-.skill-card {
-  border-radius: 20px;
-  background-color: #ffffff;
-  border: 1px solid #e0e0e0;
-  transition: box-shadow 0.3s ease, transform 0.2s ease;
-  cursor: pointer;
-}
-
-.skill-card:hover {
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
-  transform: translateY(-2px);
 }
 
 </style>

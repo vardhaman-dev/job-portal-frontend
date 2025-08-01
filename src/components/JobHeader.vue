@@ -34,8 +34,10 @@
             <q-tooltip>Bookmark</q-tooltip>
           </q-btn>
           <q-btn flat>
-              🔗
-            <q-tooltip>Share</q-tooltip>
+            <template #default>
+              <img :src="shareIcon" alt="Share" width="20" height="20" />
+              <q-tooltip>Share</q-tooltip>
+            </template>
           </q-btn>
         </div>
       </div>
@@ -45,6 +47,7 @@
 
 <script setup>
 import { ref } from 'vue'
+import shareIcon from '../assets/share.png'
 
 defineProps({ job: Object })
 
@@ -63,6 +66,7 @@ const isHovered = ref(false)
 
 .job-card:hover {
   transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(31, 101, 242, 0);
 }
 
 .job-title {

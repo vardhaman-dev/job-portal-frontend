@@ -186,7 +186,6 @@
           @click="goToLogin"
           :disable="authStore.loading"
         />
->>>>>>> Stashed changes
       </div>
     </q-card>
   </q-page>
