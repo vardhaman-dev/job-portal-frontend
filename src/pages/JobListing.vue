@@ -2,28 +2,6 @@
   <div class="joblistingpage">
     <AppHeader />
 
-    <!-- 🔹 Horizontal Summary Cards -->
-    <!-- <div class="row q-col-gutter-md q-px-md q-pt-md no-wrap scroll-area">
-      <q-card
-        v-for="job in jobList"
-        :key="job.id"
-        class="summary-card q-pa-sm cursor-pointer"
-        flat
-        bordered
-      >
-        <q-card-section class="row items-center no-wrap">
-          <q-avatar size="40px" class="bg-grey-3 text-grey-8 q-mr-sm">
-            <q-icon name="work" />
-          </q-avatar>
-          <div>
-            <div class="text-subtitle2">{{ job.title }}</div>
-            <div class="text-caption text-grey-7">{{ job.company }}</div>
-          </div>
-        </q-card-section>
-      </q-card>
-    </div> -->
-
-    <!-- 🔸 Job Listings Section -->
     <q-page class="row q-pa-md job-page-wrapper">
       <div class="col-9">
 
@@ -46,18 +24,9 @@
           />
         </div>
 
-        <!-- Filters + Clear Button -->
-        <!-- <div class="q-mb-md">
-          <FilterBar :filters="filters" @update:filters="val => filters = val" />
-          <q-btn
-            label="Clear Filters"
-            color="primary"
-            class="q-mt-sm q-px-md"
-            unelevated
-            @click="clearFilters"
-          />
-        </div> -->
+        <!-- Filters -->
         <JobFilters />
+
         <!-- Job Cards -->
         <transition-group name="fade-slide" tag="div">
           <router-link
@@ -102,7 +71,6 @@
           </router-link>
         </transition-group>
 
-        <!-- No Jobs Found Message -->
         <div v-if="filteredJobs.length === 0" class="q-mt-md text-grey text-center">
           No jobs found matching your filters.
         </div>
@@ -122,7 +90,6 @@ const category = computed(() => route.params.category?.toLowerCase().trim() || '
 
 const search = ref('');
 const sortBy = ref('Relevance');
-
 
 const filters = ref({
   workMode: [],
@@ -194,17 +161,6 @@ const filteredJobs = computed(() => {
     );
   });
 });
-
-// function clearFilters() {
-//   filters.value = {
-//     workMode: [],
-//     salaryRange: [0, 200000],
-//     salaryMin: 0,
-//     salaryMax: 200000,
-//     roleCategory: [],
-//     duration: ''
-//   };
-// }
 </script>
 
 <style scoped>
@@ -216,23 +172,6 @@ const filteredJobs = computed(() => {
 .job-page-wrapper {
   max-width: 1400px;
   margin: 0 auto;
-}
-
-.scroll-area {
-  overflow-x: auto;
-  white-space: nowrap;
-}
-
-.summary-card {
-  min-width: 220px;
-  max-width: 240px;
-  flex: 0 0 auto;
-  border-radius: 12px;
-  transition: box-shadow 0.2s ease;
-}
-
-.summary-card:hover {
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
 }
 
 .job-card {

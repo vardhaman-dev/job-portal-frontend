@@ -76,11 +76,12 @@ function selectOption(option) {
   left: 0;
   right: 0;
   /* position: static; */
-  /* margin-top: 6px; */
+  margin-top: 6px;
   background: white;
   border: 1px solid #e0e0e0;
   border-radius: 6px;
-  z-index: 1;
+  z-index: 101;
+  padding: 8px 0;  
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
   max-height: 180px;
   overflow-y: auto;

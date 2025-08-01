@@ -16,13 +16,7 @@ const routes = [
         component: () => import('pages/EmployerHomePage.vue')
       },
       {
-        path: 'job/:id', 
-        name: 'JobDescription',
-        component: () => import('pages/JobDescriptionPage.vue'),
-        props: true 
-      },
-      {
-        path: 'post-job',
+        path: 'post-job', 
         name: 'PostNewJob',
         component: () => import('components/PostNewJob.vue')
       },
@@ -32,10 +26,37 @@ const routes = [
         component: () => import('pages/JobListing.vue'),
         props: true
       },
+      {
+        path: 'job/:id',
+        name: 'JobDescription',
+        component: () => import('pages/JobDescriptionPage.vue'),
+        props: true
+      },
        {path: '/resume-builder',
         component: () => import('../components/resume-builder.vue') }
     ]
   },
+{
+  path: '/posted-jobs',
+  name: 'PostedJobs',
+  component: () => import('components/PostedJobs.vue')
+},
+{
+  path: '/candidates',
+  name: 'EmployerCandidates',
+  component: () => import('components/EmployerCandidates.vue')
+},
+{
+  path: '/employer-messages',
+  name: 'EmployerMessages',
+  component: () => import('components/EmployerMessages.vue')
+},
+{
+  path: '/company-profile',
+  name: 'CompanyProfile',
+  component: () => import('components/CompanyProfile.vue')
+}
+,
 
   {
     path: '/login',
