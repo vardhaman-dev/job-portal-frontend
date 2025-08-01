@@ -24,6 +24,27 @@ const routes = [
         component: () => import('../components/resume-builder.vue') }
     ]
   },
+{
+  path: '/posted-jobs',
+  name: 'PostedJobs',
+  component: () => import('components/PostedJobs.vue')
+},
+{
+  path: '/candidates',
+  name: 'EmployerCandidates',
+  component: () => import('components/EmployerCandidates.vue')
+},
+{
+  path: '/employer-messages',
+  name: 'EmployerMessages',
+  component: () => import('components/EmployerMessages.vue')
+},
+{
+  path: '/company-profile',
+  name: 'CompanyProfile',
+  component: () => import('components/CompanyProfile.vue')
+}
+,
 
   {
     path: '/login',
