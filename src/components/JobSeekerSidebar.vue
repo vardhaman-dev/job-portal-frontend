@@ -29,8 +29,8 @@ defineProps({
   selectedSection: String,
 })
 
+// Removed 'Browse Jobs' item
 const sidebarItems = [
-  { key: 'dashboard', label: 'Browse Jobs', icon: 'work' },
   { key: 'applications', label: 'My Applications', icon: 'assignment' },
   { key: 'bookmarks', label: 'Bookmarked Jobs', icon: 'bookmark' },
   { key: 'profile', label: 'My Profile', icon: 'person' },

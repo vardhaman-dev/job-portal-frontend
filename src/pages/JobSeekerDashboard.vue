@@ -18,105 +18,27 @@
 
         <!-- Main Content -->
         <div class="col-9">
-          <!-- DASHBOARD SECTION -->
-          <template v-if="selectedSection === 'dashboard'">
-            <q-card flat bordered class="q-pa-md q-mb-md search-box">
-              <div class="text-h6 q-mb-sm">Find Your Next Opportunity</div>
-              <q-input
-                rounded
-                dense
-                outlined
-                placeholder="Search by job title, company, or skills..."
-                color="primary"
-                class="q-mb-sm"
-              />
-              <div class="row q-col-gutter-md q-mb-sm">
-                <q-select class="col" label="Location" outlined dense :options="[]" />
-                <q-select class="col" label="Job Type" outlined dense :options="[]" />
-                <q-select class="col" label="Industry" outlined dense :options="[]" />
-              </div>
-              <div class="row items-center justify-between">
-                <span class="text-caption text-grey">Showing {{ paginatedJobs.length }} of {{ jobs.length }} jobs</span>
-                <q-btn flat icon="tune" label="More Filters" />
-              </div>
-            </q-card>
-
-            <transition-group :key="currentPage" name="fade" tag="div">
-              <q-card
-                v-for="job in paginatedJobs"
-                :key="job.id"
-                flat
-                bordered
-                class="job-card q-mb-md q-pa-md"
-              >
-                <div class="row justify-between items-center">
-                  <div>
-                    <div class="row items-center q-gutter-sm">
-                      <q-icon name="work" size="24px" class="text-primary" />
-                      <h6 class="q-mb-none text-weight-bold">{{ job.title }}</h6>
-                    </div>
-                    <div class="text-caption text-grey-7 q-mt-xs">
-                      <q-icon name="business" size="16px" /> {{ job.company }} • {{ job.location }}
-                      <q-icon name="attach_money" size="16px" class="q-ml-md" /> {{ job.salary }}
-                    </div>
-                    <div class="q-mt-sm">
-                      <q-chip
-                        v-for="skill in job.skills"
-                        :key="skill"
-                        dense
-                        color="blue-1"
-                        text-color="primary"
-                        class="q-mr-xs"
-                      >
-                        {{ skill }}
-                      </q-chip>
-                    </div>
-                    <div class="text-caption q-mt-xs text-grey-6">
-                      🕒 {{ job.posted }} • {{ job.type }}
-                    </div>
-                  </div>
-                  <div class="column items-end">
-                    <q-btn label="Apply Now" class="q-mb-sm primary-btn" />
-                    <q-btn flat round icon="bookmark_border" color="primary" />
-                  </div>
-                </div>
-              </q-card>
-            </transition-group>
-
-            <div class="custom-pagination q-mt-xl q-mb-lg row items-center justify-center q-gutter-sm">
-            <q-btn
-              flat
-              dense
-              label="Prev"
-              :disable="currentPage === 1"
-              @click="currentPage--"
-              class="nav-btn"
-            />
-
-            <q-pagination
-              v-model="currentPage"
-              :max="maxPage"
-              color="primary"
-              size="md"
-              flat
-              class="styled-pagination"
-            />
-
-            <q-btn
-              flat
-              dense
-              label="Next"
-              :disable="currentPage === maxPage"
-              @click="currentPage++"
-              class="nav-btn"
-            />
-          </div>
-
+          <!-- MY APPLICATIONS SECTION -->
+          <template v-if="selectedSection === 'applications'">
+            <MyApplications />
           </template>
 
           <!-- BOOKMARKED JOBS SECTION -->
           <template v-else-if="selectedSection === 'bookmarks'">
             <BookmarkedJobs :jobs="bookmarkedJobs" @remove="removeBookmark"/>
+          </template>
+
+          <!-- PROFILE SECTION -->
+          <template v-else-if="selectedSection === 'profile'">
+            <UserProfile />
+          </template>
+
+          <template v-else-if="selectedSection === 'notifications'">
+            <NotificationComponent />
+          </template>
+
+          <template v-else-if="selectedSection === 'settings'">
+            <SettingsComponent />
           </template>
         </div>
       </div>
@@ -133,13 +55,16 @@ import JobSeekerSidebar from 'components/JobSeekerSidebar.vue';
 import JobSeekerHeader from 'components/JobSeekerHeader.vue';
 import CompleteProfileModal from 'components/CompleteProfileModal.vue';
 import BookmarkedJobs from 'components/BookmarkedJobs.vue';
-
-import { ref, computed } from 'vue';
+import MyApplications from 'components/MyApplications.vue';
+import UserProfile from 'src/components/UserProfile.vue';
+import NotificationComponent from 'src/components/NotificationsPage.vue';
+import SettingsComponent from 'src/components/SettingsPage.vue';
+import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 
 const showProfileModal = ref(false);
 const userName = 'John';
-const selectedSection = ref('dashboard');
+const selectedSection = ref('applications');
 const router = useRouter();
 
 const goToResume = () => router.push('/resume-builder');
@@ -207,13 +132,6 @@ const removeBookmark = (id) => {
   bookmarkedJobs.value = bookmarkedJobs.value.filter(job => job.id !== id);
 };
 
-const currentPage = ref(1);
-const perPage = 3;
-const maxPage = computed(() => Math.ceil(jobs.value.length / perPage));
-const paginatedJobs = computed(() => {
-  const start = (currentPage.value - 1) * perPage;
-  return jobs.value.slice(start, start + perPage);
-});
 </script>
 
 <style scoped>

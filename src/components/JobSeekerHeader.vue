@@ -1,12 +1,20 @@
 <template>
   <div class="dashboard-header row items-center justify-between q-pa-lg">
-    <div>
-      <h5 class="welcome-text handwritten">
-        {{ welcomeMessage }}
-      </h5>
-      <p class="subtext">
-        Ready to find your next opportunity? Let’s explore what’s available for you.
-      </p>
+    <div class="row items-center">
+      <!-- Empty Avatar Placeholder -->
+      <q-avatar size="100px" class="q-mr-md bg-grey-3 text-grey-6">
+        <!-- optional: add icon -->
+        <q-icon name="person" size="32px" />
+      </q-avatar>
+
+      <div>
+        <h5 class="welcome-text handwritten">
+          {{ welcomeMessage }}
+        </h5>
+        <p class="subtext">
+          Ready to find your next opportunity? Let’s explore what’s available for you.
+        </p>
+      </div>
     </div>
     <div class="action-buttons">
       <q-btn
@@ -33,13 +41,13 @@ const welcomeMessage = ref('Welcome!');
 
 onMounted(() => {
   let userName = 'User';
-  const loginType = localStorage.getItem('loginType'); // optional; you can set this if needed
+  const loginType = localStorage.getItem('loginType');
 
   const userData = localStorage.getItem('loggedInUser');
   if (userData) {
     try {
-      const user = JSON.parse(userData);
-      userName = user.name || 'User';
+      const parsedUser = JSON.parse(userData);
+      userName = parsedUser.name || 'User';
     } catch (e) {
       console.error('Error parsing loggedInUser', e);
     }
@@ -53,7 +61,6 @@ onMounted(() => {
     welcomeMessage.value = `Welcome ${userName}!`;
   }
 });
-
 </script>
 
 <style scoped>
@@ -113,4 +120,20 @@ onMounted(() => {
 .primary-btn:hover {
   background-color: #0d47a1;
 }
+
+.profile-photo {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 2px solid #1565c0;
+}
+
+.profile-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
 </style>

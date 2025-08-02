@@ -313,6 +313,13 @@ export default {
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
   transition: transform 0.2s ease;
   text-align: center;
+  min-width: 260px;
+  max-width: 300px;
+  min-height: 330px;
+  height: 220px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 .category-card:hover {
   transform: translateY(-6px);
