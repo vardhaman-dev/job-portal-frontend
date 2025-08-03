@@ -21,7 +21,6 @@
 
 <script setup>
 import { reactive } from 'vue'
-import FilterDropdown from '../components/FilterDropdown.vue'
 
 const filters = reactive({
   workMode: '',
@@ -86,49 +85,52 @@ function applyFilters() {
 <style scoped>
 .filters-container {
   display: flex;
-  gap: 0.6rem;
-  background-color: #ffffff;
+  flex-wrap: wrap;
+  gap: 0.5rem;
   padding: 0.75rem 1rem;
-  border-radius: 10px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-  overflow: visible;
+  background-color: #fff;
 }
 
 .filter-card {
-  background: #f9fbfd;
-  border-radius: 8px;
-  padding: 0.6rem 0.8rem;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
-  transition: all 0.15s ease-in-out;
-  min-width: 140px;
-  flex-shrink: 0;
-  /* position: relative;
-  overflow: visible; */
-  position: static;
+  background-color: #e9e6e6;
+  color: #333;
+  padding: 0.5rem 1rem;
+  border-radius: 999px;
+  font-size: 14px;
+  font-weight: 500;
+  min-width: auto;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  white-space: nowrap;
 }
 
 .filter-card:hover {
-  box-shadow: 0 3px 10px rgba(0,0,0,0.1);
-  transform: translateY(-1px);
+  background-color: #d6d3d3;
+}
+
+.filter-card.active {
+  background-color: #444;
+  color: #fff;
 }
 
 .filter-actions {
   display: flex;
-  flex-direction: column;
-  justify-content: center;
-  margin-left: 0.8rem;
+  align-items: center;
+  gap: 0.5rem;
+  margin-left: auto;
 }
 
 .apply-filters-btn {
   background-color: #0a66c2;
   color: white;
   border: none;
-  border-radius: 6px;
-  padding: 6px 10px;
+  border-radius: 999px;
+  padding: 0.5rem 1rem;
   font-size: 13px;
+  font-weight: 500;
   cursor: pointer;
-  margin-bottom: 4px;
-  transition: background-color 0.2s ease;
 }
 
 .apply-filters-btn:hover {
@@ -136,16 +138,16 @@ function applyFilters() {
 }
 
 .clear-filters {
-  font-size: 12px;
-  font-weight: 500;
-  color: #333;
+  font-size: 13px;
+  color: #666;
   cursor: pointer;
   user-select: none;
-  opacity: 0.8;
 }
 
 .clear-filters:hover {
   text-decoration: underline;
-  opacity: 1;
+  color: #000;
 }
+
+
 </style>
