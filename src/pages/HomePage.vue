@@ -10,9 +10,9 @@
       </p>
 
       <div class="search-box">
-        <input type="text" placeholder="🔍 Job title or keyword" />
+    <input type="text" placeholder="🔍 Job title or keyword" v-model="searchInput" />
         <input type="text" placeholder="📍 City, state, or remote" />
-        <button>Search Jobs</button>
+        <button @click="performSearch">Search Jobs</button>
       </div>
 
       <div class="stats">
@@ -21,6 +21,8 @@
         <div><strong>2M+</strong><br />Job Seekers</div>
       </div>
     </section>
+    
+<JobListingPage :searchQuery="searchInput" />
 
     <section class="categories">
       <h2>Browse Jobs by <span>Category</span></h2>
@@ -137,24 +139,42 @@
 <script>
 import AppHeader from '../components/HeaderPart.vue';
 import AppFooter from '../components/FooterPart.vue';
+import JobListingPage from './JobListing.vue';
 import { useRouter } from 'vue-router';
+import {ref,  onMounted } from 'vue';
+import { useAuthStore } from '../stores/auth.store';
+import { storeToRefs } from 'pinia';
 
 export default {
   name: 'HomePage',
   components: {
     AppHeader,
-    AppFooter
+    AppFooter,
+    JobListingPage
   },
   setup() {
     const router = useRouter();
+    const searchInput = ref('');
+    const authStore = useAuthStore();
+    const { isAuthenticated } = storeToRefs(authStore); // ✅ make reactivity work
 
     function gotoCategory(category) {
       router.push({ name: 'JobListing', params: { category } });
     }
+function performSearch() {
+  searchInput.value = searchInput.value.trim(); // this will trigger watch in JobListingPage
+}
+
+    onMounted(() => {
+      authStore.initialize(); // ✅ ensure user data is loaded from localStorage
+    });
 
     return {
-      gotoCategory
-    };
+  gotoCategory,
+  isAuthenticated,
+  searchInput,
+  performSearch  // ✅ this was missing
+};
   }
 };
 </script>

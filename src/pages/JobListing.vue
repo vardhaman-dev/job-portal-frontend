@@ -5,15 +5,13 @@
     <q-page class="row q-pa-md job-page-wrapper">
       <div class="col-9">
 
-        <!-- Search + Sort -->
+        <!-- Suggestion Title -->
+        <div v-if="!searchQuery && authHelpers.getCurrentUser()" class="text-h6 q-mb-md">
+          Suggested for You
+        </div>
+
+        <!-- Sort -->
         <div class="row justify-between items-center q-mb-md">
-          <q-input
-            filled
-            dense
-            v-model="search"
-            placeholder="Search within results..."
-            class="col-6"
-          />
           <q-select
             filled
             dense
@@ -71,8 +69,20 @@
           </router-link>
         </transition-group>
 
+        <!-- Empty State -->
         <div v-if="filteredJobs.length === 0" class="q-mt-md text-grey text-center">
-          No jobs found matching your filters.
+          <div v-if="searchQuery">
+            <q-icon name="search_off" size="30px" class="q-mb-sm" />
+            No jobs found for "<strong>{{ searchQuery }}</strong>"
+          </div>
+          <div v-else-if="!authHelpers.getCurrentUser()">
+            <q-icon name="lock" size="30px" class="q-mb-sm" />
+            Please <router-link to="/login">log in</router-link> to get personalized job suggestions.
+          </div>
+          <div v-else>
+            <q-icon name="info" size="30px" class="q-mb-sm" />
+            No job suggestions available at the moment.
+          </div>
         </div>
       </div>
     </q-page>
@@ -80,16 +90,23 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted, watch } from 'vue';
 import { useRoute } from 'vue-router';
-import AppHeader from '../components/HeaderPart.vue';
-import JobFilters from '../components/FilterBar.vue';
+import suggestService from '../services/suggest.service';
+import searchService from '../services/search.service';
+import { authHelpers } from '../services/auth.service';
+
+const props = defineProps({
+  searchQuery: {
+    type: String,
+    default: ''
+  }
+});
 
 const route = useRoute();
 const category = computed(() => route.params.category?.toLowerCase().trim() || '');
-
-const search = ref('');
 const sortBy = ref('Relevance');
+const jobList = ref([]);
 
 const filters = ref({
   workMode: [],
@@ -100,67 +117,94 @@ const filters = ref({
   duration: ''
 });
 
-const jobList = ref([
-  {
-    id: 1,
-    title: 'Senior Frontend Developer',
-    company: 'TechCorp Inc.',
-    location: 'San Francisco, CA',
-    salary: '$120k-150k',
-    mode: 'Remote',
-    duration: 'Full-time',
-    category: 'Technology'
-  },
-  {
-    id: 2,
-    title: 'UX/UI Designer',
-    company: 'Design Studio',
-    location: 'New York, NY',
-    salary: '$85k-110k',
-    mode: 'Hybrid',
-    duration: 'Full-time',
-    category: 'Design'
-  },
-  {
-    id: 3,
-    title: 'Marketing Coordinator',
-    company: 'Growth Labs',
-    location: 'Austin, TX',
-    salary: '$55k-70k',
-    mode: 'Work from Office',
-    duration: 'Full-time',
-    category: 'Marketing'
-  },
-  {
-    id: 4,
-    title: 'Data Science Intern',
-    company: 'Analytics Pro',
-    location: 'Seattle, WA',
-    salary: '$25-35/hr',
-    mode: 'Remote',
-    duration: 'Internship',
-    category: 'Technology'
+
+const fetchJobs = async () => {
+  const currentUser = authHelpers.getCurrentUser();
+  const isLoggedIn = !!currentUser?.id;
+
+  try {
+    let result;
+
+    if (searchTerm.value && searchTerm.value.length > 0) {
+      console.log('🔍 Searching for:', searchTerm.value);
+      result = await searchService.searchJobs(searchTerm.value);
+
+      // 👇 Extract from result.data.jobs
+      jobList.value = result.success && Array.isArray(result.data.jobs)
+        ? result.data.jobs
+        : [];
+    } else if (isLoggedIn) {
+      console.log('🤖 Getting suggestions for:', currentUser.id);
+      result = await suggestService.getSuggestions(currentUser.id);
+
+      // 👇 result.data is already an array
+      jobList.value = result.success && Array.isArray(result.data)
+        ? result.data.map(job => ({
+            ...job,
+            id: job.jobId // rename jobId to id so router-link works
+          }))
+        : [];
+    } else {
+      jobList.value = [];
+    }
+
+    console.log('✅ Final jobList:', jobList.value);
+  } catch (err) {
+    console.error('🔥 API Error:', err);
+    jobList.value = [];
   }
-]);
+};
 
+
+onMounted(fetchJobs);
+const searchTerm = ref('');
+
+watch(() => props.searchQuery, (newQuery) => {
+  searchTerm.value = newQuery?.toLowerCase().trim() || '';
+  fetchJobs();
+});
 const filteredJobs = computed(() => {
+  const jobs = Array.isArray(jobList.value) ? jobList.value : [];
   const cat = category.value;
+  const isSearch = searchTerm.value !== '';
 
-  return jobList.value.filter(job => {
-    const jobSalary = parseInt(job.salary.replace(/\D/g, '')) || 0;
+  return jobs.filter(job => {
+    const jobSalary = parseInt(job.salary?.toString().replace(/\D/g, '')) || 0;
     const jobCat = job.category?.toLowerCase().trim() || '';
 
-    return (
-      (!cat || jobCat === cat) &&
-      (filters.value.workMode.length === 0 || filters.value.workMode.includes(job.mode)) &&
-      jobSalary >= filters.value.salaryMin &&
-      jobSalary <= filters.value.salaryMax &&
-      (filters.value.roleCategory.length === 0 || filters.value.roleCategory.includes(job.category)) &&
-      (!filters.value.duration || filters.value.duration === job.duration) &&
-      (search.value === '' || job.title.toLowerCase().includes(search.value.toLowerCase()))
-    );
+    if (isSearch) {
+      return (
+        (!cat || jobCat === cat) &&
+        (filters.value.workMode.length === 0 || filters.value.workMode.includes(job.mode)) &&
+        jobSalary >= filters.value.salaryMin &&
+        jobSalary <= filters.value.salaryMax &&
+        (filters.value.roleCategory.length === 0 || filters.value.roleCategory.includes(job.category)) &&
+        (!filters.value.duration || filters.value.duration === job.duration)
+      );
+    } else {
+      let tags = [];
+      try {
+        tags = Array.isArray(job.tags) ? job.tags : JSON.parse(job.tags || '[]');
+      } catch {
+        tags = [];
+      }
+
+      return (
+        (!cat || jobCat === cat) &&
+        (filters.value.workMode.length === 0 || filters.value.workMode.includes(job.mode)) &&
+        jobSalary >= filters.value.salaryMin &&
+        jobSalary <= filters.value.salaryMax &&
+        (filters.value.roleCategory.length === 0 || filters.value.roleCategory.includes(job.category)) &&
+        (!filters.value.duration || filters.value.duration === job.duration) &&
+        (
+          job.title.toLowerCase().includes(searchTerm.value) ||
+          tags.some(tag => tag.toLowerCase().includes(searchTerm.value))
+        )
+      );
+    }
   });
 });
+
 </script>
 
 <style scoped>
@@ -172,6 +216,9 @@ const filteredJobs = computed(() => {
 .job-page-wrapper {
   max-width: 1400px;
   margin: 0 auto;
+  display: flex;
+  justify-content: center;
+  min-height: 100vh;
 }
 
 .job-card {

@@ -100,58 +100,16 @@ import { useQuasar } from 'quasar';
 const router = useRouter();
 const $q = useQuasar();
 
-const employer = ref({ name: 'Innovate Inc.', email: 'hr@innovate.com' });
+const employer = ref({ name: '', email: '' });
 const selected = ref('Posted Jobs');
 
-// This ref will hold all jobs, now loaded from localStorage
 const jobs = ref([]);
-
-// This is the default data used ONLY if localStorage is empty
-const initialJobs = [
-  { id: 1, title: 'Senior Frontend Developer', datePosted: '2025-07-28', deadline: '2025-08-28', status: 'Approved', applicants: 25 },
-  { id: 2, title: 'UI/UX Designer', datePosted: '2025-07-25', deadline: '2025-08-20', status: 'Approved', applicants: 42 },
-  { id: 3, title: 'QA Engineer', datePosted: '2025-07-22', deadline: '2025-08-15', status: 'Pending Review', applicants: 15 },
-  { id: 4, title: 'DevOps Specialist', datePosted: '2025-07-20', deadline: '2025-08-10', status: 'Rejected', applicants: 8 },
-  { id: 5, title: 'Backend Developer (Node.js)', datePosted: '2025-07-18', deadline: '2025-08-18', status: 'Approved', applicants: 31 },
-];
-
-onMounted(() => {
-  const storedEmployer = localStorage.getItem('employerData');
-  if (storedEmployer) employer.value = JSON.parse(storedEmployer);
-
-  // FIX: Load jobs from localStorage
-  const storedJobs = localStorage.getItem('jobhubJobs');
-  if (storedJobs) {
-    jobs.value = JSON.parse(storedJobs);
-  } else {
-    // If no jobs are in storage, use the initial data and save it
-    jobs.value = initialJobs;
-    localStorage.setItem('jobhubJobs', JSON.stringify(initialJobs));
-  }
-});
-
-const links = [
-  { label: 'Dashboard Overview', icon: 'dashboard', to: '/employer-portal' },
-  { label: 'Posted Jobs', icon: 'work', to: '/posted-jobs' },
-  { label: 'Post New Job', icon: 'add_box', to: '/post-job' },
-  { label: 'Candidates', icon: 'groups', to: '/candidates' },
-  { label: 'Messages', icon: 'mail', to: '/employer-messages' },
-  { label: 'Company Profile', icon: 'domain', to: '/company-profile' },
-  { label: 'Settings', icon: 'settings' }
-];
-
-const navigate = (link) => {
-  selected.value = link.label;
-  if (link.to) router.push(link.to);
-};
-
-const logout = () => {
-  localStorage.removeItem('employerData');
-  router.push('/employers');
-};
-
+const initialJobs = []; // optionally keep empty or hardcoded as fallback
+const jobToDelete = ref(null);
+const showDeleteConfirm = ref(false);
 const searchQuery = ref('');
 const statusFilter = ref('All');
+
 const statusOptions = [
   { label: 'All Statuses', value: 'All' },
   { label: 'Approved', value: 'Approved' },
@@ -181,10 +139,8 @@ const filteredJobs = computed(() => {
     filtered = filtered.filter(job => job.status === statusFilter.value);
   }
   if (searchQuery.value) {
-    const lowerCaseQuery = searchQuery.value.toLowerCase();
-    filtered = filtered.filter(job =>
-      job.title.toLowerCase().includes(lowerCaseQuery)
-    );
+    const lower = searchQuery.value.toLowerCase();
+    filtered = filtered.filter(job => job.title.toLowerCase().includes(lower));
   }
   return filtered;
 });
@@ -198,15 +154,8 @@ const getStatusIcon = (status) => {
   }
 };
 
-const viewApplicants = (jobId) => {
-  router.push(`/candidates?jobId=${jobId}`);
-};
-const editJob = (jobId) => {
-  router.push(`/post-job?edit=${jobId}`);
-};
-
-const showDeleteConfirm = ref(false);
-const jobToDelete = ref(null);
+const viewApplicants = (jobId) => router.push(`/candidates?jobId=${jobId}`);
+const editJob = (jobId) => router.push(`/post-job?edit=${jobId}`);
 
 const confirmDelete = (job) => {
   jobToDelete.value = job;
@@ -217,18 +166,38 @@ const deleteJob = () => {
   const index = jobs.value.findIndex(j => j.id === jobToDelete.value.id);
   if (index > -1) {
     jobs.value.splice(index, 1);
-    // FIX: Save the updated jobs array back to localStorage
     localStorage.setItem('jobhubJobs', JSON.stringify(jobs.value));
-    $q.notify({
-      type: 'positive',
-      message: `Job "${jobToDelete.value.title}" deleted successfully.`,
-      icon: 'delete_sweep'
-    });
+    $q.notify({ type: 'positive', message: `Job "${jobToDelete.value.title}" deleted.`, icon: 'delete_sweep' });
   }
   showDeleteConfirm.value = false;
   jobToDelete.value = null;
 };
+
+const navigate = (link) => {
+  selected.value = link.label;
+  if (link.to) router.push(link.to);
+};
+
+const logout = () => {
+  localStorage.removeItem('employerData');
+  router.push('/employers');
+};
+
+onMounted(() => {
+  const storedEmployer = localStorage.getItem('employerData');
+  if (storedEmployer) employer.value = JSON.parse(storedEmployer);
+
+  const storedJobs = localStorage.getItem('jobhubJobs');
+  if (storedJobs) {
+    jobs.value = JSON.parse(storedJobs);
+  } else {
+    jobs.value = initialJobs;
+    localStorage.setItem('jobhubJobs', JSON.stringify(initialJobs));
+  }
+});
 </script>
+
+
 
 <style scoped>
 /* Sidebar and Page Wrapper styles */

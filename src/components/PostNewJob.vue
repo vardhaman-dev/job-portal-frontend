@@ -58,10 +58,42 @@
              <div class="q-gutter-y-lg">
                <div class="row q-col-gutter-x-md q-col-gutter-y-lg">
                  <div class="col-12 col-md-6"><q-input v-model="form.salary" label="Salary Range (per annum)" filled stack-label required hint="e.g., ₹8,00,000 - ₹12,00,000" /></div>
+                 
                  <div class="col-12 col-md-6"><q-input v-model="form.timeline" label="Recruitment Timeline" filled stack-label required hint="e.g., 'Immediate', 'Within 2 weeks'" /></div>
                </div>
                <q-input v-model="form.benefits" label="Bonus and Benefits (Optional)" filled stack-label />
              </div>
+              <q-separator spaced="xl" />
+             <!-- Tags input field -->
+<div class="row">
+  <div class="col-12">
+  <q-input
+  v-model="tagInput"
+  label="Job Tags"
+  filled
+  stack-label
+  hint="Type a tag and press Enter or comma"
+  @keyup="onTagKeyup"
+  @blur="addTag"
+>
+  <template v-slot:append>
+    <q-chip
+      v-for="(tag, index) in form.tags"
+      :key="index"
+      removable
+      @remove="form.tags.splice(index, 1)"
+      class="q-mr-xs"
+      color="primary"
+      text-color="white"
+    >
+      {{ tag }}
+    </q-chip>
+  </template>
+</q-input>
+
+  </div>
+</div>
+
              <q-separator spaced="xl" />
              <div>
                <div class="text-subtitle1 q-mb-sm text-weight-medium">Job Description</div>
@@ -164,11 +196,13 @@
 import { ref, computed, onMounted } from 'vue';
 import { useQuasar } from 'quasar';
 import { useRouter } from 'vue-router';
+import jobService from '../services/jobpost.service'
 
-const router = useRouter()
-const $q = useQuasar()
-const step = ref(1)
-const submitted = ref(false)
+const router = useRouter();
+const $q = useQuasar();
+const step = ref(1);
+const submitted = ref(false);
+const tagInput = ref(''); // Add ref for tag input
 
 const employer = ref({ name: 'Innovate Inc.', email: 'hr@innovate.com' });
 const selected = ref('Post New Job');
@@ -206,10 +240,11 @@ const stepSections = [
 
 const form = ref({
   title: '', location: '', type: null, positions: 1, timeline: '', salary: '', benefits: '', description: '',
-  experience: '', skills: '', education: '', communication: ['email'], resumeRequired: true, deadline: '', questions: []
+  experience: '', skills: '', education: '', communication: ['email'], resumeRequired: true, deadline: '',
+  questions: [], tags: []
 });
 
-const plainDescription = computed(() => (form.value.description || '').replace(/<[^>]*>/g, '').trim())
+const plainDescription = computed(() => (form.value.description || '').replace(/<[^>]*>/g, '').trim());
 const descriptionRules = [val => (val && plainDescription.value.length >= 200) || 'Minimum 200 characters required.'];
 
 let questionId = 0;
@@ -217,27 +252,60 @@ const addQuestion = () => form.value.questions.push({ id: questionId++, text: ''
 const removeQuestion = (index) => form.value.questions.splice(index, 1);
 const nextStep = () => { if (step.value < 5) step.value++ };
 
-const submitJob = () => {
+// Add tag handling methods
+const addTag = () => {
+  if (tagInput.value.trim()) {
+    form.value.tags.push(tagInput.value.trim());
+    tagInput.value = ''; // Clear input after adding
+  }
+};
+
+const onTagKeyup = (event) => {
+  if (event.key === 'Enter' || event.key === ',') {
+    event.preventDefault();
+    addTag();
+  }
+};
+
+const submitJob = async () => {
   submitted.value = true;
-  const existingJobs = JSON.parse(localStorage.getItem('jobhubJobs') || '[]');
-  const newJob = {
-    id: Date.now(),
+
+  const employerData = JSON.parse(localStorage.getItem('employerData') || '{}');
+  const payload = {
+    company_id: employerData.id,
     title: form.value.title,
-    datePosted: new Date().toISOString().split('T')[0],
-    deadline: form.value.deadline,
-    status: 'Pending',
-    applications: 0,
-    location: form.value.location,
     description: form.value.description,
+    location: form.value.location,
+    type: form.value.type,
+    salary: form.value.salary,
+    deadline: form.value.deadline,
+    skills: form.value.skills.split(',').map(s => s.trim()).filter(Boolean),
+    tags: form.value.tags,
+    status: 'open'
   };
-  existingJobs.push(newJob);
-  localStorage.setItem('jobhubJobs', JSON.stringify(existingJobs));
-  $q.notify({
-    type: 'positive', message: 'Job submitted successfully! Awaiting admin review.', position: 'top',
-    icon: 'cloud_done', timeout: 2500
-  });
-  setTimeout(() => { router.push('/employer-portal') }, 2000);
-}
+
+  console.log('Payload being sent:', payload); // Debug log to verify tags
+
+  const result = await jobService.postJob(payload);
+
+  if (result.success) {
+    $q.notify({
+      type: 'positive',
+      message: `Job posted successfully!`,
+      icon: 'check_circle',
+      position: 'top'
+    });
+    setTimeout(() => router.push('/employer-portal'), 1500);
+  } else {
+    $q.notify({
+      type: 'negative',
+      message: `Error: ${result.error}`,
+      icon: 'error',
+      position: 'top'
+    });
+    submitted.value = false;
+  }
+};
 </script>
 
 <style scoped>
