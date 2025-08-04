@@ -55,8 +55,12 @@ const routes = [
   path: '/company-profile',
   name: 'CompanyProfile',
   component: () => import('components/CompanyProfile.vue')
-}
-,
+},
+  {
+    path: '/employer-settings',
+    name: 'EmployerSettings',
+    component: () => import('components/EmployerSettings.vue')
+  },
 
   {
     path: '/login',

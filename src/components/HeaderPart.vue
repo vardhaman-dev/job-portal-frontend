@@ -8,11 +8,14 @@
     </nav>
 
     <div class="auth-buttons">
-      <template v-if="!user">
+      <!-- UPDATED: This template block now checks if it's an employer page -->
+      <template v-if="!user && !isEmployerPage">
         <router-link to="/login" class="sign-in">Sign In</router-link>
         <router-link to="/create-account" class="sign-up">Sign Up</router-link>
       </template>
-      <template v-else>
+      
+      <!-- This logic now handles both user types -->
+      <template v-if="user">
         <div class="user-dropdown" @click="toggleDropdown">
           <div class="user-profile">
             <q-icon name="account_circle" class="q-mr-sm" />
@@ -20,10 +23,12 @@
             <q-icon name="arrow_drop_down" />
           </div>
 
-          <!-- Inside template -->
           <div v-if="showDropdown" class="dropdown-menu">
-            <div class="dropdown-item" @click="$router.push('/dashboard')">
-              Dashboard
+            <div v-if="user.type === 'seeker'" class="dropdown-item" @click="$router.push('/dashboard')">
+              Job Seeker Dashboard
+            </div>
+            <div v-if="user.type === 'employer'" class="dropdown-item" @click="$router.push('/employer-portal')">
+              Employer Dashboard
             </div>
             <q-separator class="q-my-xs" />
             <div class="dropdown-item logout-item" @click="logout">Logout</div>
@@ -45,33 +50,58 @@ export default {
       showDropdown: false
     };
   },
+  computed: {
+    isEmployerPage() {
+      const employerPaths = [
+        '/employer-portal',
+        '/posted-jobs',
+        '/post-job',
+        '/candidates',
+        '/employer-messages',
+        '/company-profile',
+        '/employer-settings'
+      ];
+      return employerPaths.includes(this.$route.path);
+    }
+  },
   mounted() {
-  this.fetchUser();
-},
-watch: {
-  $route() {
-    this.fetchUser(); // refresh on route change
-  }
-},
-methods: {
-  fetchUser() {
-    const userData = localStorage.getItem('loggedInUser');
-    this.user = userData ? JSON.parse(userData) : null;
+    this.fetchUser();
   },
-  toggleDropdown() {
-    this.showDropdown = !this.showDropdown;
+  watch: {
+    $route() {
+      this.fetchUser(); // Refresh user state on any route change
+    }
   },
-  logout() {
-    localStorage.removeItem('loggedInUser');
-    this.user = null;
-    this.showDropdown = false;
-    this.$router.push('/');
-  }
-}
+  methods: {
+    fetchUser() {
+      const seekerData = localStorage.getItem('loggedInUser');
+      const employerData = localStorage.getItem('employerData');
 
+      if (seekerData) {
+        this.user = { ...JSON.parse(seekerData), type: 'seeker' };
+      } else if (employerData) {
+        this.user = { ...JSON.parse(employerData), type: 'employer' };
+      } else {
+        this.user = null;
+      }
+    },
+    toggleDropdown() {
+      this.showDropdown = !this.showDropdown;
+    },
+    logout() {
+      if (this.user && this.user.type === 'employer') {
+        localStorage.removeItem('employerData');
+      } else {
+        localStorage.removeItem('loggedInUser');
+      }
+      
+      this.user = null;
+      this.showDropdown = false;
+      this.$router.push('/');
+    }
+  }
 };
 </script>
-
 
 <style scoped>
 /* Your navbar styles copied from original file */

@@ -1,4 +1,5 @@
 <template>
+<AppHeader class="sticky-header" />
   <div class="page-wrapper row no-wrap">
     <div class="sidebar">
       <div class="sidebar-section logo-section flex items-center q-gutter-sm q-pa-md">
@@ -173,6 +174,7 @@
 import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { useQuasar } from 'quasar';
+import AppHeader from 'src/components/HeaderPart.vue';
 
 const router = useRouter();
 const $q = useQuasar();
@@ -269,7 +271,7 @@ const links = [
   { label: 'Candidates', icon: 'groups', to: '/candidates' },
   { label: 'Messages', icon: 'mail', to: '/employer-messages' },
   { label: 'Company Profile', icon: 'domain', to: '/company-profile' },
-  { label: 'Settings', icon: 'settings' }
+  { label: 'Settings', icon: 'settings', to: '/employer-settings' }
 ];
 
 const navigate = (link) => {
@@ -286,6 +288,34 @@ const logout = () => {
 </script>
 
 <style scoped>
+.portal-layout {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden; /* Important to prevent double scrollbars */
+}
+
+.sticky-header {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  /* The header component has its own background and shadow */
+}
+
+.page-wrapper {
+  flex-grow: 1; /* Takes up the remaining vertical space */
+  overflow: hidden; /* Important */
+}
+
+/* Sidebar and Content Area take full height of the wrapper */
+.sidebar, .content-area {
+  height: 100%;
+}
+
+.content-area {
+  flex: 1;
+  overflow-y: auto;
+}
 .page-wrapper {
   height: 100vh;
   background-color: #f4f8fa;

@@ -1,4 +1,5 @@
 <template>
+<AppHeader class="sticky-header" />
   <div class="page-wrapper row no-wrap">
     <div class="sidebar">
       <div class="sidebar-section logo-section flex items-center q-gutter-sm q-pa-md">
@@ -87,7 +88,7 @@
       <q-card style="width: 500px">
         <q-card-section>
           <div class="text-h6">Create Broadcast Message</div>
-          <div class="text-caption">This message will appear on the dashboard for all users.</div>
+          <div class="text-caption">This message will appear on the dashboard.</div>
         </q-card-section>
         <q-card-section class="q-gutter-y-md">
           <q-input v-model="broadcastForm.text" type="textarea" outlined label="Broadcast Message" />
@@ -130,6 +131,7 @@
 import { ref, onMounted, nextTick } from 'vue';
 import { useRouter } from 'vue-router';
 import { useQuasar } from 'quasar';
+import AppHeader from 'src/components/HeaderPart.vue';
 
 const router = useRouter();
 const $q = useQuasar();
@@ -145,7 +147,6 @@ const broadcastForm = ref({ text: '', expiry: '' });
 onMounted(() => {
   const stored = localStorage.getItem('employerData');
   if (stored) employer.value = JSON.parse(stored);
-  // Select the first conversation by default
   if (conversations.value.length > 0) {
     selectConversation(conversations.value[0]);
   }
@@ -162,16 +163,8 @@ const conversations = ref([
   },
   {
     candidateId: 104, candidateName: 'Sneha Verma', unread: false,
-    messages: [
-      { sender: 'candidate', text: 'Thank you for scheduling the interview. I look forward to it!', timestamp: '2025-07-30T15:00:00Z' },
-    ]
+    messages: [ { sender: 'candidate', text: 'Thank you for scheduling the interview. I look forward to it!', timestamp: '2025-07-30T15:00:00Z' } ]
   },
-  {
-    candidateId: 105, candidateName: 'Vikram Singh', unread: false,
-    messages: [
-      { sender: 'candidate', text: 'Is the Backend Developer position open to remote work?', timestamp: '2025-08-01T08:15:00Z' },
-    ]
-  }
 ]);
 
 const scrollToBottom = () => {
@@ -211,32 +204,27 @@ const scheduleBroadcast = () => {
   localStorage.setItem('jobhubBroadcast', JSON.stringify(broadcastData));
   $q.notify({ type: 'positive', message: 'Broadcast scheduled successfully!' });
   showBroadcastDialog.value = false;
-  broadcastForm.value = { text: '', expiry: '' }; // Reset form
+  broadcastForm.value = { text: '', expiry: '' };
 };
 
-
 const links = [
-  { label: 'Dashboard Overview', icon: 'dashboard', to: '/employer-portal' },
-  { label: 'Posted Jobs', icon: 'work', to: '/posted-jobs' },
-  { label: 'Post New Job', icon: 'add_box', to: '/post-job' },
-  { label: 'Candidates', icon: 'groups', to: '/candidates' },
-  { label: 'Messages', icon: 'mail', to: '/employer-messages' },
-  { label: 'Company Profile', icon: 'domain', to: '/company-profile' },
-  { label: 'Settings', icon: 'settings' }
+    { label: 'Dashboard Overview', icon: 'dashboard', to: '/employer-portal' },
+    { label: 'Posted Jobs', icon: 'work', to: '/posted-jobs' },
+    { label: 'Post New Job', icon: 'add_box', to: '/post-job' },
+    { label: 'Candidates', icon: 'groups', to: '/candidates' },
+    { label: 'Messages', icon: 'mail', to: '/employer-messages' },
+    { label: 'Company Profile', icon: 'domain', to: '/company-profile' },
+    { label: 'Settings', icon: 'settings', to: '/employer-settings' }
 ];
-
 const navigate = (link) => {
   selected.value = link.label;
   if (link.to) router.push(link.to);
 };
-
 const logout = () => {
   localStorage.removeItem('employerData');
   router.push('/employers');
 };
-
 const formatTimeAgo = (dateString) => {
-    // This is a simplified version. For production, a library like date-fns is better.
     const date = new Date(dateString);
     const now = new Date();
     const diff = now.getTime() - date.getTime();
@@ -251,17 +239,36 @@ const formatTimeAgo = (dateString) => {
 </script>
 
 <style scoped>
-/* Basic styles for sidebar and page wrapper */
-.page-wrapper {
+.portal-layout {
+  display: flex;
+  flex-direction: column;
   height: 100vh;
-  background-color: #f4f8fa;
+  overflow: hidden; /* Important to prevent double scrollbars */
 }
-.sidebar {
-  width: 260px;
-  background-color: #102A43;
-  color: #f0f4f8;
-  display: flex; flex-direction: column;
+
+.sticky-header {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  /* The header component has its own background and shadow */
 }
+
+.page-wrapper {
+  flex-grow: 1; /* Takes up the remaining vertical space */
+  overflow: hidden; /* Important */
+}
+
+/* Sidebar and Content Area take full height of the wrapper */
+.sidebar, .content-area {
+  height: 100%;
+}
+
+.content-area {
+  flex: 1;
+  overflow-y: auto;
+}
+.page-wrapper { height: 100vh; background-color: #f4f8fa; }
+.sidebar { width: 260px; background-color: #102A43; color: #f0f4f8; display: flex; flex-direction: column; }
 .sidebar-section { border-bottom: 1px solid #243B55; }
 .logo-section { border-bottom-color: transparent; }
 .nav-list .q-item { color: #BCCCDC; padding: 12px; margin: 4px 12px; border-radius: 8px; }
@@ -270,38 +277,13 @@ const formatTimeAgo = (dateString) => {
 .logout-btn { color: #FFB5B5; border-radius: 8px; margin: 16px; }
 .logout-btn:hover { background-color: #d32f2f; color: #ffffff; }
 
-/* Chat-specific styles */
-.content-area {
-  flex: 1;
-  overflow-y: hidden;
-}
-.full-height {
-  height: 100%;
-}
-.conversation-list {
-  width: 350px;
-  min-width: 350px;
-  background-color: #fff;
-  border-right: 1px solid #e0e0e0;
-}
-.list-header {
-  border-bottom: 1px solid #e0e0e0;
-}
-.selected-convo {
-  background-color: #e3f2fd;
-}
-.chat-window {
-  flex-grow: 1;
-}
-.chat-header {
-  background-color: #f5f5f5;
-  border-bottom: 1px solid #e0e0e0;
-}
-.chat-messages {
-  background-color: #f4f8fa;
-}
-.chat-input-area {
-  background-color: #fff;
-  border-top: 1px solid #e0e0e0;
-}
+.content-area { flex: 1; overflow-y: hidden; }
+.full-height { height: 100%; }
+.conversation-list { width: 350px; min-width: 350px; background-color: #fff; border-right: 1px solid #e0e0e0; }
+.list-header { border-bottom: 1px solid #e0e0e0; }
+.selected-convo { background-color: #e3f2fd; }
+.chat-window { flex-grow: 1; }
+.chat-header { background-color: #f5f5f5; border-bottom: 1px solid #e0e0e0; }
+.chat-messages { background-color: #f4f8fa; }
+.chat-input-area { background-color: #fff; border-top: 1px solid #e0e0e0; }
 </style>

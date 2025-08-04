@@ -1,4 +1,5 @@
 <template>
+<AppHeader class="sticky-header" />
   <div class="page-wrapper row no-wrap">
     <div class="sidebar">
        <div class="sidebar-section logo-section flex items-center q-gutter-sm q-pa-md">
@@ -196,7 +197,8 @@
 import { ref, computed, onMounted } from 'vue';
 import { useQuasar } from 'quasar';
 import { useRouter } from 'vue-router';
-import jobService from '../services/jobpost.service'
+import jobService from '../services/jobpost.service';
+import AppHeader from 'src/components/HeaderPart.vue';
 
 const router = useRouter();
 const $q = useQuasar();
@@ -309,6 +311,33 @@ const submitJob = async () => {
 </script>
 
 <style scoped>
+.portal-layout {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden; 
+}
+
+.sticky-header {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  
+}
+
+.page-wrapper {
+  flex-grow: 1; 
+  overflow: hidden; 
+}
+
+.sidebar, .content-area {
+  height: 100%;
+}
+
+.content-area {
+  flex: 1;
+  overflow-y: auto;
+}
 /* Styles are unchanged */
 .page-wrapper {
   height: 100vh;
@@ -316,9 +345,9 @@ const submitJob = async () => {
 .sidebar {
   width: 260px;
   background-color: #102A43;
-  color: #f0f4f8;
   display: flex;
   flex-direction: column;
+  color: #f0f4f8;
 }
 .sidebar-section {
   border-bottom: 1px solid #243B55;
