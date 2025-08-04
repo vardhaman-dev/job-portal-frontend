@@ -249,6 +249,7 @@ export default {
         if (response.success) {
           // Store employer data in local storage
           const employerData = {
+            id:formData.value.id, // Use company name as ID for simplicity
             name: formData.value.companyName,
             email: formData.value.email,
             // Add any other employer data you want to store

@@ -237,6 +237,7 @@ const handleLogin = async () => {
     try {
       // Call the login action
       const { success, error } = await authStore.login({
+        id: formData.value.id, 
         email: formData.value.email.trim(),
         password: formData.value.password
       });

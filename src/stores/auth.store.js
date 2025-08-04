@@ -69,47 +69,53 @@ export const useAuthStore = defineStore('auth', {
 
     // Unified login for both job seekers and companies
     async login(credentials) {
-      this.loading = true;
-      this.error = null;
+  this.loading = true;
+  this.error = null;
 
-      try {
-        const result = await auth.login(credentials);
+  try {
+    const result = await auth.login(credentials);
 
-        if (result.success) {
-          // Save auth data
-          authHelpers.setAuthData(
-            result.data.token,
-            result.data.user
-          );
+    if (result.success) {
+      const user = result.data.user;
 
-          // Update store state
-          this.user = result.data.user;
-          this.role = result.role;
-          this.isAuthenticated = true;
+      // Save auth data
+      authHelpers.setAuthData(result.data.token, user);
 
-          return {
-            success: true,
-            role: result.role
-          };
-        } else {
-          this.error = result.error;
-          return {
-            success: false,
-            error: result.error
-          };
-        }
-      } catch (error) {
-        const errorMessage = error.response?.data?.message || 'An error occurred during login. Please try again.';
-        this.error = errorMessage;
-        console.error('Login error:', error);
-        return {
-          success: false,
-          error: errorMessage
-        };
-      } finally {
-        this.loading = false;
-      }
-    },
+      // Update store state
+      this.user = {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        companyProfile: result.data.company_profile || null
+      };
+
+      this.role = user.role;  // ✅ use from `user`, not `result`
+      this.isAuthenticated = true;
+
+      return {
+        success: true,
+        role: this.role
+      };
+    } else {
+      this.error = result.error;
+      return {
+        success: false,
+        error: result.error
+      };
+    }
+  } catch (error) {
+    const errorMessage = error.response?.data?.message || 'An error occurred during login. Please try again.';
+    this.error = errorMessage;
+    console.error('Login error:', error);
+    return {
+      success: false,
+      error: errorMessage
+    };
+  } finally {
+    this.loading = false;
+  }
+},
+
 
     // Logout
     logout() {
