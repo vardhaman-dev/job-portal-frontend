@@ -142,7 +142,7 @@ export default {
   },
   methods: {
     goToEmployerLogin() {
-      this.$router.push('/employer-login');
+      this.$router.push('/employer-signup');
     }
   }
 };

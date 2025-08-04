@@ -1,10 +1,11 @@
 import { defineStore } from 'pinia';
-import { jobSeekerAuth, authHelpers } from 'src/services/auth.service';
+import { auth, jobSeekerAuth, authHelpers } from 'src/services/auth.service';
 import { useRouter } from 'vue-router';
 
 export const useAuthStore = defineStore('auth', {
   state: () => ({
     user: null,
+    role: null, // 'job_seeker' or 'company'
     isAuthenticated: false,
     loading: false,
     error: null,
@@ -12,10 +13,10 @@ export const useAuthStore = defineStore('auth', {
   }),
 
   getters: {
-    isJobSeeker: (state) => state.user?.userType === 'jobseeker',
-    isEmployer: (state) => state.user?.userType === 'employer',
-    userType: (state) => state.user?.userType,
-    userData: (state) => state.user?.data || {}
+    isJobSeeker: (state) => state.role === 'job_seeker',
+    isEmployer: (state) => state.role === 'company',
+    userType: (state) => state.role,
+    userData: (state) => state.user || {}
   },
 
   actions: {
@@ -66,13 +67,13 @@ export const useAuthStore = defineStore('auth', {
       }
     },
 
-    // Job Seeker Login
+    // Unified login for both job seekers and companies
     async login(credentials) {
       this.loading = true;
       this.error = null;
 
       try {
-        const result = await jobSeekerAuth.login(credentials);
+        const result = await auth.login(credentials);
 
         if (result.success) {
           // Save auth data
@@ -82,21 +83,29 @@ export const useAuthStore = defineStore('auth', {
           );
 
           // Update store state
-          this.user = {
-            userType: 'jobseeker',
-            data: result.data.user
-          };
+          this.user = result.data.user;
+          this.role = result.role;
           this.isAuthenticated = true;
 
-          return { success: true };
+          return {
+            success: true,
+            role: result.role
+          };
         } else {
           this.error = result.error;
-          return { success: false, error: result.error };
+          return {
+            success: false,
+            error: result.error
+          };
         }
       } catch (error) {
-        this.error = 'An error occurred during login. Please try again.';
+        const errorMessage = error.response?.data?.message || 'An error occurred during login. Please try again.';
+        this.error = errorMessage;
         console.error('Login error:', error);
-        return { success: false, error: this.error };
+        return {
+          success: false,
+          error: errorMessage
+        };
       } finally {
         this.loading = false;
       }

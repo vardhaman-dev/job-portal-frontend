@@ -45,7 +45,7 @@
       </q-banner>
 
       <!-- Form -->
-      <q-form @submit.prevent="handleLogin" class="q-gutter-md">
+      <q-form @submit.prevent="handleLogin" class="q-gutter-md" ref="loginForm">
         <!-- Email Input -->
         <q-input
           filled
@@ -167,6 +167,7 @@ import { ref, onMounted } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { useQuasar } from 'quasar';
 import { useAuthStore } from 'src/stores/auth.store';
+import { Loading } from 'quasar';
 
 const $q = useQuasar();
 const router = useRouter();
@@ -181,6 +182,8 @@ const formData = ref({
 });
 
 const showPassword = ref(false);
+
+const loginForm = ref(null);
 
 // Check for registration success message on component mount
 onMounted(() => {
@@ -206,32 +209,68 @@ onMounted(() => {
   }
 });
 
+// Redirect user based on their role
+const redirectBasedOnRole = () => {
+  if (authStore.isJobSeeker) {
+    router.push(authStore.returnUrl || '/dashboard');
+  } else if (authStore.isEmployer) {
+    router.push(authStore.returnUrl || '/employer-portal');
+  }
+  authStore.setReturnUrl(null);
+};
+
 // Handle form submission
 const handleLogin = async () => {
   try {
-    const result = await authStore.login({
-      email: formData.value.email,
-      password: formData.value.password
+    // Reset any previous errors
+    authStore.clearError();
+
+    // Validate form
+    const valid = await loginForm.value.validate();
+    if (!valid) return;
+
+    // Show loading state
+    Loading.show({
+      message: 'Signing in...'
     });
 
-    if (result.success) {
-      // Show success message
-      $q.notify({
-        type: 'positive',
-        message: 'Login successful!',
-        position: 'top',
-        timeout: 2000
+    try {
+      // Call the login action
+      const { success, error } = await authStore.login({
+        email: formData.value.email.trim(),
+        password: formData.value.password
       });
 
-      // Redirect to dashboard or intended URL
-      const redirectTo = authStore.returnUrl || '/';
-      router.push(redirectTo);
+      if (success) {
+        // Show success message
+        $q.notify({
+          type: 'positive',
+          message: 'Login successful!',
+          position: 'top',
+          timeout: 1500
+        });
 
-      // Clear return URL after redirect
-      authStore.setReturnUrl(null);
+        // Redirect based on role
+        redirectBasedOnRole();
+      } else {
+        // Show error message
+        $q.notify({
+          type: 'negative',
+          message: error || 'Login failed. Please try again.',
+          position: 'top'
+        });
+      }
+    } finally {
+      Loading.hide();
     }
   } catch (error) {
     console.error('Login error:', error);
+    $q.notify({
+      type: 'negative',
+      message: 'An error occurred during login. Please try again.'
+    });
+  } finally {
+    Loading.hide();
   }
 };
 

@@ -24,6 +24,94 @@ api.interceptors.request.use(
   }
 );
 
+// Company Auth API
+export const companyAuth = {
+  // Register a new company
+  register: async (companyData) => {
+    try {
+      console.log('Preparing registration payload with data:', companyData);
+
+      // Send exactly what the backend expects
+      const payload = {
+        companyName: companyData.companyName,
+        email: companyData.email,
+        password: companyData.password,
+        contactNumber: companyData.contactNumber
+      };
+
+      console.log('Sending registration request to /auth/company/register with payload:', payload);
+      const response = await api.post('/auth/company/register', payload);
+      return {
+        success: true,
+        data: response.data,
+      };
+    } catch (error) {
+      console.error('Company registration error:', error);
+      console.error('Error details:', {
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data,
+        message: error.message,
+        config: {
+          url: error.config?.url,
+          method: error.config?.method,
+          data: error.config?.data
+        }
+      });
+
+      let errorMessage = 'Company registration failed. Please try again.';
+
+      if (error.response?.data?.errors) {
+        // Handle validation errors
+        errorMessage = error.response.data.errors
+          .map(err => `${err.param}: ${err.msg}`)
+          .join('\n');
+      } else if (error.response?.data?.message) {
+        errorMessage = error.response.data.message;
+      }
+
+      return {
+        success: false,
+        error: errorMessage,
+        response: error.response?.data
+      };
+    }
+  },
+  // Add other company auth methods as needed
+};
+
+// Unified Auth API
+export const auth = {
+  // Unified login for both job seekers and companies
+  login: async (credentials) => {
+    try {
+      const response = await api.post('/auth/login', {
+        email: credentials.email,
+        password: credentials.password
+      });
+
+      return {
+        success: true,
+        data: response.data,
+        role: response.data.user.role // 'job_seeker' or 'company'
+      };
+    } catch (error) {
+      console.error('Login error:', error);
+
+      let errorMessage = 'Login failed. Please check your credentials and try again.';
+      if (error.response?.data?.message) {
+        errorMessage = error.response.data.message;
+      }
+
+      return {
+        success: false,
+        error: errorMessage,
+        response: error.response?.data
+      };
+    }
+  },
+};
+
 // Job Seeker Auth API
 export const jobSeekerAuth = {
   // Register a new job seeker
