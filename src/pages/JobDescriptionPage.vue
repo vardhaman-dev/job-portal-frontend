@@ -42,6 +42,7 @@ import CompanyInfo from 'src/components/CompanyInfo.vue'
 import AppFooter from 'src/components/FooterPart.vue'
 
 const job = ref({
+  id: 1,
   title: 'Senior Frontend Developer',
   company: 'TechCorp Inc.',
   location: 'San Francisco, CA',

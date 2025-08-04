@@ -33,12 +33,10 @@
 
       <div class="category-grid">
         <q-card class="category-card cursor-pointer" @click="gotoCategory('Technology')">
-        <div class="category-card">
           <div class="icon">💻</div>
           <h3>Information Technology</h3>
           <p class="count">12,500+ jobs</p>
           <small>Software, Web Development, Data Science</small>
-        </div>
         </q-card>
         <div class="category-card">
           <div class="icon">📈</div>

@@ -28,6 +28,7 @@
           :style="{ backgroundColor: '#1565c0', color: 'white' }"
           class="q-mb-sm"
           unelevated
+          @click="goToApplicationForm"
         />
         <div class="q-gutter-sm">
           <q-btn flat icon="bookmark_border">
@@ -45,14 +46,27 @@
   </q-card>
 </template>
 
+
 <script setup>
-import { ref } from 'vue'
+import { ref, toRef } from 'vue'
+import { useRouter } from 'vue-router'
 import shareIcon from '../assets/share.png'
 
-defineProps({ job: Object })
+const props = defineProps({ job: Object })
 
+const job = toRef(props, 'job') // makes job reactive
+const router = useRouter()
 const isHovered = ref(false)
+
+const goToApplicationForm = () => {
+  if (job.value?.id) {
+    router.push({ name: 'ApplicationForm', params: { jobId: job.value.id } })
+  } else {
+    console.warn('Job ID is missing')
+  }
+}
 </script>
+
 
 <style scoped>
 .transition-all {
