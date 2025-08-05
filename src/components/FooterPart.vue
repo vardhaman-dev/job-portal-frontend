@@ -29,9 +29,9 @@
         </div>
         <div>
           <h4>Company</h4>
-          <a href="#">About Us</a>
-          <a href="#">Contact</a>
-          <a href="#">Privacy Policy</a>
+          <router-link to="/about">About Us</router-link>
+          <router-link to="/contact">Contact</router-link>
+          <router-link to="/privacy-policy">Privacy Policy</router-link>
           <a href="#">Terms of Service</a>
         </div>
       </div>

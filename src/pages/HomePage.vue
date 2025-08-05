@@ -175,6 +175,7 @@ function performSearch() {
 };
   }
 };
+
 </script>
 
 
@@ -192,10 +193,13 @@ function performSearch() {
 .navbar {
   display: flex;
   justify-content: space-between;
-  padding: 20px 60px;
   align-items: center;
-  background-color: #fff;
+  padding: 20px 60px;
+  background: #fff;
   border-bottom: 1px solid #eaecef;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
 }
 
 .logo {
