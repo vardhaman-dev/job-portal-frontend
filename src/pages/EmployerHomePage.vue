@@ -7,23 +7,21 @@
         <p>Connect with over <strong>500,000</strong> pre‑screened professionals. Use AI-powered matching to find your perfect candidate in days, not months.</p>
         <div class="hero-buttons">
           <button class="btn primary" @click="goToEmployerLogin">Post a Job Now</button>
-
-          <button class="btn outline">Explore Talent Pool</button>
+          <button class="btn outline" @click="scrollToPricing">View Plans</button>
         </div>
-        <div class="hero-stats">
-          <div><strong>10K+</strong> Active Employers</div>
-          <div><strong>500K+</strong> Quality Candidates</div>
-          <div><strong>95%</strong> Successful Hires</div>
-          <div><strong>60%</strong> Faster Hiring</div>
+        <div class="hero-stats" ref="heroStats">
+          <div><strong ref="statEmployers">0</strong> Active Employers</div>
+          <div><strong ref="statCandidates">0</strong> Quality Candidates</div>
+          <div><strong ref="statHires">0</strong>% Successful Hires</div>
+          <div><strong ref="statSpeed">0</strong>% Faster Hiring</div>
         </div>
       </div>
       <div class="hero-image">
-        <!-- Replace with actual image -->
-        <img src="../assets/employee.jpg" alt="Employer happy direct hire">
+        <img src="../assets/employee.jpg" alt="Employer happy direct hire" class="hero-image-glow">
       </div>
     </section>
 
-    <section class="why-choose">
+    <section class="why-choose glass-section">
       <h2>Why Choose JobHub for Hiring?</h2>
       <p>Join thousands of companies that have transformed their hiring process with our platform.</p>
       <ul class="features-list">
@@ -34,7 +32,7 @@
       </ul>
     </section>
 
-    <section class="how-it-works">
+    <section class="how-it-works glass-section">
       <h2>How It Works</h2>
       <p>Get started with hiring in three simple steps. It's that easy.</p>
       <div class="steps">
@@ -56,7 +54,7 @@
       </div>
     </section>
 
-    <section class="employer-features">
+    <section class="employer-features glass-section">
       <h2>Powerful Features for Employers</h2>
       <p>Everything you need to streamline your hiring process and find the right talent.</p>
       <div class="features-grid">
@@ -83,6 +81,67 @@
       </div>
     </section>
 
+    <section class="pricing glass-section" id="pricing-section">
+      <div class="reveal-trigger" @click="isPricingVisible = !isPricingVisible">
+        <span>Checkout Our Pricing</span>
+        <span class="chevron" :class="{ 'rotated': isPricingVisible }"></span>
+      </div>
+      <transition name="expand">
+        <div v-if="isPricingVisible" class="collapsible-content">
+          <div class="pricing-toggle">
+            <label :class="{ active: billingCycle === 'monthly' }">Monthly</label>
+            <div class="toggle-switch" @click.stop="billingCycle = billingCycle === 'monthly' ? 'annually' : 'monthly'" :class="{ 'toggled': billingCycle === 'annually' }">
+              <div class="toggle-handle"></div>
+            </div>
+            <label :class="{ active: billingCycle === 'annually' }">Annually <span class="discount-badge">Save 20%</span></label>
+          </div>
+          <div class="pricing-cards">
+            <div class="pricing-card">
+              <h3>Basic</h3>
+              <p class="price">{{ billingCycle === 'monthly' ? '$49' : '$39' }}<span>/mo</span></p>
+              <ul><li>✓ 5 Job Posts</li><li>✓ Basic Company Profile</li><li>✓ Candidate Search</li><li>✗ AI Matching</li><li>✗ 24/7 Support</li></ul>
+              <button class="btn outline">Get Started</button>
+            </div>
+            <div class="pricing-card popular">
+              <span class="popular-badge">Most Popular</span>
+              <h3>Pro</h3>
+              <p class="price">{{ billingCycle === 'monthly' ? '$99' : '$79' }}<span>/mo</span></p>
+              <ul><li>✓ 20 Job Posts</li><li>✓ Premium Company Profile</li><li>✓ Candidate Search</li><li>✓ AI Matching</li><li>✓ 24/7 Support</li></ul>
+              <button class="btn primary">Get Started</button>
+            </div>
+            <div class="pricing-card">
+              <h3>Enterprise</h3>
+              <p class="price">Contact Us</p>
+              <ul><li>✓ Unlimited Job Posts</li><li>✓ Fully Customizable Profile</li><li>✓ Dedicated Account Manager</li><li>✓ Advanced Analytics</li><li>✓ Priority Support</li></ul>
+              <button class="btn outline">Contact Sales</button>
+            </div>
+          </div>
+        </div>
+      </transition>
+    </section>
+
+    <section class="testimonials glass-section">
+      <div class="reveal-trigger" @click="isTestimonialsVisible = !isTestimonialsVisible">
+        <span>Trusted by Leading Companies</span>
+        <span class="chevron" :class="{ 'rotated': isTestimonialsVisible }"></span>
+      </div>
+      <transition name="expand">
+        <div v-if="isTestimonialsVisible" class="collapsible-content">
+          <div class="testimonial-wrapper">
+            <transition name="slide-fade" mode="out-in">
+              <div class="testimonial-card" :key="currentTestimonialIndex">
+                <img :src="currentTestimonial.img" :alt="currentTestimonial.name" class="client-photo">
+                <p class="quote">"{{ currentTestimonial.quote }}"</p>
+                <p class="author"><strong>{{ currentTestimonial.name }}</strong>, {{ currentTestimonial.title }}</p>
+                <p class="company-logo">{{ currentTestimonial.company }}</p>
+              </div>
+            </transition>
+            <button @click="prevTestimonial" class="nav-btn prev-btn" aria-label="Previous testimonial">‹</button>
+            <button @click="nextTestimonial" class="nav-btn next-btn" aria-label="Next testimonial">›</button>
+          </div>
+        </div>
+      </transition>
+    </section>
 
     <footer class="footer">
       <div class="footer-top">
@@ -90,14 +149,12 @@
           <div class="footer-logo">💼 <strong>JobHub</strong></div>
           <p>Empowering employers to connect with top-tier professionals globally.</p>
         </div>
-
         <div class="footer-links">
           <div>
             <h4>For Employers</h4>
             <a href="#">Post a Job</a>
-            <a href="#">Find Candidates</a>
+            <a href="#pricing-section" @click.prevent="scrollToAndOpenPricing">Pricing</a>
             <a href="#">Employer Branding</a>
-            <a href="#">Pricing</a>
           </div>
           <div>
             <h4>For Job Seekers</h4>
@@ -106,13 +163,12 @@
           </div>
           <div>
             <h4>Company</h4>
-            <a href="#">About Us</a>
-            <a href="#">Contact</a>
-            <a href="#">Privacy Policy</a>
+            <router-link to="/about">About Us</router-link>
+            <router-link to="/contact">Contact</router-link>
+            <router-link to="/privacy-policy">Privacy Policy</router-link>
           </div>
         </div>
       </div>
-
       <div class="footer-bottom">
         © 2025 JobHub. All rights reserved.
       </div>
@@ -128,22 +184,123 @@ export default {
   components: {
     AppHeader
   },
+  data() {
+    return {
+      isPricingVisible: false,
+      isTestimonialsVisible: false,
+      billingCycle: 'monthly',
+      currentTestimonialIndex: 0,
+      testimonials: [
+        {
+          quote: "JobHub's AI matching is phenomenal. We filled our Senior Developer role in just two weeks, a process that used to take months. The quality of candidates was outstanding.",
+          name: 'Sarah Chen',
+          title: 'CTO, Innovate Inc.',
+          company: 'Innovate Inc.',
+          img: 'https://randomuser.me/api/portraits/women/44.jpg'
+        },
+        {
+          quote: "The platform is incredibly user-friendly and the support team is always responsive. We've cut our hiring time by more than half since we started using JobHub.",
+          name: 'David Lee',
+          title: 'HR Director, Tech Solutions',
+          company: 'Tech Solutions',
+          img: 'https://randomuser.me/api/portraits/men/32.jpg'
+        },
+        {
+          quote: "As a startup, finding the right talent quickly is crucial. JobHub gave us access to a pool of pre-screened professionals that we couldn't find anywhere else. A total game-changer.",
+          name: 'Maria Garcia',
+          title: 'CEO, NextGen Startups',
+          company: 'NextGen',
+          img: 'https://randomuser.me/api/portraits/women/33.jpg'
+        }
+      ],
+      observer: null
+    };
+  },
+  computed: {
+    currentTestimonial() {
+      return this.testimonials[this.currentTestimonialIndex];
+    }
+  },
   methods: {
     goToEmployerLogin() {
       this.$router.push('/employer-signup');
+    },
+    scrollToPricing() {
+        const pricingSection = document.getElementById('pricing-section');
+        pricingSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        this.isPricingVisible = true;
+    },
+    scrollToAndOpenPricing() {
+        this.scrollToPricing();
+    },
+    nextTestimonial() {
+      this.currentTestimonialIndex = (this.currentTestimonialIndex + 1) % this.testimonials.length;
+    },
+    prevTestimonial() {
+      this.currentTestimonialIndex = (this.currentTestimonialIndex - 1 + this.testimonials.length) % this.testimonials.length;
+    },
+    animateValue(ref, start, end, duration, suffix = '') {
+      let startTimestamp = null;
+      const step = (timestamp) => {
+        if (!startTimestamp) startTimestamp = timestamp;
+        const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+        const currentVal = Math.floor(progress * (end - start) + start);
+        ref.innerHTML = currentVal.toLocaleString() + suffix;
+        if (progress < 1) {
+          window.requestAnimationFrame(step);
+        }
+      };
+      window.requestAnimationFrame(step);
+    },
+    initIntersectionObserver() {
+      const options = {
+        root: null,
+        threshold: 0.5
+      };
+      this.observer = new IntersectionObserver((entries, observer) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            this.animateValue(this.$refs.statEmployers, 0, 10000, 2000, '+');
+            this.animateValue(this.$refs.statCandidates, 0, 500, 2000, 'K+');
+            this.animateValue(this.$refs.statHires, 0, 95, 2000, '%');
+            this.animateValue(this.$refs.statSpeed, 0, 60, 2000, '%');
+            observer.unobserve(entry.target);
+          }
+        });
+      }, options);
+      if (this.$refs.heroStats) {
+        this.observer.observe(this.$refs.heroStats);
+      }
+    }
+  },
+  mounted() {
+    this.initIntersectionObserver();
+  },
+  beforeUnmount() {
+    if (this.observer) {
+      this.observer.disconnect();
     }
   }
 };
 </script>
 
-
 <style scoped>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Satisfy&display=swap');
+
+/* --- NEW: Animated Background --- */
+@keyframes animatedGradient {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
 
 .landing-page {
   font-family: 'Inter', sans-serif;
   color: #2a2a2a;
-  background: linear-gradient(to bottom, #f9fbfd, #fff);
+  background: linear-gradient(-45deg, #d1e3ff, #f0f8ff, #e0f0ff, #f3eaff);
+  background-size: 400% 400%;
+  animation: animatedGradient 20s ease infinite;
 }
 
 .navbar {
@@ -151,306 +308,75 @@ export default {
   justify-content: space-between;
   align-items: center;
   padding: 20px 60px;
-  background: #fff;
-  border-bottom: 1px solid #eaecef;
+  background: rgba(255, 255, 255, 0.5);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
 }
 
-.logo { font-weight: 700; color: #2d6cff; font-size: 24px; }
-
-.nav-links a {
-  margin: 0 20px;
-  color: #333;
-  font-weight: 500;
-  text-decoration: none;
-  transition: color 0.2s;
+/* --- MODIFIED: Interactive Glassmorphism Sections --- */
+.glass-section {
+  margin: 40px 60px;
+  border-radius: 24px;
+  padding: 60px;
+  text-align: center; /* Center aligns h2 and p tags */
+  background: transparent;
+  border: 1px solid transparent; /* Prevents layout shift on hover */
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  box-shadow: none;
+  transition: background 0.4s ease, border-color 0.4s ease, backdrop-filter 0.4s ease, box-shadow 0.4s ease;
 }
 
-.nav-links a:hover,
-.nav-links .active-link { color: #2d6cff; }
-
-.auth-buttons .sign-in { margin-right: 15px; font-weight: 600; color: #333; }
-.auth-buttons .sign-in:hover { color: #2d6cff; }
-
-.auth-buttons .sign-up {
-  background: #2d6cff;
-  color: #fff;
-  padding: 8px 20px;
-  border-radius: 6px;
-  font-weight: 600;
-  text-decoration: none;
+.glass-section:hover {
+  background: rgba(255, 255, 255, 0.4); /* "Slightly white" on hover */
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.1);
 }
 
-.auth-buttons .sign-up:hover { background: #1c4fcf; }
 
-.hero-text {
-  max-width: 600px;
-}
-
+/* --- Hero Section (no glass effect) --- */
 .employer-hero {
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 80px 60px;
 }
+.hero-text { max-width: 600px; text-align: left;} /* Keep hero text left-aligned */
+.employer-hero h1 { font-size: 42px; font-weight: 700; margin-bottom: 20px; }
+.employer-hero p { font-size: 18px; color: #333; margin-bottom: 30px; }
+.hero-stats { display: flex; gap: 40px; font-size: 16px; margin-top: 40px; }
+.hero-stats strong { display: block; font-size: 28px; color: #2d6cff; min-width: 100px; text-align: left; }
+.hero-image-glow { max-width: 500px; border-radius: 12px; animation: pulseGlow 4s infinite ease-in-out; }
+.handwritten { font-family: 'Satisfy', cursive; font-size: 48px; color: #2d6cff; }
 
-.employer-hero h1 {
-  font-size: 42px;
-  font-weight: 700;
-  margin-bottom: 20px;
+/* --- Cards inside Glass Sections (remain visible) --- */
+.features-list li, .step, .feature, .pricing-card, .testimonial-card, .reveal-trigger {
+  background: rgba(255, 255, 255, 0.6) !important;
+  border: 1px solid rgba(255, 255, 255, 0.7) !important;
+  text-align: left; /* Reset text-align for card content where needed */
+}
+.step, .feature, .testimonial-card, .reveal-trigger {
+  text-align: center; /* Re-apply center alignment for specific cards */
 }
 
-.employer-hero h1 span { color: #2d6cff; }
 
-.employer-hero p {
-  font-size: 18px;
-  color: #555;
-  margin-bottom: 30px;
+.pricing-card.popular {
+  border-color: #2d6cff !important;
 }
 
-.hero-buttons .btn {
-  padding: 14px 24px;
-  border-radius: 8px;
-  font-weight: 600;
-  border: none;
-  cursor: pointer;
-  margin-right: 15px;
-  margin-bottom: 20px;
-}
+/* --- Original Styles (with minor adjustments if needed) --- */
+.logo{font-weight:700;color:#2d6cff;font-size:24px}.nav-links a{margin:0 20px;color:#333;font-weight:500;text-decoration:none;transition:color .2s}.nav-links a:hover,.nav-links .active-link{color:#2d6cff}.auth-buttons .sign-in{margin-right:15px;font-weight:600;color:#333;text-decoration:none}.auth-buttons .sign-in:hover{color:#2d6cff}.auth-buttons .sign-up{background:#2d6cff;color:#fff;padding:8px 20px;border-radius:6px;font-weight:600;text-decoration:none}.auth-buttons .sign-up:hover{background:#1c4fcf}.hero-buttons{text-align:left;}.hero-buttons .btn{padding:14px 24px;border-radius:8px;font-weight:600;border:none;cursor:pointer;margin-right:15px;margin-bottom:20px}.btn.primary{background:#2d6cff;color:#fff}.btn.primary:hover{background:#1c4fcf}.btn.outline{background:transparent;color:#2d6cff;border:2px solid #2d6cff}.btn.outline:hover{background:rgba(45,108,255,0.1)}.tagline{opacity:0;transform:scale(.8);animation:zoomIn .6s ease-out forwards;animation-delay:.2s}.why-choose h2{font-size:32px;margin-bottom:15px}.why-choose p{color:#666;margin-bottom:50px}.features-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:30px;list-style:none;padding:0;margin:0}.features-list li{padding:30px;border-radius:12px;position:relative;overflow:hidden;transition:transform .3s ease,box-shadow .3s ease;opacity:0;animation:fadeInUp .6s ease-out forwards}.features-list li:nth-child(1){animation-delay:.2s}.features-list li:nth-child(2){animation-delay:.4s}.features-list li:nth-child(3){animation-delay:.6s}.features-list li:nth-child(4){animation-delay:.8s}.features-list li::after{content:'';position:absolute;top:0;left:0;right:0;height:4px;background-color:#2d6cff;transform:translateY(-100%);transition:transform .3s ease}.features-list li:hover{transform:translateY(-8px);box-shadow:0 12px 28px rgba(0,0,0,.08)}.features-list li:hover::after{transform:translateY(0)}.features-list li strong{color:#2d6cff;display:block;margin-bottom:10px;font-size:18px}.how-it-works h2{font-size:32px;margin-bottom:10px}.how-it-works p{color:#666;margin-bottom:60px}.steps{display:flex;justify-content:center;gap:40px;flex-wrap:wrap;position:relative}.steps::before{content:'';position:absolute;top:25px;left:20%;right:20%;height:2px;background:repeating-linear-gradient(90deg,#c4d5ff,#c4d5ff 8px,transparent 8px,transparent 16px);z-index:0}.step{max-width:290px;padding:30px 25px;border-radius:16px;box-shadow:0 4px 15px rgba(0,0,0,.05);transition:transform .3s ease,box-shadow .3s ease;z-index:1;opacity:0;animation:popIn .6s cubic-bezier(.34,1.56,.64,1) forwards}.steps .step:nth-child(1){animation-delay:.3s}.steps .step:nth-child(2){animation-delay:.6s}.steps .step:nth-child(3){animation-delay:.9s}.step:hover{transform:translateY(-12px);box-shadow:0 10px 25px rgba(45,108,255,.15)}.step-number{background:linear-gradient(135deg,#2d6cff,#4e8bff);color:#fff;width:50px;height:50px;font-size:20px;font-weight:700;line-height:50px;border-radius:50%;margin:0 auto 20px;transition:transform .3s ease;box-shadow:0 4px 10px rgba(45,108,255,.3)}.step:hover .step-number{transform:scale(1.15)}.step h3{font-size:20px;margin-bottom:10px;color:#333}.step p{color:#555;font-size:15px;line-height:1.6}.employer-features h2{font-size:32px;margin-bottom:10px}.employer-features p{color:#666;margin-bottom:50px}.features-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:40px}.feature{padding:30px;border-radius:12px;transition:transform .3s ease,box-shadow .3s ease,border-color .3s ease;opacity:0;animation:fadeInUp .6s ease-out forwards}.features-grid .feature:nth-child(1){animation-delay:.2s}.features-grid .feature:nth-child(2){animation-delay:.4s}.features-grid .feature:nth-child(3){animation-delay:.6s}.features-grid .feature:nth-child(4){animation-delay:.8s}.feature:hover{transform:translateY(-8px);box-shadow:0 8px 20px rgba(0,0,0,.07);border-color:#2d6cff !important}.feature-icon{font-size:36px;color:#2d6cff;margin-bottom:15px;transition:transform .4s ease}.feature:hover .feature-icon{transform:rotateY(360deg)}.feature h4{transition:color .3s ease;margin-bottom:10px}.feature:hover h4{color:#2d6cff}.footer{background:rgba(45, 108, 255, 0.8); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); color:#fff;padding:60px 40px}.footer-top{display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;border-bottom:1px solid rgba(255,255,255,.2);padding-bottom:40px}.footer-logo{font-size:20px;font-weight:700;margin-bottom:10px}.footer-links h4{margin-bottom:10px}.footer-links a{display:block;color:#e0e0e0;text-decoration:none;margin-bottom:6px}.footer-links a:hover{color:#fff}.footer-bottom{text-align:center;margin-top:30px;font-size:13px}.footer-brand{max-width:300px;flex-shrink:0}.footer-links{display:flex;justify-content:flex-end;gap:60px}.footer-links>div{min-width:150px}
+@keyframes zoomIn{to{opacity:1;transform:scale(1)}}@keyframes pulseGlow{0%{box-shadow:0 0 15px rgba(45,108,255,.4)}50%{box-shadow:0 0 30px rgba(45,108,255,.6)}100%{box-shadow:0 0 15px rgba(45,108,255,.4)}}@keyframes fadeInUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}@keyframes popIn{from{opacity:0;transform:scale(.8)}to{opacity:1;transform:scale(1)}}
 
-.btn.primary {
-  background: #2d6cff;
-  color: #fff;
-}
+.pricing-toggle{display:flex;justify-content:center;align-items:center;margin-bottom:40px}.pricing-toggle label{font-weight:600;color:#555;transition:color .3s ease}.pricing-toggle label.active{color:#2d6cff}.toggle-switch{width:50px;height:26px;background:#ccc;border-radius:13px;margin:0 15px;cursor:pointer;position:relative;transition:background-color .3s ease}.toggle-switch.toggled{background-color:#2d6cff}.toggle-handle{width:22px;height:22px;background:#fff;border-radius:50%;position:absolute;top:2px;left:2px;transition:transform .3s ease}.toggle-switch.toggled .toggle-handle{transform:translateX(24px)}.discount-badge{background:rgba(45,108,255,0.1);color:#2d6cff;font-size:12px;font-weight:600;padding:3px 8px;border-radius:4px;margin-left:8px}.pricing-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:30px;max-width:1100px;margin:0 auto}.pricing-card:hover{transform:translateY(-10px);box-shadow:0 12px 28px rgba(0,0,0,0.08)}.pricing-card.popular{transform:scale(1.05);position:relative}.popular-badge{position:absolute;top:-15px;left:50%;transform:translateX(-50%);background:#2d6cff;color:#fff;padding:5px 15px;border-radius:15px;font-size:14px;font-weight:600}.pricing-card h3{font-size:24px;margin-bottom:10px}.pricing-card .price{font-size:42px;font-weight:700;color:#2d6cff;margin-bottom:30px}.pricing-card .price span{font-size:16px;font-weight:400;color:#666}.pricing-card ul{list-style:none;padding:0;margin-bottom:30px}.pricing-card li{margin-bottom:15px;color:#555}.pricing-card .btn{width:100%;text-align:center;padding:14px}
 
-.btn.primary:hover {
-  background: #1c4fcf;
-}
+.testimonial-wrapper{position:relative;max-width:800px;margin:0 auto}.client-photo{width:80px;height:80px;border-radius:50%;border:4px solid rgba(255,255,255,0.8);box-shadow:0 4px 10px rgba(0,0,0,0.1);margin-bottom:20px}.quote{font-size:18px;line-height:1.6;color:#555;margin-bottom:20px;font-style:italic}.author{font-size:16px;color:#333;margin-bottom:5px}.company-logo{font-size:14px;color:#2d6cff;font-weight:600}.nav-btn{position:absolute;top:50%;transform:translateY(-50%);background:rgba(255,255,255,0.5);border:1px solid #ddd;border-radius:50%;width:40px;height:40px;font-size:24px;cursor:pointer;transition:background-color .3s,border-color .3s;z-index:10}.nav-btn:hover{background:#2d6cff;color:#fff;border-color:#2d6cff}.prev-btn{left:-20px}.next-btn{right:-20px}.slide-fade-enter-active,.slide-fade-leave-active{transition:all .5s cubic-bezier(.55,0,.1,1)}.slide-fade-enter-from,.slide-fade-leave-to{opacity:0;transform:scale(.9)}
 
-.btn.outline {
-  background: white;
-  color: #2d6cff;
-  border: 2px solid #2d6cff;
-}
-
-.btn.outline:hover {
-  background: #f0f4ff;
-}
-
-.hero-stats {
-  display: flex;
-  gap: 40px;
-  font-size: 16px;
-  margin-top: 30px;
-}
-
-.hero-stats strong {
-  display: block;
-  font-size: 22px;
-  color: #2d6cff;
-}
-
-.hero-image img {
-  max-width: 500px;
-  border-radius: 12px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-}
-
-.why-choose {
-  text-align: center;
-  padding: 80px 60px;
-}
-
-.why-choose h2 {
-  font-size: 32px;
-  margin-bottom: 15px;
-}
-
-.why-choose p {
-  color: #666;
-  margin-bottom: 40px;
-}
-
-.features-list {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  gap: 30px;
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-.features-list li {
-  background: #fff;
-  padding: 30px;
-  border-radius: 12px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
-  text-align: left;
-}
-
-.features-list li strong {
-  color: #2d6cff;
-  display: block;
-  margin-bottom: 10px;
-}
-
-.footer {
-  background: #2d6cff;
-  color: #fff;
-  padding: 60px 40px;
-}
-
-.footer-top {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  flex-wrap: wrap;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-  padding-bottom: 40px;
-}
-
-.footer-logo { font-size: 20px; font-weight: bold; margin-bottom: 10px; }
-
-.footer-links h4 { margin-bottom: 10px; }
-.footer-links a {
-  display: block;
-  color: #e0e0e0;
-  text-decoration: none;
-  margin-bottom: 6px;
-}
-
-.footer-links a:hover {
-  color: #fff;
-}
-
-.footer-bottom {
-  text-align: center;
-  margin-top: 30px;
-  font-size: 13px;
-}
-
-.footer-brand {
-  max-width: 300px;
-  flex-shrink: 0;
-}
-
-.footer-links {
-  display: flex;
-  justify-content: flex-end;
-  gap: 60px;
-}
-
-.footer-links > div {
-  min-width: 150px;
-}
-
-.handwritten {
-  font-family: 'Satisfy', cursive;
-  font-size: 30px;
-  color: #2d6cff; /* Keep the same blue or adjust */
-  display: inline-block;
-  margin-top: 10px;
-  letter-spacing: 1px;
-  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.05);
-  font-size: larger;
-}
-
-.tagline {
-  opacity: 0;
-  transform: scale(0.8);
-  animation: zoomIn 0.6s ease-out forwards;
-  animation-delay: 0.2s;
-}
-
-@keyframes zoomIn {
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
-}
-
-.how-it-works {
-  text-align: center;
-  padding: 80px 60px;
-}
-
-.how-it-works h2 {
-  font-size: 30px;
-  margin-bottom: 10px;
-}
-
-.how-it-works p {
-  color: #666;
-  margin-bottom: 40px;
-}
-
-.steps {
-  display: flex;
-  justify-content: center;
-  gap: 60px;
-  flex-wrap: wrap;
-}
-
-.step {
-  max-width: 250px;
-  text-align: center;
-}
-
-.step-number {
-  background: #2d6cff;
-  color: #fff;
-  width: 50px;
-  height: 50px;
-  font-size: 20px;
-  font-weight: bold;
-  line-height: 50px;
-  border-radius: 50%;
-  margin: 0 auto 15px;
-}
-
-.step h3 {
-  font-size: 18px;
-  margin-bottom: 10px;
-}
-
-.step p {
-  color: #555;
-  font-size: 15px;
-}
-
-.employer-features {
-  background: #f8f9fc;
-  text-align: center;
-  padding: 80px 60px;
-}
-
-.employer-features h2 {
-  font-size: 28px;
-  margin-bottom: 10px;
-}
-
-.employer-features p {
-  color: #666;
-  margin-bottom: 40px;
-}
-
-.features-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 40px;
-}
-
-.feature {
-  background: #fff;
-  padding: 30px;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
-  text-align: center;
-}
-
-.feature-icon {
-  font-size: 30px;
-  color: #2d6cff;
-  margin-bottom: 15px;
-}
-
+.reveal-trigger{display:flex;align-items:center;justify-content:center;cursor:pointer;padding:20px;margin:0;max-width:none;border-radius:20px;transition:background-color .3s,box-shadow .3s}.reveal-trigger:hover{background-color:rgba(255,255,255,0.7) !important;box-shadow:none}.reveal-trigger span{font-size:20px;font-weight:600;color:#333}.reveal-trigger::before,.reveal-trigger::after{content:'';flex:1;height:1px;background:rgba(200,215,255,0.8);margin:0 20px}.chevron{display:inline-block;width:24px;height:24px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%232d6cff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");background-size:contain;transition:transform .4s ease;margin-left:15px}.chevron.rotated{transform:rotate(180deg)}.collapsible-content{padding-top:40px;overflow:hidden}.expand-enter-active,.expand-leave-active{transition:grid-template-rows .5s ease,opacity .5s ease}.expand-enter-from,.expand-leave-to{grid-template-rows:0fr;opacity:0}.expand-enter-to,.expand-leave-from{grid-template-rows:1fr;opacity:1}.collapsible-content{display:grid;grid-template-rows:1fr}
 </style>

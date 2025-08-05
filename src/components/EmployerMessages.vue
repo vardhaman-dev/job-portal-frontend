@@ -268,7 +268,7 @@ const formatTimeAgo = (dateString) => {
   overflow-y: auto;
 }
 .page-wrapper { height: 100vh; background-color: #f4f8fa; }
-.sidebar { width: 260px; background-color: #102A43; color: #f0f4f8; display: flex; flex-direction: column; }
+.sidebar { width: 260px; background-color: #1565c0; color: #f0f4f8; display: flex; flex-direction: column; }
 .sidebar-section { border-bottom: 1px solid #243B55; }
 .logo-section { border-bottom-color: transparent; }
 .nav-list .q-item { color: #BCCCDC; padding: 12px; margin: 4px 12px; border-radius: 8px; }

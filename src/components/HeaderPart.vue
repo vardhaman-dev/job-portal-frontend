@@ -16,9 +16,9 @@
       <template v-if="user">
         <div class="user-dropdown" @click="toggleDropdown">
           <div class="user-profile">
-            <q-icon name="account_circle" class="q-mr-sm" size="2rem" />
+            <q-icon name="account_circle" class="q-mr-sm" size="2.5rem" />
             {{ user.name || user.email }}
-            <q-icon name="arrow_drop_down" size="1.5rem" />
+            <q-icon name="arrow_drop_down" size="1.8rem" />
           </div>
 
           <div v-if="showDropdown" class="dropdown-menu">
@@ -100,7 +100,6 @@ export default {
 </script>
 
 <style scoped>
-/* Updated styles to adjust for larger icon */
 .navbar { display: flex; justify-content: space-between; padding: 20px 60px; align-items: center; background-color: #fff; border-bottom: 1px solid #eaecef; }
 .logo { font-weight: 700; color: #1565c0; font-size: 24px; }
 .nav-links a { margin: 0 20px; color: #333; font-weight: 500; text-decoration: none; transition: color 0.2s; }
@@ -119,11 +118,15 @@ export default {
   color: #1565c0;
   display: flex;
   align-items: center;
-  transition: color 0.2s ease;
-  gap: 8px; /* Added to improve spacing with larger icon */
+  transition: all 0.2s ease;
+  gap: 10px; /* Increased for larger icons */
+  font-size: 1.2rem; /* Larger text for user name/email */
+  padding: 6px 12px; /* Added padding for a button-like feel */
+  border-radius: 6px; /* Subtle rounding */
 }
 .user-profile:hover {
   color: #1c4fcf;
+  background-color: #f5f7fa; /* Subtle background on hover */
 }
 
 .user-dropdown {

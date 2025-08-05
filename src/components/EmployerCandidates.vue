@@ -302,7 +302,7 @@ const logout = () => {
 }
 .sidebar {
   width: 260px;
-  background-color: #102A43;
+  background-color: #1565c0;
   color: #f0f4f8;
   display: flex;
   flex-direction: column;

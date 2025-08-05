@@ -1,4 +1,5 @@
 import HomePage from 'pages/HomePage.vue'
+const AboutUs = () => import('pages/AboutUs.vue')
 
 const routes = [
   {
@@ -14,6 +15,21 @@ const routes = [
         path: 'employers',
         name: 'Employers',
         component: () => import('pages/EmployerHomePage.vue')
+      },
+      {
+        path: 'about',
+        name: 'About',
+        component: AboutUs
+  },
+        {
+        path: 'contact',
+        name: 'Contact',
+        component: () => import('pages/ContactPage.vue')
+      },
+            {
+        path: 'privacy-policy', 
+        name: 'PrivacyPolicy',
+        component: () => import('pages/PrivacyPolicy.vue')
       },
       {
         path: 'job/:id',

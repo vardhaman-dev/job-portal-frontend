@@ -29,9 +29,9 @@
         </div>
         <div>
           <h4>Company</h4>
-          <a href="#">About Us</a>
-          <a href="#">Contact</a>
-          <a href="#">Privacy Policy</a>
+          <router-link to="/about">About Us</router-link>
+          <router-link to="/contact">Contact</router-link>
+          <router-link to="/privacy-policy">Privacy Policy</router-link>
           <a href="#">Terms of Service</a>
         </div>
       </div>
@@ -44,17 +44,129 @@
 </template>
 
 <style scoped>
-.footer { background: #1565c0; color: white; padding: 60px 40px 20px; margin-top: 80px; }
-.footer-top { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 40px; border-bottom: 1px solid rgba(255, 255, 255, 0.2); padding-bottom: 40px; }
-.footer-brand { max-width: 300px; }
-.footer-logo { font-size: 20px; font-weight: bold; margin-bottom: 10px; }
-.footer-brand p { font-size: 14px; line-height: 1.6; color: #e0e0e0; }
-.social-icons { margin-top: 15px; }
-.social-icons a { margin-right: 10px; color: white; font-size: 16px; transition: color 0.2s ease; }
-.social-icons a:hover { color: #cfd8ff; }
-.footer-links { display: flex; gap: 50px; flex-wrap: wrap; }
-.footer-links h4 { margin-bottom: 10px; font-size: 16px; font-weight: 600; }
-.footer-links a { display: block; margin-bottom: 8px; color: #e0e0e0; font-size: 14px; text-decoration: none; }
-.footer-links a:hover { color: white; }
-.footer-bottom { text-align: center; font-size: 13px; padding-top: 20px; color: #cbdfff; }
+.footer {
+  background: linear-gradient(135deg, var(--color-primary-700), var(--color-primary-800));
+  color: white;
+  padding: var(--space-16) var(--space-10) var(--space-5);
+  margin-top: var(--space-20);
+}
+
+.footer-top {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: var(--space-10);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+  padding-bottom: var(--space-10);
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.footer-brand {
+  max-width: 320px;
+}
+
+.footer-logo {
+  font-size: var(--font-size-xl);
+  font-weight: 700;
+  margin-bottom: var(--space-3);
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.footer-brand p {
+  font-size: var(--font-size-sm);
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.8);
+  margin-bottom: var(--space-4);
+}
+
+.social-icons {
+  display: flex;
+  gap: var(--space-3);
+}
+
+.social-icons a {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: var(--border-radius-lg);
+  color: white;
+  font-size: var(--font-size-base);
+  text-decoration: none;
+  transition: all var(--transition-base);
+  backdrop-filter: blur(8px);
+}
+
+.social-icons a:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: translateY(-2px);
+}
+
+.footer-links {
+  display: flex;
+  gap: var(--space-12);
+  flex-wrap: wrap;
+}
+
+.footer-links > div {
+  min-width: 160px;
+}
+
+.footer-links h4 {
+  margin-bottom: var(--space-3);
+  font-size: var(--font-size-base);
+  font-weight: 600;
+  color: white;
+}
+
+.footer-links a {
+  display: block;
+  margin-bottom: var(--space-2);
+  color: rgba(255, 255, 255, 0.8);
+  font-size: var(--font-size-sm);
+  text-decoration: none;
+  transition: all var(--transition-base);
+  padding: var(--space-1) 0;
+  border-radius: var(--border-radius-sm);
+}
+
+.footer-links a:hover {
+  color: white;
+  padding-left: var(--space-2);
+}
+
+.footer-bottom {
+  text-align: center;
+  font-size: var(--font-size-xs);
+  padding-top: var(--space-5);
+  color: rgba(255, 255, 255, 0.7);
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+  .footer {
+    padding: var(--space-12) var(--space-4) var(--space-4);
+  }
+  
+  .footer-top {
+    flex-direction: column;
+    gap: var(--space-8);
+  }
+  
+  .footer-links {
+    gap: var(--space-8);
+  }
+  
+  .footer-links > div {
+    min-width: auto;
+    flex: 1;
+  }
+}
 </style>

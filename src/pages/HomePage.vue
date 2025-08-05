@@ -207,7 +207,8 @@ export default {
 
 
 <style scoped>
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Satisfy&display=swap');
+
 
 .landing-page {
   font-family: 'Inter', 'Segoe UI', sans-serif;
@@ -454,7 +455,7 @@ export default {
 .tagline {
   opacity: 0;
   transform: scale(0.8);
-  animation: fadeInUp 0.6s ease-out forwards;
+  animation: zoomIn 0.6s ease-out forwards;
   animation-delay: 0.2s;
 }
 
@@ -647,21 +648,11 @@ export default {
 }
 
 .feature-item:hover {
-  transform: translateY(-8px);
+  transform: translateY(-4px);
   transition: all 0.3s ease;
   background-color: #f4f8ff;
   border-radius: 10px;
   padding: 10px;
 }
 
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(20px) scale(0.9);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-}
 </style>

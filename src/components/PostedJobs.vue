@@ -210,27 +210,25 @@ onMounted(() => {
 </script>
 
 <style scoped>
-/* UPDATED LAYOUT STYLES */
 .portal-layout {
   display: flex;
   flex-direction: column;
   height: 100vh;
-  overflow: hidden; /* Important to prevent double scrollbars */
+  overflow: hidden; 
 }
 
 .sticky-header {
   position: sticky;
   top: 0;
   z-index: 1000;
-  /* The header component has its own background and shadow */
+  
 }
 
 .page-wrapper {
-  flex-grow: 1; /* Takes up the remaining vertical space */
-  overflow: hidden; /* Important */
+  flex-grow: 1; 
+  overflow: hidden; 
 }
 
-/* Sidebar and Content Area take full height of the wrapper */
 .sidebar, .content-area {
   height: 100%;
 }
@@ -240,11 +238,9 @@ onMounted(() => {
   overflow-y: auto;
 }
 
-/* --- Original Styles Below --- */
-
 .sidebar {
   width: 260px;
-  background-color: #102A43;
+  background-color: #1565c0;
   display: flex;
   flex-direction: column;
   color: #f0f4f8;

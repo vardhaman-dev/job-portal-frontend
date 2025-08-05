@@ -292,7 +292,7 @@ watch(() => settings.displayName, (newName) => { if (newName) { employer.value.n
 }
 /* Page Wrapper & Sidebar */
 .page-wrapper { height: 100vh; background-color: #F0F7FF; }
-.sidebar { width: 260px; min-width: 260px; background-color: #102A43; display: flex; flex-direction: column; color: #f0f4f8; }
+.sidebar { width: 260px; min-width: 260px; background-color: #1565c0; display: flex; flex-direction: column; color: #f0f4f8; }
 .sidebar-section { border-bottom: 1px solid #243B55; }
 .nav-list .q-item { color: #BCCCDC; padding: 12px; margin: 4px 12px; border-radius: 8px; }
 .active-link { background-color: #00529b !important; color: #ffffff !important; font-weight: 600; }
