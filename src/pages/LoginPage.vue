@@ -212,9 +212,9 @@ onMounted(() => {
 // Redirect user based on their role
 const redirectBasedOnRole = () => {
   if (authStore.isJobSeeker) {
-    router.push(authStore.returnUrl || '/dashboard');
+    router.push(authStore.returnUrl || '/');
   } else if (authStore.isEmployer) {
-    router.push(authStore.returnUrl || '/employer-portal');
+    router.push(authStore.returnUrl || '/employers');
   }
   authStore.setReturnUrl(null);
 };
@@ -222,43 +222,32 @@ const redirectBasedOnRole = () => {
 // Handle form submission
 const handleLogin = async () => {
   try {
-    // Reset any previous errors
     authStore.clearError();
-
-    // Validate form
     const valid = await loginForm.value.validate();
     if (!valid) return;
 
-    // Show loading state
-    Loading.show({
-      message: 'Signing in...'
-    });
+    Loading.show({ message: 'Signing in...' });
 
     try {
-      // Call the login action
-      const { success, error } = await authStore.login({
-        id: formData.value.id, 
+      const response = await authStore.login({
         email: formData.value.email.trim(),
-        password: formData.value.password
+        password: formData.value.password,
       });
 
-      if (success) {
-        // Show success message
+      if (response.success) {
         $q.notify({
           type: 'positive',
           message: 'Login successful!',
           position: 'top',
-          timeout: 1500
+          timeout: 1500,
         });
 
-        // Redirect based on role
         redirectBasedOnRole();
       } else {
-        // Show error message
         $q.notify({
           type: 'negative',
-          message: error || 'Login failed. Please try again.',
-          position: 'top'
+          message: response.error || 'Login failed. Please try again.',
+          position: 'top',
         });
       }
     } finally {
@@ -268,12 +257,12 @@ const handleLogin = async () => {
     console.error('Login error:', error);
     $q.notify({
       type: 'negative',
-      message: 'An error occurred during login. Please try again.'
+      message: 'An error occurred during login. Please try again.',
     });
-  } finally {
     Loading.hide();
   }
 };
+
 
 // Navigation methods
 const goBack = () => {

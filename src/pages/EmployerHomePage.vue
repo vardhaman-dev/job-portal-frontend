@@ -1,18 +1,6 @@
 <template>
   <div class="landing-page">
-    <header class="navbar">
-      <div class="logo">💼 JobHub</div>
-      <nav class="nav-links">
-        <router-link to="/" exact-active-class="active-link">Home</router-link>
-        <JobsDropdown />
-        <router-link to="/employers" exact-active-class="active-link">Employers</router-link>
-      </nav>
-      <div class="auth-buttons">
-        <router-link to="/login" class="sign-in">Sign In</router-link>
-        <router-link to="/create-account" class="sign-up">Sign Up</router-link>
-      </div>
-    </header>
-
+    <AppHeader />
     <section class="employer-hero">
       <div class="hero-text">
         <h1 class="tagline">Hire the Best Talent <span class="handwritten">Faster</span></h1>
@@ -133,12 +121,12 @@
 </template>
 
 <script>
-import JobsDropdown from '../components/JobsDropDown.vue';
+import AppHeader from '../components/HeaderPart.vue';
 
 export default {
   name: 'EmployerHomePage',
   components: {
-    JobsDropdown
+    AppHeader
   },
   methods: {
     goToEmployerLogin() {

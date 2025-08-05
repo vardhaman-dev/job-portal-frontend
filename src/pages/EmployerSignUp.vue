@@ -257,7 +257,7 @@ export default {
           localStorage.setItem('employerData', JSON.stringify(employerData));
 
           // Redirect to employer portal dashboard
-          router.push('/employer-portal');
+          router.push('/employers');
         } else {
           // Handle error response from auth service
           error.value = response.error || 'Registration failed. Please check your information and try again.';

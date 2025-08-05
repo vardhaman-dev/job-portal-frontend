@@ -139,7 +139,7 @@ import AppHeader from '../components/HeaderPart.vue';
 import AppFooter from '../components/FooterPart.vue';
 import JobListingPage from './JobListing.vue';
 import { useRouter } from 'vue-router';
-import {ref,  onMounted } from 'vue';
+import { ref, onMounted } from 'vue';
 import { useAuthStore } from '../stores/auth.store';
 import { storeToRefs } from 'pinia';
 
@@ -154,25 +154,53 @@ export default {
     const router = useRouter();
     const searchInput = ref('');
     const authStore = useAuthStore();
-    const { isAuthenticated } = storeToRefs(authStore); // ✅ make reactivity work
+    const { isAuthenticated } = storeToRefs(authStore);
+
+    const jobs = ref(0);
+    const companies = ref(0);
+    const seekers = ref(0);
 
     function gotoCategory(category) {
       router.push({ name: 'JobListing', params: { category } });
     }
-function performSearch() {
-  searchInput.value = searchInput.value.trim(); // this will trigger watch in JobListingPage
-}
+
+    function performSearch() {
+      searchInput.value = searchInput.value.trim();
+    }
+
+    function animateCount(refVar, target, duration = 1000) {
+      const stepTime = 20;
+      const steps = duration / stepTime;
+      const increment = target / steps;
+      let count = 0;
+      const interval = setInterval(() => {
+        count += increment;
+        if (count >= target) {
+          count = target;
+          clearInterval(interval);
+        }
+        refVar.value = Math.floor(count);
+      }, stepTime);
+    }
 
     onMounted(() => {
-      authStore.initialize(); // ✅ ensure user data is loaded from localStorage
+      authStore.initialize();
+
+      // Animate the numbers
+      animateCount(jobs, 50000);
+      animateCount(companies, 15000);
+      animateCount(seekers, 2000000);
     });
 
     return {
-  gotoCategory,
-  isAuthenticated,
-  searchInput,
-  performSearch  // ✅ this was missing
-};
+      gotoCategory,
+      isAuthenticated,
+      searchInput,
+      performSearch,
+      jobs,
+      companies,
+      seekers
+    };
   }
 };
 </script>
@@ -342,6 +370,7 @@ function performSearch() {
 .category-card:hover {
   transform: translateY(-6px);
   box-shadow: 0 6px 24px rgba(0, 0, 0, 0.08);
+  border: 1px solid #1565c0;
 }
 .category-card .icon {
   font-size: 30px;
@@ -425,7 +454,7 @@ function performSearch() {
 .tagline {
   opacity: 0;
   transform: scale(0.8);
-  animation: zoomIn 0.6s ease-out forwards;
+  animation: fadeInUp 0.6s ease-out forwards;
   animation-delay: 0.2s;
 }
 
@@ -599,4 +628,40 @@ function performSearch() {
   width: 100%;
 }
 
+.search-box input:hover {
+  border-color: #1565c0;
+  box-shadow: 0 0 0 2px rgba(21, 101, 192, 0.2);
+  transition: all 0.3s ease;
+}
+
+.search-box button:hover {
+  transform: scale(1.05);
+  background-color: #1c4fcf;
+}
+
+
+.step:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 20px rgba(21, 101, 192, 0.1);
+  transition: all 0.3s ease;
+}
+
+.feature-item:hover {
+  transform: translateY(-8px);
+  transition: all 0.3s ease;
+  background-color: #f4f8ff;
+  border-radius: 10px;
+  padding: 10px;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
 </style>

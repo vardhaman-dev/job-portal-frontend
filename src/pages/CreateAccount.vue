@@ -222,29 +222,38 @@ const handleSubmit = async () => {
       firstName: formData.value.firstName,
       lastName: formData.value.lastName,
       email: formData.value.email,
-      phone: formData.value.phone.replace(/\D/g, ''), // Remove non-digit characters
-      password: formData.value.password
+      phone: formData.value.phone.replace(/\D/g, ''),
+      password: formData.value.password,
     });
 
     if (result.success) {
-      // Show success message
       $q.notify({
         type: 'positive',
-        message: 'Account created successfully! Redirecting...',
+        message: 'Account created successfully! Logging in...',
         position: 'top',
-        timeout: 2000
+        timeout: 2000,
       });
 
-      // Redirect to login page with email pre-filled
-      setTimeout(() => {
+      // Auto-login after registration
+      const loginResult = await authStore.login({
+        email: formData.value.email,
+        password: formData.value.password,
+      });
+
+      if (loginResult.success) {
+        setTimeout(() => {
+          if (authStore.isJobSeeker) {
+            router.push('/');
+          } else if (authStore.isEmployer) {
+            router.push('/employer-portal');
+          }
+        }, 2000);
+      } else {
         router.push({
           path: '/login',
-          query: {
-            registered: 'true',
-            email: formData.value.email
-          }
+          query: { registered: 'true', email: formData.value.email },
         });
-      }, 2000);
+      }
     }
   } catch (error) {
     console.error('Registration error:', error);

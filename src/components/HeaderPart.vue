@@ -8,26 +8,24 @@
     </nav>
 
     <div class="auth-buttons">
-      <!-- UPDATED: This template block now checks if it's an employer page -->
       <template v-if="!user && !isEmployerPage">
         <router-link to="/login" class="sign-in">Sign In</router-link>
         <router-link to="/create-account" class="sign-up">Sign Up</router-link>
       </template>
-      
-      <!-- This logic now handles both user types -->
+
       <template v-if="user">
         <div class="user-dropdown" @click="toggleDropdown">
           <div class="user-profile">
-            <q-icon name="account_circle" class="q-mr-sm" />
-            {{ user.name }}
-            <q-icon name="arrow_drop_down" />
+            <q-icon name="account_circle" class="q-mr-sm" size="2rem" />
+            {{ user.name || user.email }}
+            <q-icon name="arrow_drop_down" size="1.5rem" />
           </div>
 
           <div v-if="showDropdown" class="dropdown-menu">
-            <div v-if="user.type === 'seeker'" class="dropdown-item" @click="$router.push('/dashboard')">
+            <div v-if="user.role === 'job_seeker'" class="dropdown-item" @click="$router.push('/dashboard')">
               Job Seeker Dashboard
             </div>
-            <div v-if="user.type === 'employer'" class="dropdown-item" @click="$router.push('/employer-portal')">
+            <div v-if="user.role === 'company'" class="dropdown-item" @click="$router.push('/employer-portal')">
               Employer Dashboard
             </div>
             <q-separator class="q-my-xs" />
@@ -40,17 +38,31 @@
 </template>
 
 <script>
+import { useAuthStore } from 'src/stores/auth.store';
 import JobsDropDown from './JobsDropDown.vue';
 
 export default {
+  name: 'AppNavbar',
   components: { JobsDropDown },
   data() {
     return {
-      user: null,
-      showDropdown: false
+      showDropdown: false,
+      initialized: false,
     };
   },
+  setup() {
+    const authStore = useAuthStore();
+    return { authStore };
+  },
+  async mounted() {
+    await this.authStore.checkAuth();
+    this.initialized = true;
+    console.log('AppNavbar mounted, user:', this.user);
+  },
   computed: {
+    user() {
+      return this.authStore.userData;
+    },
     isEmployerPage() {
       const employerPaths = [
         '/employer-portal',
@@ -59,52 +71,36 @@ export default {
         '/candidates',
         '/employer-messages',
         '/company-profile',
-        '/employer-settings'
+        '/employer-settings',
       ];
       return employerPaths.includes(this.$route.path);
-    }
-  },
-  mounted() {
-    this.fetchUser();
+    },
   },
   watch: {
-    $route() {
-      this.fetchUser(); // Refresh user state on any route change
-    }
+    $route: {
+      handler() {
+        this.authStore.checkAuth();
+        console.log('Route changed, user:', this.user);
+      },
+      immediate: true,
+    },
   },
   methods: {
-    fetchUser() {
-      const seekerData = localStorage.getItem('loggedInUser');
-      const employerData = localStorage.getItem('employerData');
-
-      if (seekerData) {
-        this.user = { ...JSON.parse(seekerData), type: 'seeker' };
-      } else if (employerData) {
-        this.user = { ...JSON.parse(employerData), type: 'employer' };
-      } else {
-        this.user = null;
-      }
-    },
     toggleDropdown() {
       this.showDropdown = !this.showDropdown;
     },
     logout() {
-      if (this.user && this.user.type === 'employer') {
-        localStorage.removeItem('employerData');
-      } else {
-        localStorage.removeItem('loggedInUser');
-      }
-      
-      this.user = null;
+      this.authStore.logout();
       this.showDropdown = false;
       this.$router.push('/');
-    }
-  }
+      console.log('Logout triggered, user:', this.user);
+    },
+  },
 };
 </script>
 
 <style scoped>
-/* Your navbar styles copied from original file */
+/* Updated styles to adjust for larger icon */
 .navbar { display: flex; justify-content: space-between; padding: 20px 60px; align-items: center; background-color: #fff; border-bottom: 1px solid #eaecef; }
 .logo { font-weight: 700; color: #1565c0; font-size: 24px; }
 .nav-links a { margin: 0 20px; color: #333; font-weight: 500; text-decoration: none; transition: color 0.2s; }
@@ -124,6 +120,7 @@ export default {
   display: flex;
   align-items: center;
   transition: color 0.2s ease;
+  gap: 8px; /* Added to improve spacing with larger icon */
 }
 .user-profile:hover {
   color: #1c4fcf;
@@ -150,14 +147,8 @@ export default {
 }
 
 @keyframes fadeIn {
-  0% {
-    opacity: 0;
-    transform: translateY(-5px);
-  }
-  100% {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  0% { opacity: 0; transform: translateY(-5px); }
+  100% { opacity: 1; transform: translateY(0); }
 }
 
 .dropdown-item {
@@ -175,7 +166,6 @@ export default {
   color: #1565c0;
 }
 
-/* Logout styled in red */
 .logout-item {
   color: #d32f2f !important;
 }

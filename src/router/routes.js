@@ -114,11 +114,11 @@ const routes = [
   },
 {
   path: '/employer-login',
-  component: () => import('pages/EmployerLogin.vue')
+  component: () => import('src/pages/EmployerSignUp.vue')
 },
 {
   path: '/employer-signup',
-  component: () => import('pages/EmployerLogin.vue')
+  component: () => import('src/pages/EmployerSignUp.vue')
 },
 {
   path: '/employer-portal',
