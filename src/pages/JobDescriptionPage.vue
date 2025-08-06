@@ -44,8 +44,7 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
-import axios from 'axios'
-
+import jobService from '../services/job.service.js'
 // Components
 import AppHeader from '../components/HeaderPart.vue'
 import AppFooter from '../components/FooterPart.vue'
@@ -65,16 +64,18 @@ const loading = ref(true)
 const auth = useAuthStore();
 const isSignedIn = ref(auth.isAuthenticated);
 
+ // adjust path as needed
+
 onMounted(async () => {
   try {
-    const res = await axios.get(`http://localhost:3000/api/jobs/jobs/${route.params.id}`)
-    job.value = res.data.job
+    job.value = await jobService.getJobById(route.params.id)
   } catch (err) {
     console.error('Failed to load job:', err)
   } finally {
     loading.value = false
   }
 })
+
 </script>
 
 
