@@ -3,56 +3,28 @@
     <div class="section-heading text-h6 text-weight-bold q-mb-md">
       Required Skills & Qualifications
     </div>
-
-    <!-- Education -->
-    <div class="section-block q-mb-md">
-      <div class="section-title text-purple">
-        <span>🎓 Education</span>
+       <div v-if="job.education" class="section-block q-mb-md">
+      <div class="section-title text-indigo-8">
+        🎓 Qualification
       </div>
       <ul class="section-list">
-        <li>Bachelor's degree in Computer Science, Engineering, or related field</li>
-      </ul>
-    </div>
-
-    <!-- Experience -->
-    <div class="section-block q-mb-md">
-      <div class="section-title text-primary">
-        <span>💼 Experience</span>
-      </div>
-      <ul class="section-list">
-        <li>5+ years of experience in frontend development</li>
-        <li>Strong experience with React and TypeScript</li>
+        <li>{{ job.education }}</li>
       </ul>
     </div>
 
     <!-- Technical Skills -->
-    <div class="section-block q-mb-md">
+    <div v-if="job.skills && job.skills.length" class="section-block q-mb-md">
       <div class="section-title text-green-8">
         <span>🛠️ Technical Skills</span>
       </div>
       <ul class="section-list">
-        <li>React</li>
-        <li>TypeScript</li>
-        <li>JavaScript</li>
-        <li>HTML5</li>
-        <li>CSS3</li>
-        <li>Git</li>
-        <li>Webpack</li>
-        <li>REST APIs</li>
+        <li v-for="(skill, index) in job.skills" :key="index">{{ skill }}</li>
       </ul>
     </div>
 
-    <!-- Soft Skills -->
-    <div class="section-block">
-      <div class="section-title text-deep-orange-8">
-        <span>🧠 Soft Skills</span>
-      </div>
-      <ul class="section-list">
-        <li>Strong problem-solving abilities</li>
-        <li>Excellent communication skills</li>
-        <li>Team collaboration</li>
-        <li>Attention to detail</li>
-      </ul>
+    <!-- If no skills listed -->
+    <div v-else class="text-grey q-mt-sm">
+      No specific skills required for this role.
     </div>
   </q-card>
 </template>
@@ -72,12 +44,12 @@ defineProps({ job: Object })
   border-radius: 16px;
   background-color: #ffffff;
   border: 1px solid #e0e0e0;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 1); /* base shadow */
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 1);
   transition: box-shadow 0.3s ease, transform 0.2s ease;
 }
 
 .skill-card:hover {
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1); /* hover shadow */
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
   transform: translateY(-2px);
 }
 
@@ -106,5 +78,4 @@ defineProps({ job: Object })
   margin-bottom: 4px;
   list-style: disc;
 }
-
 </style>

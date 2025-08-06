@@ -9,10 +9,12 @@
       <!-- Left: Job Info -->
       <div class="col">
         <div class="text-h5 text-bold job-title">{{ job.title }}</div>
-        <div class="text-subtitle2 q-mt-xs">{{ job.company }}</div>
+        <div class="text-subtitle2 q-mt-xs">{{ job.company?.companyName || 'Unknown Company' }}</div>
+
         <div class="text-grey text-caption q-mt-xs">
-          {{ job.location }} • Posted on {{ job.postedDate }} • Apply by {{ job.applyBy }}
-        </div>
+  {{ job.location }} • Posted on {{ createddate }} • Apply by {{ formattedDeadline }}
+</div>
+
 
         <div class="q-mt-sm q-gutter-sm">
           <q-badge v-if="job.remote" color="green-3" text-color="black" label="Remote" />
@@ -48,7 +50,7 @@
 
 
 <script setup>
-import { ref, toRef } from 'vue'
+import { ref, toRef,computed } from 'vue'
 import { useRouter } from 'vue-router'
 import shareIcon from '../assets/share.png'
 
@@ -58,6 +60,23 @@ const job = toRef(props, 'job') // makes job reactive
 const router = useRouter()
 const isHovered = ref(false)
 
+const formattedDeadline = computed(() => {
+  if (!job.value?.deadline) return 'Not specified'
+return new Date(job.value.deadline).toLocaleDateString('en-GB', {
+  day: '2-digit',
+  month: 'short',
+  year: 'numeric'
+})
+
+})
+const createddate = computed(() => {
+  if (!job.value?.posted_at) return 'Not specified'
+  return new Date(job.value.posted_at).toLocaleDateString('en-GB', {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric'
+  })
+})
 const goToApplicationForm = () => {
   if (job.value?.id) {
     router.push({ name: 'ApplicationForm', params: { jobId: job.value.id } })

@@ -6,7 +6,7 @@
     @mouseleave="isHovered = false"
   >
     <div class="text-h6 text-bold">Job Overview</div>
-    <p class="q-mt-sm">{{ job.overview }}</p>
+    <p class="q-mt-sm">{{ job.description }}</p>
   </q-card>
 </template>
 

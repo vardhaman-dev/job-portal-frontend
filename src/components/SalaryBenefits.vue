@@ -8,22 +8,21 @@
     <!-- Salary Section -->
     <div class="q-mt-md">
       <div class="text-subtitle2 text-weight-medium">Salary Range</div>
-      <q-badge
-        color="green-7"
-        text-color="white"
-        class="q-mt-sm q-pa-sm text-subtitle2"
-        align="middle"
-      >
-        <q-icon name="attach_money" class="q-mr-xs" />
-        {{ job.salary }}
-      </q-badge>
+      <q-badge v-if="job.salary_range" color="green-7" text-color="white" class="q-mt-sm q-pa-sm text-subtitle2" align="middle">
+  <q-icon name="attach_money" class="q-mr-xs" />
+  {{ job.salary_range }}
+</q-badge>
+<div v-else class="q-mt-sm text-caption text-grey">
+  Salary not disclosed
+</div>
+
     </div>
 
     <!-- Benefits Section -->
     <div class="q-mt-md">
       <div class="text-subtitle2 text-weight-medium">Benefits & Perks</div>
       <q-list bordered separator class="q-mt-sm">
-        <q-item v-for="(perk, index) in job.benefits" :key="index" class="q-py-sm">
+      <q-item v-for="(perk, index) in parsedBenefits" :key="index" class="q-py-sm">
           <q-item-section avatar>
             <q-icon name="check_circle" color="green-8" size="20px" />
           </q-item-section>
@@ -37,7 +36,15 @@
 </template>
 
 <script setup>
-defineProps({ job: Object })
+import { computed } from 'vue'
+
+const props = defineProps({ job: Object })
+
+const parsedBenefits = computed(() => {
+  if (!props.job.benefits) return []
+  return props.job.benefits.split(',').map(b => b.trim())
+})
+
 </script>
 
 <style scoped>

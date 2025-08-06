@@ -26,7 +26,7 @@ api.interceptors.request.use(
 
 // Company Auth API
 export const companyAuth = {
-  // Register a new company
+  // Register a new companyr
   register: async (companyData) => {
     try {
       console.log('Preparing registration payload with data:', companyData);

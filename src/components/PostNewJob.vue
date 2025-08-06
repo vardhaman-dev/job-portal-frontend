@@ -51,7 +51,7 @@
                <div class="row q-col-gutter-x-md q-col-gutter-y-lg">
                  <div class="col-12 col-md-6"><q-input v-model="form.title" label="Job Title" filled stack-label required /></div>
                  <div class="col-12 col-md-6"><q-input v-model="form.location" label="Job Location (e.g., City, 'Remote')" filled stack-label required /></div>
-                 <div class="col-12 col-md-6"><q-select v-model="form.type" label="Job Type" :options="['Full Time', 'Remote', 'Hybrid']" filled stack-label required /></div>
+                 <div class="col-12 col-md-6"><q-select v-model="form.type" label="Job Type" :options="['full_time', 'part_time', 'contract', 'internship', 'remote']" filled stack-label required /></div>
                  <div class="col-12 col-md-6"><q-input v-model.number="form.positions" type="number" label="Number of Positions" filled stack-label required /></div>
                </div>
              </div>
@@ -117,7 +117,8 @@
          <q-card-section class="q-gutter-y-lg">
            <q-input v-model="form.experience" label="Experience Range" filled stack-label hint="e.g. 2-5 years" />
            <q-input v-model="form.skills" label="Key Skills" filled stack-label hint="Enter skills separated by commas" />
-           <q-input v-model="form.education" label="Education Level" filled stack-label hint="e.g. Bachelor's Degree in Computer Science" />
+          <q-select  v-model="form.education" label="Education Level"  :options="educationOptions"  filled  stack-label  emit-value  map-options  hint="Select highest education level"/>
+
          </q-card-section>
          <q-card-actions align="right" class="q-pa-md">
            <q-btn flat label="Back" color="black" @click="step--" />
@@ -211,6 +212,14 @@ const tagInput = ref(''); // Add ref for tag input
 
 const employer = ref({ name: 'Innovate Inc.', email: 'hr@innovate.com' });
 const selected = ref('Post New Job');
+const educationOptions = [
+  { label: '10th (SSC)', value: '10th' },
+  { label: '12th (HSC)', value: '12th' },
+  { label: 'Diploma', value: 'diploma' },
+  { label: 'Graduation (Bachelor\'s)', value: 'Bachelor' },
+  { label: 'Post Graduation (Master\'s)', value: 'Master' },
+  { label: 'PhD / Doctorate', value: 'PHD' }
+];
 
 onMounted(() => {
   const stored = localStorage.getItem('employerData');
@@ -283,7 +292,9 @@ const submitJob = async () => {
     location: form.value.location,
     type: form.value.type,
     salary: form.value.salary,
+    benefits: form.value.benefits, 
     deadline: form.value.deadline,
+    education: form.value.education,
     skills: form.value.skills.split(',').map(s => s.trim()).filter(Boolean),
     tags: form.value.tags,
     status: 'open'

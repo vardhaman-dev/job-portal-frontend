@@ -1,12 +1,15 @@
 <template>
   <q-page class="q-pa-md">
+    <HeaderPart/>
     <div class="row q-col-gutter-md">
+      
       <!-- Form Section -->
       <div class="col-12 col-md-6">
         <q-card flat bordered class="q-pa-md">
+          
           <q-card-section>
             <h2 class="text-h5 text-primary">Resume Builder</h2>
-
+           
             <q-form class="q-gutter-md">
               <!-- Template Selector -->
               <q-select
@@ -15,13 +18,24 @@
                 label="Select Template"
                 filled
               />
-
+              <q-file
+  v-model="resumePhotoFile"
+  accept="image/*"
+  label="Upload Photo"
+  filled
+  use-chips
+  prepend-icon="photo"
+  @update:model-value="handlePhotoUpload"
+/>
               <!-- Basic Info -->
               <q-input v-model="resumeData.name" label="Full Name" filled />
+              <q-input v-model="resumeData.title" label="Title (e.g., Marketing Manager)" filled />
+              <q-input v-model="resumeData.position" label="Position (e.g., Head of Digital Strategy)" filled />
+
               <q-input v-model="resumeData.email" label="Email" filled />
               <q-input v-model="resumeData.phone" label="Phone" filled />
               <q-input v-model="resumeData.address" label="Address" filled />
-            
+              
 
               <!-- Education -->
               <q-expansion-item label="Education" icon="school" expand-separator header-class="text-bold">
@@ -65,7 +79,14 @@
                 </div>
                 <q-btn label="Add Project" icon="add" flat color="primary" @click="addProject" />
               </q-expansion-item>
-
+            <q-expansion-item label="Languages" icon="translate" expand-separator header-class="text-bold">
+  <div v-for="(lang, index) in resumeData.languages" :key="'lang-' + index" class="row items-center q-gutter-sm q-mb-sm">
+    <q-input v-model="lang.name" label="Language" filled class="col" />
+    <q-input v-model="lang.level" label="Proficiency (e.g., Native, Fluent)" filled class="col" />
+    <q-btn icon="delete" round dense flat color="negative" @click="removeLanguage(index)" />
+  </div>
+  <q-btn label="Add Language" icon="add" flat color="primary" @click="addLanguage" />
+</q-expansion-item>
               <!-- Download Button -->
               <q-btn label="Download PDF" icon="download" color="primary" @click="downloadPDF" class="q-mt-md" />
             </q-form>
@@ -85,10 +106,13 @@
         </q-card>
       </div>
     </div>
+  <footer-part/>
   </q-page>
 </template>
 
 <script setup>
+import HeaderPart from './HeaderPart.vue';
+import FooterPart from './FooterPart.vue';
 import { ref } from 'vue';
 import { jsPDF } from 'jspdf';
 import ModernTemplate from '../components/templates/ModernTemplate.vue';
@@ -99,6 +123,8 @@ import CreativeTemplate from '../components/templates/CreativeTemplate.vue';
 // Resume data state
 const resumeData = ref({
   name: '',
+    title: '',        
+  position: '',  
   email: '',
   phone: '',
   address:'',
@@ -106,11 +132,22 @@ const resumeData = ref({
   experience: [],
   skills: [],
   projects: [],
+   languages: [] 
 });
+const resumePhotoFile = ref(null);
+
+const handlePhotoUpload = async (file) => {
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    resumeData.value.photo = reader.result; // base64 image string
+  };
+  reader.readAsDataURL(file);
+};
 
 // Template selection
 const selectedTemplate = ref('Modern');
-const templateOptions = ['Modern', 'Classic', 'Professional', 'Creative'];
+const templateOptions = ['Modern', 'Creative'];
 const templateComponents = {
   Modern: ModernTemplate,
   Classic: ClassicTemplate,
@@ -142,6 +179,14 @@ const addProject = () => {
 };
 const removeProject = (index) => {
   resumeData.value.projects.splice(index, 1);
+};
+// Add/Remove languages
+const addLanguage = () => {
+  if (!resumeData.value.languages) resumeData.value.languages = [];
+  resumeData.value.languages.push({ name: '', level: '' });
+};
+const removeLanguage = (index) => {
+  resumeData.value.languages.splice(index, 1);
 };
 
 // Download PDF
