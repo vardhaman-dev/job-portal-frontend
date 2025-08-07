@@ -1,6 +1,15 @@
 <template>
   <div>
     <h5 class="text-primary q-mb-md">Bookmarked Jobs</h5>
+
+    <!-- No bookmarks fallback -->
+    <div v-if="jobs.length === 0" class="text-center q-mt-xl text-grey">
+      <q-icon name="bookmark_border" size="64px" class="q-mb-md" />
+      <div class="text-h6">No bookmarked jobs yet</div>
+      <div class="text-caption">Jobs you bookmark will appear here</div>
+    </div>
+
+    <!-- Bookmarks list -->
     <q-card
       v-for="job in jobs"
       :key="job.id"
@@ -9,7 +18,8 @@
       class="job-card q-mb-md q-pa-md"
     >
       <div class="row justify-between items-center">
-        <div>
+        <!-- Clickable content to go to job details -->
+        <div class="clickable-area" @click="goToJobDetails(job.id)">
           <div class="row items-center q-gutter-sm">
             <q-icon name="work" size="24px" class="text-primary" />
             <h6 class="q-mb-none text-weight-bold">{{ job.title }}</h6>
@@ -31,18 +41,39 @@
             </q-chip>
           </div>
           <div class="text-caption q-mt-xs text-grey-6">
-            🕒 {{ job.posted }} • {{ job.type }}
+            🕒 {{ formatDate(job.posted) }} • {{ job.type }}
           </div>
         </div>
-        <q-btn label="Remove" color="negative" flat @click="$emit('remove', job.id)" />
+
+        <!-- Remove button -->
+        <q-btn
+          label="Remove"
+          color="negative"
+          flat
+          @click.stop="$emit('remove', job.id)"
+        />
       </div>
     </q-card>
   </div>
 </template>
 
 <script setup>
-defineProps(['jobs']);
-defineEmits(['remove']);
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
+defineProps(['jobs'])
+defineEmits(['remove'])
+const formatDate = (dateStr) => {
+  if (!dateStr) return 'Not specified';
+  return new Date(dateStr).toLocaleDateString('en-GB', {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric'
+  });
+};
+const goToJobDetails = (id) => {
+  router.push(`/job/${id}`)
+}
 </script>
 
 <style scoped>
@@ -62,5 +93,9 @@ defineEmits(['remove']);
   background-color: #e3f2fd;
   font-size: 13px;
   font-weight: 500;
+}
+.clickable-area {
+  cursor: pointer;
+  flex: 1;
 }
 </style>

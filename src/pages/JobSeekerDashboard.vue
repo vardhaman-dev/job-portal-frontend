@@ -26,7 +26,7 @@
 
         <!-- BOOKMARKED JOBS SECTION -->
         <template v-else-if="selectedSection === 'bookmarks'">
-          <BookmarkedJobs :jobs="bookmarkedJobs" @remove="removeBookmark" />
+          <BookmarkedJobs :jobs="bookmarkedJobs" @remove="handleRemove" />
         </template>
 
         <!-- PROFILE SECTION -->
@@ -59,79 +59,64 @@ import MyApplications from 'components/MyApplications.vue';
 import UserProfile from 'src/components/UserProfile.vue';
 import NotificationComponent from 'src/components/NotificationsPage.vue';
 import SettingsComponent from 'src/components/SettingsPage.vue';
-import { ref } from 'vue';
+
 import { useRouter } from 'vue-router';
 
+import { ref, onMounted } from 'vue';
+import { bookmarkService } from '../services/bookmarkService';
+import { authHelpers } from '../services/auth.service';
+const bookmarkedJobs = ref([]);
 const showProfileModal = ref(false);
 const userName = 'John';
 const selectedSection = ref('applications');
 const router = useRouter();
 
+const userId = authHelpers.getCurrentUser()?.id
+
 const goToResume = () => router.push('/resume-builder');
 
-const jobs = ref([
-  {
-    id: 1,
-    title: 'Marketing Intern',
-    company: 'Growth Co.',
-    location: 'Los Angeles, CA',
-    salary: '$25/hour',
-    skills: ['Social Media', 'Analytics', 'Content Creation'],
-    posted: '5 days ago',
-    type: 'Internship'
-  },
-  {
-    id: 2,
-    title: 'Data Scientist',
-    company: 'AI Solutions',
-    location: 'Boston, MA',
-    salary: '$110k - $140k',
-    skills: ['Python', 'Machine Learning', 'SQL', 'TensorFlow'],
-    posted: '1 day ago',
-    type: 'Full-time'
-  },
-  {
-    id: 3,
-    title: 'DevOps Engineer',
-    company: 'CloudTech',
-    location: 'Seattle, WA',
-    salary: '$115k - $145k',
-    skills: ['Kubernetes', 'Jenkins', 'AWS', 'Terraform'],
-    posted: '4 days ago',
-    type: 'Full-time'
-  },
-  {
-    id: 4,
-    title: 'Frontend Developer',
-    company: 'PixelCrafters',
-    location: 'Austin, TX',
-    salary: '$90k - $120k',
-    skills: ['Vue.js', 'JavaScript', 'HTML', 'CSS', 'Quasar'],
-    posted: '2 days ago',
-    type: 'Full-time'
-  },
-  {
-    id: 5,
-    title: 'Data Analyst',
-    company: 'InsightSphere',
-    location: 'Chicago, IL',
-    salary: '$80k - $100k',
-    skills: ['SQL', 'Python', 'Power BI', 'Tableau'],
-    posted: '1 day ago',
-    type: 'Part-time'
+
+ 
+const fetchBookmarks = async () => {
+  try {
+    if (!userId) return;
+    const jobs = await bookmarkService.getBookmarkedJobs(userId);
+    bookmarkedJobs.value = jobs.map(b => ({
+      id: b.id,
+      title: b.title,
+      company: b.company,
+      location: b.location,
+      salary: b.salary,
+      skills: Array.isArray(b.skills) ? b.skills : JSON.parse(b.skills),
+      posted: b.posted,
+    
+      type: b.type
+    }));
+  } catch (error) {
+    console.error('Error fetching bookmarks:', error);
   }
-]);
-
-const bookmarkedJobs = ref([
-  jobs.value[1],
-  jobs.value[3],
-  jobs.value[2]
-]);
-
-const removeBookmark = (id) => {
-  bookmarkedJobs.value = bookmarkedJobs.value.filter(job => job.id !== id);
 };
 
+const handleRemove = async (jobId) => {
+  const original = [...bookmarkedJobs.value];
+
+  bookmarkedJobs.value = bookmarkedJobs.value.filter(job => job.id !== jobId);
+
+  try {
+    await bookmarkService.removeBookmark(userId, jobId);
+    console.log('Bookmark removed');
+  } catch (error) {
+    console.error("Failed to remove bookmark:", error);
+    bookmarkedJobs.value = original; // rollback
+  }
+};
+
+
+
+
+onMounted(() => {
+  fetchBookmarks();
+});
 </script>
 
 <style scoped>
