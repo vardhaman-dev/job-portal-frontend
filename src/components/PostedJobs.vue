@@ -25,9 +25,7 @@
             </q-item>
           </q-list>
         </div>
-        <div class="sidebar-section q-mt-auto">
-          <q-btn flat icon="logout" label="Logout" class="full-width logout-btn" @click="logout" />
-        </div>
+
       </div>
 
       <div class="content-area column q-pa-lg">
@@ -190,10 +188,6 @@ const navigate = (link) => {
   if (link.to) router.push(link.to);
 };
 
-const logout = () => {
-  localStorage.removeItem('employerData');
-  router.push('/employers');
-};
 
 onMounted(() => {
   const storedEmployer = localStorage.getItem('employerData');

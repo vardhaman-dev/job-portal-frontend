@@ -24,9 +24,6 @@
             </q-item>
           </q-list>
         </div>
-        <div class="sidebar-section q-mt-auto">
-          <q-btn flat icon="logout" label="Logout" class="full-width logout-btn" @click="logout" />
-        </div>
       </div>
 
       <!-- Main Content -->
@@ -188,10 +185,6 @@ const todaysDate = new Date('2025-08-01T08:10:47+05:30').toLocaleDateString('en-
   weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
 });
 
-const logout = () => {
-  localStorage.removeItem('employerData');
-  router.push('/employers');
-};
 </script>
 
 <style scoped>

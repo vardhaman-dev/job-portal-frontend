@@ -15,16 +15,26 @@
         <button @click="performSearch">Search Jobs</button>
       </div>
 
-      <div class="stats">
-        <div><strong>50,000+</strong><br />Active Jobs</div>
-        <div><strong>15,000+</strong><br />Companies</div>
-        <div><strong>2M+</strong><br />Job Seekers</div>
-      </div>
+        <div class="hero-stats" ref="heroStats">
+          <div><strong ref="statJobs">0</strong> Active Jobs</div>
+          <div><strong ref="statCompanies">0</strong> Companies</div>
+          <div><strong ref="statSeekers">0</strong>Job Seekers</div>
+        </div>
     </section>
-    
-<JobListingPage :searchQuery="searchInput" />
+   
+    <section v-if="isLoggedIn">
+      <JobListingPage :searchQuery="searchInput" />
+    </section>
 
-    <section class="categories">
+    <div v-else class="login-prompt">
+      <p>
+        <q-icon name="lock" size="1.2em" class="q-mr-sm" />
+        Please <router-link to="/login">log in</router-link> to get personalized job suggestions.
+      </p>
+    </div>
+
+
+    <section v-if="!isEmployer" class="categories">
       <h2>Browse Jobs by <span>Category</span></h2>
       <p>
         Explore opportunities across various industries and find the perfect role that
@@ -82,7 +92,7 @@
         </div>
       </div>
     </section>
-        <section class="how-it-works">
+        <section v-if="!isLoggedIn" class="how-it-works">
       <h2>How It Works</h2>
       <p class="subtitle">
         Get started with your job search in three simple steps. Our streamlined process<br />
@@ -139,7 +149,7 @@ import AppHeader from '../components/HeaderPart.vue';
 import AppFooter from '../components/FooterPart.vue';
 import JobListingPage from './JobListing.vue';
 import { useRouter } from 'vue-router';
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue'; // Added computed here
 import { useAuthStore } from '../stores/auth.store';
 import { storeToRefs } from 'pinia';
 
@@ -155,10 +165,56 @@ export default {
     const searchInput = ref('');
     const authStore = useAuthStore();
     const { isAuthenticated } = storeToRefs(authStore);
+    const isLoggedIn = computed(() => !!authStore.userData);
+    const isEmployer = computed(() => authStore.userData?.role === 'company');
 
-    const jobs = ref(0);
-    const companies = ref(0);
-    const seekers = ref(0);
+    // DECLARED REFS for template elements to enable animation
+    const heroStats = ref(null);
+    const statJobs = ref(null);
+    const statCompanies = ref(null);
+    const statSeekers = ref(null);
+
+    // This is the animation logic for the counters
+    function animateCount(refVar, target, duration = 2000) {
+        if (!refVar.value) return; // Guard clause if the element isn't rendered
+        const start = 0;
+        let startTimestamp = null;
+        const step = (timestamp) => {
+            if (!startTimestamp) startTimestamp = timestamp;
+            const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+            const currentVal = Math.floor(progress * (target - start) + start);
+            refVar.value.innerText = currentVal.toLocaleString();
+            if (progress < 1) {
+                window.requestAnimationFrame(step);
+            }
+        };
+        window.requestAnimationFrame(step);
+    }
+
+    function initIntersectionObserver() {
+      const options = {
+        root: null,
+        threshold: 0.5
+      };
+
+      const observer = new IntersectionObserver((entries, observerInstance) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            // Call animateCount for each stat
+            animateCount(statJobs, 50000);
+            animateCount(statCompanies, 15000);
+            animateCount(statSeekers, 2000000);
+            
+            // Stop observing after the animation has run once
+            observerInstance.unobserve(entry.target);
+          }
+        });
+      }, options);
+
+      if (heroStats.value) {
+        observer.observe(heroStats.value);
+      }
+    }
 
     function gotoCategory(category) {
       router.push({ name: 'JobListing', params: { category } });
@@ -168,28 +224,9 @@ export default {
       searchInput.value = searchInput.value.trim();
     }
 
-    function animateCount(refVar, target, duration = 1000) {
-      const stepTime = 20;
-      const steps = duration / stepTime;
-      const increment = target / steps;
-      let count = 0;
-      const interval = setInterval(() => {
-        count += increment;
-        if (count >= target) {
-          count = target;
-          clearInterval(interval);
-        }
-        refVar.value = Math.floor(count);
-      }, stepTime);
-    }
-
     onMounted(() => {
       authStore.initialize();
-
-      // Animate the numbers
-      animateCount(jobs, 50000);
-      animateCount(companies, 15000);
-      animateCount(seekers, 2000000);
+      initIntersectionObserver();
     });
 
     return {
@@ -197,9 +234,12 @@ export default {
       isAuthenticated,
       searchInput,
       performSearch,
-      jobs,
-      companies,
-      seekers
+      isLoggedIn,
+      isEmployer,
+      heroStats,
+      statJobs,
+      statCompanies,
+      statSeekers
     };
   }
 };
@@ -209,11 +249,30 @@ export default {
 <style scoped>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Satisfy&display=swap');
 
-
+@keyframes breathe {
+  0%   { background-color: #e1f5fe; } /* Light Sky Blue */
+  20%  { background-color: #e0f2f1; } /* Light Cyan/Green */
+  40%  { background-color: #fffde7; } /* Light Yellow */
+  60%  { background-color: #f3e5f5; } /* Light Violet/Purple */
+  80%  { background-color: #e3f2fd; } /* Light Blue */
+  100% { background-color: #e1f5fe; } /* Back to Light Sky Blue */
+}
+@keyframes hover-breathe {
+  0%   { background-color: #e3f2fd; } /* Light Blue */
+  25%  { background-color: #fff3f7ff; } /* Light Pink */
+  50%  { background-color: #fbf4e8ff; } /* Light Orange */
+  75%  { background-color: #fffde7; } /* Light Yellow */
+  100% { background-color: #e3f2fd; } /* Back to Light Blue */
+}
+@keyframes sea-breathe {
+  0%   { background-color: #e0f7fa; } /* Light Sea Blue */
+  50%  { background-color: #e0f2f1; } /* Light Sea Green */
+  100% { background-color: #e0f7fa; } /* Back to Light Sea Blue */
+}
 .landing-page {
   font-family: 'Inter', 'Segoe UI', sans-serif;
   color: #2a2a2a;
-  background: linear-gradient(to bottom, #f9fbfd, #fff);
+  animation: breathe 18s ease-in-out infinite;
   line-height: 1.6;
 }
 
@@ -267,6 +326,13 @@ export default {
   background-color: #1c4fcf;
 }
 
+.section-divider {
+  border: 0;
+  height: 1px;
+  background-image: linear-gradient(to right, rgba(0, 0, 0, 0), rgba(21, 101, 192, 0.2), rgba(0, 0, 0, 0));
+  margin: 20px auto;
+}
+
 /* Hero */
 .hero {
   text-align: center;
@@ -284,31 +350,74 @@ export default {
   color: #555;
   font-size: 18px;
 }
+.hero-stats {
+  display: flex;
+  justify-content: center;
+  gap: 40px;
+  font-size: 16px;
+  margin: 60px auto 0;
+  padding: 20px;
+  max-width: 800px;
+  background-color: transparent;
+  backdrop-filter: blur(4px);
+}
+.hero-stats > div {
+  position: relative;
+  padding: 0 30px;
+  text-align: center;
+}
+.hero-stats > div:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  right: -5px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 1px;
+  height: 40px;
+  background-color: #dbe4f0;
+}
+.hero-stats strong {
+  display: block;
+  font-size: 28px;
+  color: #1565c0; 
+}
 
 /* Search */
 .search-box {
-  margin-top: 35px;
+  margin-top: 40px;
   display: flex;
   justify-content: center;
-  gap: 12px;
+  gap: 0; 
   flex-wrap: wrap;
+  background: #fff;
+  padding: 12px;
+ border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(21, 101, 192, 0.15);
+  max-width: 850px;
+  margin-left: auto;
+  margin-right: auto;
 }
 .search-box input {
   padding: 14px 20px;
-  border: 1px solid #ccc;
-  border-radius: 10px;
+  border: none; 
+  border-radius: 0;
   width: 260px;
   font-size: 15px;
+  border-right: 1px solid #eee; 
+}
+.search-box input:last-of-type {
+  border-right: none;
 }
 .search-box button {
   background-color: #1565c0;
   color: white;
   padding: 14px 24px;
   border: none;
-  border-radius: 10px;
+  border-radius: 8px; 
   font-weight: 600;
   cursor: pointer;
   transition: background-color 0.3s;
+  margin-left: 10px;
 }
 .search-box button:hover {
   background-color: #1c4fcf;
@@ -328,14 +437,48 @@ export default {
   color: #1565c0;
 }
 
+/* logged-out message */
+.login-prompt {
+  text-align: center;
+  font-size: 25px;
+  font-family: monospace;
+  padding: 30px 20px;
+  background-color: transparent; /* Changed from a solid color */
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  margin: 40px auto;
+  max-width: 800px;
+  color: #555;
+  transition: background-color 0.4s ease; /* For a smooth start to the hover */
+}
+
+/* ADD THIS: Apply the new animation on hover */
+.login-prompt:hover {
+  animation: sea-breathe 8s ease-in-out infinite;
+}
+
+.login-prompt a {
+  color: #1565c0; /* Your theme's primary blue color */
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.login-prompt a:hover {
+  text-decoration: underline;
+}
+
 /* Categories */
 .categories {
   text-align: center;
-  padding: 70px 30px;
-  background-color: #f3f6fa;
+  font-family: Lucida Bright;
+  padding: 30px 30px 70px;
+  background-color: transparent; /* Changed from a solid color */
+  border-radius: 20px; /* Add border-radius for a nicer hover effect */
+  transition: background-color 0.5s ease; /* Smooth transition in */
 }
 .categories h2 {
-  font-size: 30px;
+  font-size: 40px;
+  font-family: MV Boli;
   font-weight: 700;
   margin-bottom: 12px;
 }
@@ -343,15 +486,17 @@ export default {
   color: #1565c0;
 }
 .categories p {
-  font-size: 16px;
+  font-size: 20px;
+  font-family:Rockwell;
   color: #666;
 }
-
 .category-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  display: flex; 
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));         
+  flex-wrap: wrap;        
+  justify-content: center;
   gap: 32px;
-  margin-top: 50px;
+  margin-top: 20px;
 }
 .category-card {
   background: white;
@@ -360,6 +505,8 @@ export default {
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
   transition: transform 0.2s ease;
   text-align: center;
+  font-style:bold;
+  text-effect: glow;
   min-width: 260px;
   max-width: 300px;
   min-height: 330px;
@@ -396,17 +543,27 @@ export default {
 .how-it-works {
   padding: 80px 30px;
   text-align: center;
-  background-color: #ffffff;
+  background-color: transparent; /* Changed from a solid color */
+  border-radius: 20px;
+  transition: background-color 0.5s ease;
 }
 .how-it-works h2 {
-  font-size: 30px;
+  font-size: 40px;
+  font-family:MV Boli;
   color: #1565c0;
   margin-bottom: 10px;
 }
 .how-it-works .subtitle {
-  font-size: 16px;
+  font-size: 20px;
+  font-style:bold;
+  font-family: Geneva;
   color: #666;
   margin-bottom: 50px;
+}
+
+.categories:hover,
+.how-it-works:hover {
+  animation: hover-breathe 15s ease-in-out infinite;
 }
 
 .steps {

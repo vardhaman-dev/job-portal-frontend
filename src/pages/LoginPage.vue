@@ -1,29 +1,25 @@
 <template>
-  <q-page class="flex flex-center q-pa-md bg-grey-1 dark:bg-dark">
+  <q-page class="flex flex-center q-pa-md login-page-bg">
     <q-card
-      class="q-pa-xl q-mx-sm shadow-10"
-      style="width: 100%; max-width: 450px; border-radius: 16px;"
+      class="q-pa-xl q-mx-sm shadow-10 glass-card"
+      style="width: 100%; max-width: 450px; border-radius: 20px;"
     >
-      <!-- Back -->
       <div
-        class="q-mb-lg row items-center text-grey-6 dark:text-grey-4 cursor-pointer"
+        class="q-mb-lg row items-center text-black-6 dark:text-grey-4 cursor-pointer interactive-link"
         @click="goBack"
-        style="font-size: 14px;"
       >
         <q-icon name="arrow_back" size="20px" class="q-mr-sm" />
         <span class="text-weight-medium">Back to Home</span>
       </div>
 
-      <!-- Logo -->
       <div class="q-mb-lg text-center">
         <q-avatar size="72px" class="bg-blue-1 q-mb-sm">
           <q-icon name="work" size="38px" color="#1565c0" />
         </q-avatar>
         <div class="text-h5 text-weight-bold text-dark dark:text-white">Welcome Back</div>
-        <div class="text-subtitle2 text-grey-6 dark:text-grey-5">Sign in to your JobHub account</div>
+        <div class="text-subtitle2 text-grey-8 dark:text-grey-3">Sign in to your JobHub account</div>
       </div>
 
-      <!-- Error Message -->
       <q-banner
         v-if="authStore.error"
         class="bg-red-1 text-red q-mb-md"
@@ -35,26 +31,14 @@
         </template>
       </q-banner>
 
-      <!-- Success Message (for redirects after registration) -->
-      <q-banner
-        v-if="$route.query.registered"
-        class="bg-green-1 text-green q-mb-md"
-        rounded
-      >
-        Registration successful! Please log in with your credentials.
-      </q-banner>
-
-      <!-- Form -->
       <q-form @submit.prevent="handleLogin" class="q-gutter-md" ref="loginForm">
-        <!-- Email Input -->
         <q-input
-          filled
+          outlined
           dense
           label="Email address"
           v-model="formData.email"
           type="email"
-          class="bg-grey-2 dark:bg-grey-9"
-          borderless
+          :dark="$q.dark.isActive"
           :rules="[
             val => !!val || 'Email is required',
             val => /.+@.+\..+/.test(val) || 'Please enter a valid email'
@@ -63,15 +47,13 @@
           :disable="authStore.loading"
         />
 
-        <!-- Password Input -->
         <q-input
-          filled
+          outlined
           dense
           label="Password"
           v-model="formData.password"
           :type="showPassword ? 'text' : 'password'"
-          class="bg-grey-2 dark:bg-grey-9"
-          borderless
+          :dark="$q.dark.isActive"
           :rules="[val => !!val || 'Password is required']"
           lazy-rules
           :disable="authStore.loading"
@@ -86,7 +68,6 @@
           </template>
         </q-input>
 
-        <!-- Remember Me & Forgot Password -->
         <div class="row items-center justify-between q-mt-sm">
           <q-checkbox
             v-model="formData.rememberMe"
@@ -97,22 +78,21 @@
           <q-btn
             flat
             label="Forgot Password?"
-            style="color: #1565c0;"
             size="sm"
-            class="q-pa-none"
+            class="q-pa-none interactive-link"
             @click="$router.push('/forgot-password')"
             :disable="authStore.loading"
           />
         </div>
 
-        <!-- Submit Button -->
         <q-btn
           label="Sign In"
-          class="full-width bg-custom-blue"
+          class="full-width bg-custom-blue q-mt-lg"
           unelevated
           rounded
           type="submit"
           size="lg"
+          no-caps
           :loading="authStore.loading"
         >
           <template v-slot:loading>
@@ -121,18 +101,16 @@
           </template>
         </q-btn>
 
-        <!-- Divider -->
         <div class="row items-center q-my-md no-wrap">
           <q-separator class="col" />
-          <div class="q-px-sm text-grey-6 text-caption">or continue with</div>
+          <div class="q-px-sm text-black-6 text-caption">or continue with</div>
           <q-separator class="col" />
         </div>
 
-        <!-- Social Login (optional) -->
         <q-btn
           outline
           class="full-width q-mb-sm"
-          color="grey-8"
+          :color="$q.dark.isActive ? 'white' : 'grey-8'"
           no-caps
           size="md"
           :disable="authStore.loading"
@@ -146,14 +124,12 @@
         </q-btn>
       </q-form>
 
-      <!-- Sign Up Link -->
       <div class="text-center q-mt-lg">
-        <span class="text-grey-7">Don't have an account? </span>
+        <span class="text-grey-8 dark:text-grey-4">Don't have an account? </span>
         <q-btn
           flat
           label="Sign Up"
-          class="q-pa-none text-weight-medium"
-          style="color: #1565c0;"
+          class="q-pa-none text-weight-medium interactive-link"
           @click="goToSignup"
           :disable="authStore.loading"
         />
@@ -174,42 +150,32 @@ const router = useRouter();
 const route = useRoute();
 const authStore = useAuthStore();
 
-// Form data
 const formData = ref({
   email: '',
   password: '',
   rememberMe: false
 });
-
 const showPassword = ref(false);
-
 const loginForm = ref(null);
 
-// Check for registration success message on component mount
 onMounted(() => {
-  // If redirected from registration with success
   if (route.query.registered === 'true' && route.query.email) {
     formData.value.email = route.query.email;
     $q.notify({
       type: 'positive',
-      message: 'Registration successful! Please log in with your credentials.',
+      message: 'Registration successful! Please log in.',
       position: 'top',
       timeout: 5000
     });
-
-    // Clean up the URL
     const cleanUrl = window.location.pathname;
     window.history.replaceState({}, document.title, cleanUrl);
   }
-
-  // Auto-focus email field if empty
   if (!formData.value.email) {
     const emailInput = document.querySelector('input[type="email"]');
     if (emailInput) emailInput.focus();
   }
 });
 
-// Redirect user based on their role
 const redirectBasedOnRole = () => {
   if (authStore.isJobSeeker) {
     router.push(authStore.returnUrl || '/');
@@ -219,7 +185,6 @@ const redirectBasedOnRole = () => {
   authStore.setReturnUrl(null);
 };
 
-// Handle form submission
 const handleLogin = async () => {
   try {
     authStore.clearError();
@@ -228,66 +193,118 @@ const handleLogin = async () => {
 
     Loading.show({ message: 'Signing in...' });
 
-    try {
-      const response = await authStore.login({
-        email: formData.value.email.trim(),
-        password: formData.value.password,
+    const response = await authStore.login({
+      email: formData.value.email.trim(),
+      password: formData.value.password,
+    });
+
+    if (response.success) {
+      $q.notify({
+        type: 'positive',
+        message: 'Login successful!',
+        position: 'top',
+        timeout: 1500,
       });
-
-      if (response.success) {
-        $q.notify({
-          type: 'positive',
-          message: 'Login successful!',
-          position: 'top',
-          timeout: 1500,
-        });
-
-        redirectBasedOnRole();
-      } else {
-        $q.notify({
-          type: 'negative',
-          message: response.error || 'Login failed. Please try again.',
-          position: 'top',
-        });
-      }
-    } finally {
-      Loading.hide();
+      redirectBasedOnRole();
+    } else {
+      $q.notify({
+        type: 'negative',
+        message: response.error || 'Login failed. Please try again.',
+        position: 'top',
+      });
     }
   } catch (error) {
     console.error('Login error:', error);
     $q.notify({
       type: 'negative',
-      message: 'An error occurred during login. Please try again.',
+      message: 'An error occurred during login.',
     });
+  } finally {
     Loading.hide();
   }
 };
 
-
-// Navigation methods
-const goBack = () => {
-  router.push('/');
-};
-
-const goToSignup = () => {
-  router.push('/create-account');
-};
+const goBack = () => router.push('/');
+const goToSignup = () => router.push('/create-account');
 </script>
 
 <style scoped>
-.custom-blue {
-  color: #1565c0 !important;
+/* --- Page Background --- */
+.login-page-bg {
+  background-image:
+    linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)),
+    url('https://images.pexels.com/photos/3184418/pexels-photo-3184418.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2');
+  background-size: cover;
+  background-position: center;
 }
 
+/* --- Improved Glass Card --- */
+.glass-card {
+  /* Increased opacity for better readability */
+  background-color: rgba(255, 255, 255, 0.48);
+  
+  /* Increased blur for a stronger separation from the background */
+  backdrop-filter: blur(25px);
+  -webkit-backdrop-filter: blur(25px);
+
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  transition: background-color 0.3s ease, border 0.3s ease;
+}
+
+/* --- Dark Mode Adjustments --- */
+.body--dark .glass-card {
+  background-color: rgba(30, 30, 30, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* --- Improved Input Fields --- */
+:deep(.q-field--outlined .q-field__control) {
+  border-radius: 10px !important;
+}
+
+/* Make labels more readable */
+.body--light :deep(.q-field .q-field__label) {
+  color: #444 !important;
+}
+.body--dark :deep(.q-field .q-field__label) {
+  color: #ccc !important;
+}
+
+/* Highlight the focused input field with the primary color */
+:deep(.q-field--outlined.q-field--focused .q-field__control:after) {
+  border-color: #1565c0 !important;
+  border-width: 2px;
+}
+
+/* --- Interactivity & Attractiveness --- */
+
+/* All buttons get a smooth transition and slight lift on hover */
+.q-btn {
+  transition: transform 0.2s ease-out, box-shadow 0.2s ease-out;
+}
+.q-btn:hover {
+  transform: scale(1.03);
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+/* Special class for text-based links/buttons */
+.interactive-link {
+  color: #1565c0;
+  transition: filter 0.2s ease-out, text-decoration 0.2s ease-out;
+}
+.interactive-link:hover {
+  filter: brightness(1.2);
+  text-decoration: underline;
+}
+.body--dark .interactive-link {
+  color: #64b5f6; /* Lighter blue for dark mode */
+}
+
+/* --- Base Custom Colors (from original code) --- */
 .bg-custom-blue {
   background: #1565c0 !important;
   color: white !important;
 }
-
-:deep(.q-field--filled .q-field__control) {
-  border-radius: 8px !important;
-}
-
 :deep(.q-field--disabled) {
   opacity: 0.7;
 }

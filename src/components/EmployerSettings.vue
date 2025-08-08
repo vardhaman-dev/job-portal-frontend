@@ -22,9 +22,7 @@
           </q-item>
         </q-list>
       </div>
-      <div class="sidebar-section q-mt-auto">
-        <q-btn flat icon="logout" label="Logout" class="full-width logout-btn" @click="logout" />
-      </div>
+
     </div>
 
     <div class="content-area column q-pa-md q-pa-lg-lg">
@@ -98,12 +96,6 @@
 
                 <q-tab-panel name="account" class="q-gutter-y-xl">
                   <div>
-                    <div class="text-h6 panel-title">Change Email Address</div>
-                    <q-separator class="q-my-sm" />
-                    <q-input :model-value="settings.email" label="Current Email Address" filled readonly class="q-mb-sm"/>
-                    <q-btn unelevated color="primary" label="Change Email" @click="showChangeEmailDialog = true" />
-                  </div>
-                  <div>
                     <div class="text-h6 panel-title">Change Password</div>
                     <q-separator class="q-my-sm" />
                     <q-input v-model="newPassword" label="New Password" type="password" filled />
@@ -138,7 +130,6 @@
                       <div class="text-h6 danger-title">Account Actions</div>
                       <div class="row items-center q-gutter-md q-mt-sm">
                         <q-btn outline color="orange-8" label="Deactivate Account" />
-                        <q-btn outline color="negative" label="Delete This Account" @click="confirmDelete" />
                       </div>
                     </q-card-section>
                   </q-card>
@@ -149,21 +140,6 @@
         </div>
       </div>
 
-      <q-dialog v-model="showDeleteConfirm" persistent>
-        <q-card style="width: 400px">
-          <q-card-section class="row items-center">
-            <q-avatar icon="warning" color="negative" text-color="white" />
-            <div class="text-h6 q-ml-md">Confirm Account Deletion</div>
-          </q-card-section>
-          <q-card-section class="text-body1">
-            Are you sure you want to permanently delete your account? All of your data will be lost.
-          </q-card-section>
-          <q-card-actions align="right">
-            <q-btn flat label="Cancel" color="primary" v-close-popup />
-            <q-btn label="Delete My Account" color="negative" @click="deleteAccount" v-close-popup />
-          </q-card-actions>
-        </q-card>
-      </q-dialog>
       <q-dialog v-model="showChangeEmailDialog">
         <q-card style="width: 450px">
           <q-card-section>
@@ -225,9 +201,9 @@ const loginDevices = ref([
 const originalSettings = reactive({});
 const newPassword = ref('');
 const confirmPassword = ref('');
-const showDeleteConfirm = ref(false);
+
 const isSaving = ref(false);
-const showChangeEmailDialog = ref(false);
+
 const newEmail = ref('');
 const currentPassword = ref('');
 
@@ -250,14 +226,13 @@ onMounted(() => {
 
 const saveSettings = () => { isSaving.value = true; setTimeout(() => { Object.assign(originalSettings, JSON.parse(JSON.stringify(settings))); localStorage.setItem('employerSettings', JSON.stringify(settings)); $q.notify({ color: 'positive', message: 'Settings saved successfully!', icon: 'check_circle' }); isSaving.value = false; }, 1000); };
 const savePassword = () => { $q.notify({ color: 'positive', message: 'Password changed successfully!', icon: 'lock' }); newPassword.value = ''; confirmPassword.value = ''; };
-const confirmDelete = () => { showDeleteConfirm.value = true; };
-const deleteAccount = () => { $q.notify({ color: 'negative', message: 'Account deleted.' }); logout(); };
-const changeEmail = () => { $q.notify({ color: 'positive', message: 'A confirmation link has been sent to your new email address.' }); showChangeEmailDialog.value = false; newEmail.value = ''; currentPassword.value = ''; };
+
+
 const logoutDevice = (id) => { loginDevices.value = loginDevices.value.filter(d => d.id !== id); $q.notify('Device has been logged out.'); };
 
 const links = [ { label: 'Dashboard Overview', icon: 'dashboard', to: '/employer-portal' }, { label: 'Posted Jobs', icon: 'work', to: '/posted-jobs' }, { label: 'Post New Job', icon: 'add_box', to: '/post-job' }, { label: 'Candidates', icon: 'groups', to: '/candidates' }, { label: 'Messages', icon: 'mail', to: '/employer-messages' }, { label: 'Company Profile', icon: 'domain', to: '/company-profile' }, { label: 'Settings', icon: 'settings', to: '/employer-settings' }];
 const navigate = (link) => { selected.value = link.label; if (link.to) router.push(link.to); };
-const logout = () => { localStorage.removeItem('employerData'); localStorage.removeItem('employerSettings'); router.push('/employers'); };
+
 watch(() => settings.displayName, (newName) => { if (newName) { employer.value.name = newName; }});
 </script>
 

@@ -100,13 +100,43 @@ export default {
 </script>
 
 <style scoped>
-.navbar { display: flex; justify-content: space-between; padding: 20px 60px; align-items: center; background-color: #fff; border-bottom: 1px solid #eaecef; }
-.logo { font-weight: 700; color: #1565c0; font-size: 24px; }
-.nav-links a { margin: 0 20px; color: #333; font-weight: 500; text-decoration: none; transition: color 0.2s; }
+.navbar { 
+  display: flex; 
+  justify-content: space-between; 
+  padding: 20px 60px; 
+  align-items: center; 
+  border-bottom: 1px solid #dde2e7; /* A slightly more defined border */
+  font-family: 'Copperplate Gothic Light', sans-serif;
+  font-style: bold; 
+  font-size: 20px;
+
+  /* --- Themed Background --- */
+  background-color: #f8f9fa; /* A very light, professional grey base */
+  background-image: 
+    linear-gradient(45deg, #f1f3f5 25%, transparent 25%), 
+    linear-gradient(-45deg, #f1f3f5 25%, transparent 25%), 
+    linear-gradient(45deg, transparent 75%, #f1f3f5 75%), 
+    linear-gradient(-45deg, transparent 75%, #f1f3f5 75%);
+  background-size: 20px 20px;
+}
+.logo {
+  font-weight: 700;
+  color: #1565c0;
+  font-size: 35px;
+  font-family: Gabriola;
+  font-style: bold;
+  cursor: pointer; /* Indicates it's interactive */
+  transition: all 0.3s ease-in-out; /* Add this for a smooth effect */
+}
+.logo:hover {
+  transform: scale(1.05); /* Makes the logo slightly larger */
+  text-shadow: 0 2px 15px rgba(36, 231, 192, 0.64); /* Adds a soft blue glow */
+}
+.nav-links a { margin: 0 20px; color: #333; font-weight: 500; text-decoration: none; transition: color 0.2s;  font-family:Copperplate Gothic Light; font-style:bold; font-size: 20px; }
 .nav-links a:hover { color: #1565c0; }
-.auth-buttons .sign-in { margin-right: 15px; font-weight: 600; color: #333; text-decoration: none; }
+.auth-buttons .sign-in { margin-right: 15px; font-weight: 600; font-family:Zapf Chancery; font-style:bold; font-size: 20px; color: #333; text-decoration: none; }
 .auth-buttons .sign-in:hover { color: #1565c0; }
-.auth-buttons .sign-up { background-color: #1565c0; color: white; padding: 8px 20px; border-radius: 6px; font-weight: 600; text-decoration: none; transition: background 0.3s; }
+.auth-buttons .sign-up { background-color: #1565c0; color: white; font-family:Zapf Chancery; font-style:bold; font-size: 20px; padding: 8px 20px; border-radius: 6px; font-weight: 600; text-decoration: none; transition: background 0.3s; }
 .auth-buttons .sign-up:hover { background-color: #1c4fcf; }
 .nav-links .active-link { position: relative; color: #1565c0; font-weight: 700; transition: color 0.3s ease; }
 .nav-links .active-link::after { content: ''; position: absolute; bottom: -6px; left: 0; width: 100%; height: 2px; background-color: #1565c0; animation: slideIn 0.3s ease-out forwards; }

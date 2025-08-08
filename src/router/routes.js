@@ -32,6 +32,11 @@ const routes = [
         component: () => import('pages/PrivacyPolicy.vue')
       },
       {
+        path: '/terms-and-conditions',
+        name: 'TermsConditions',
+        component: () => import('pages/TermsConditions.vue')
+      },
+      {
         path: 'job/:id',
         name: 'JobDescription',
         component: () => import('pages/JobDescriptionPage.vue'),
@@ -144,6 +149,18 @@ const routes = [
     role: 'company'
   }
 },
+
+  {
+    path: '/forgot-password',
+    component: () => import('layouts/AuthLayout.vue'),
+    children: [
+      {
+        path: '',
+        name: 'ForgotPassword',
+        component: () => import('pages/ChangePassword.vue')
+      }
+    ]
+  },
 
   // Admin Routes
   {

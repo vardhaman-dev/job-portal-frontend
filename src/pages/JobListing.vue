@@ -70,7 +70,7 @@
         </transition-group>
 
         <!-- Empty State -->
-        <div v-if="filteredJobs.length === 0" class="q-mt-md text-grey text-center">
+        <div v-if="filteredJobs.length === 0" class="empty-state-container">
           <div v-if="searchQuery">
             <q-icon name="search_off" size="30px" class="q-mb-sm" />
             No jobs found for "<strong>{{ searchQuery }}</strong>"
@@ -255,5 +255,15 @@ const filteredJobs = computed(() => {
 .no-underline {
   text-decoration: none;
   color: inherit;
+}
+/* Add this new class to your <style scoped> section */
+.empty-state-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 10vh; /* Ensures it occupies a substantial part of the view */
+  color: #757575; /* A standard grey color */
+  text-align: center;
 }
 </style>

@@ -77,12 +77,17 @@
         <p>If you have any questions about this Privacy Policy, please visit our <router-link to="/contact">Contact Page</router-link> or email us at privacy@jobhub.com.</p>
       </div>
     </div>
+    <AppFooter />
   </div>
 </template>
 
 <script>
+import AppFooter from '../components/FooterPart.vue';
 export default {
-  name: 'PrivacyPolicy'
+  name: 'PrivacyPolicy',
+    components: {
+    AppFooter
+  }
 };
 </script>
 
