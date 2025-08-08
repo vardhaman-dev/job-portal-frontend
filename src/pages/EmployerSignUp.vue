@@ -244,19 +244,27 @@ export default {
         
         if (response.success) {
           const employerData = {
-            id: response.employer.id,
-            name: response.employer.companyName,
-            email: response.employer.email,
+            id: formData.value.id, // Use company name as ID for simplicity
+            name: formData.value.companyName,
+            email: formData.value.email,
+            status: 'pending',
+            // Add any other employer data you want to store
           };
           localStorage.setItem('employerData', JSON.stringify(employerData));
           
-          $q.notify({
-            type: 'positive',
-            message: 'Registration Successful!',
-            position: 'top'
-          });
+          // Store auth token if available in response
+          if (response.token) {
+            localStorage.setItem('authToken', response.token);
+            localStorage.setItem('userData', JSON.stringify({
+              id: response.userId,
+              email: formData.value.email,
+              role: 'company',
+              status: 'pending'
+            }));
+          }
 
-          router.push('/employers');
+          // Redirect to employer portal
+          router.push('/employer-portal');
         } else {
           error.value = response.error || 'Registration failed.';
         }

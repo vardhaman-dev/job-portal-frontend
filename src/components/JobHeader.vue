@@ -12,9 +12,8 @@
         <div class="text-subtitle2 q-mt-xs">{{ job.company?.companyName || 'Unknown Company' }}</div>
 
         <div class="text-grey text-caption q-mt-xs">
-  {{ job.location }} • Posted on {{ createddate }} • Apply by {{ formattedDeadline }}
-</div>
-
+          {{ job.location }} • Posted on {{ createddate }} • Apply by {{ formattedDeadline }}
+        </div>
 
         <div class="q-mt-sm q-gutter-sm">
           <q-badge v-if="job.remote" color="green-3" text-color="black" label="Remote" />
@@ -33,9 +32,20 @@
           @click="goToApplicationForm"
         />
         <div class="q-gutter-sm">
-          <q-btn flat icon="bookmark_border">
-            <q-tooltip>Bookmark</q-tooltip>
+          <!-- Bookmark Button -->
+          <q-btn
+            flat
+            round
+            dense
+            :icon="isBookmarked ? 'bookmark' : 'bookmark_border'"
+            :color="isBookmarked ? 'blue' : 'grey'"
+            @click="toggleBookmark"
+            :loading="loading"
+          >
+            <q-tooltip>{{ isBookmarked ? 'Remove Bookmark' : 'Bookmark' }}</q-tooltip>
           </q-btn>
+
+          <!-- Share Button -->
           <q-btn flat>
             <template #default>
               <img :src="shareIcon" alt="Share" width="20" height="20" />
@@ -48,27 +58,31 @@
   </q-card>
 </template>
 
-
 <script setup>
-import { ref, toRef,computed } from 'vue'
+import { ref, toRef, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import { authHelpers } from '../services/auth.service'
+import { bookmarkService } from '../services/bookmarkService'
 import shareIcon from '../assets/share.png'
 
 const props = defineProps({ job: Object })
-
-const job = toRef(props, 'job') // makes job reactive
+const job = toRef(props, 'job')
 const router = useRouter()
 const isHovered = ref(false)
+const isBookmarked = ref(false)
+const loading = ref(false)
+
+const userId = authHelpers.getCurrentUser()?.id
 
 const formattedDeadline = computed(() => {
   if (!job.value?.deadline) return 'Not specified'
-return new Date(job.value.deadline).toLocaleDateString('en-GB', {
-  day: '2-digit',
-  month: 'short',
-  year: 'numeric'
+  return new Date(job.value.deadline).toLocaleDateString('en-GB', {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric'
+  })
 })
 
-})
 const createddate = computed(() => {
   if (!job.value?.posted_at) return 'Not specified'
   return new Date(job.value.posted_at).toLocaleDateString('en-GB', {
@@ -77,13 +91,43 @@ const createddate = computed(() => {
     year: 'numeric'
   })
 })
+
 const goToApplicationForm = () => {
   if (job.value?.id) {
     router.push({ name: 'ApplicationForm', params: { jobId: job.value.id } })
-  } else {
-    console.warn('Job ID is missing')
   }
 }
+
+const checkBookmark = async () => {
+  try {
+    const res = await bookmarkService.checkBookmark(userId, job.value.id)
+    console.log("Bookmark check response:", res)
+    isBookmarked.value = res.bookmarked
+  } catch (err) {
+    console.error('Error checking bookmark:', err)
+  }
+}
+
+const toggleBookmark = async () => {
+  loading.value = true
+  try {
+    if (isBookmarked.value) {
+      await bookmarkService.removeBookmark(userId, job.value.id)
+      isBookmarked.value = false
+    } else {
+      await bookmarkService.addBookmark(userId, job.value.id)
+      isBookmarked.value = true
+    }
+  } catch (err) {
+    console.error('Error toggling bookmark:', err)
+  } finally {
+    loading.value = false
+  }
+}
+
+onMounted(() => {
+  checkBookmark()
+})
 </script>
 
 
