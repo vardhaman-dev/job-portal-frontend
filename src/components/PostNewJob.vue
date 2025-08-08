@@ -242,10 +242,8 @@ import { useRouter } from 'vue-router';
 import jobService from '../services/jobpost.service';
 import { api } from 'boot/axios';
 import AppHeader from 'src/components/HeaderPart.vue';
-import { useAuthStore } from 'src/stores/auth.store';
 
 // Initialize stores and utilities
-const authStore = useAuthStore();
 const router = useRouter();
 const $q = useQuasar();
 
@@ -281,7 +279,7 @@ const educationOptions = [
 // Fetch company status from server
 const fetchCompanyStatus = async () => {
   try {
-    isLoading.value = true;
+    loading.value = true;
     const token = localStorage.getItem('authToken');
     if (!token) {
       throw new Error('No authentication token found');
@@ -318,7 +316,7 @@ const fetchCompanyStatus = async () => {
       rejectionReason.value = employerData.rejectionReason || '';
     }
   } finally {
-    isLoading.value = false;
+    loading.value = false;
   }
 };
 
@@ -387,9 +385,6 @@ const onTagKeyup = (event) => {
     addTag();
   }
 };
-
-// Add loading ref at the top with other refs
-const loading = ref(false);
 
 const submitJob = async () => {
   submitted.value = true;

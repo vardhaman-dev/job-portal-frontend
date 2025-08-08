@@ -86,6 +86,7 @@ export default {
     },
   },
   methods: {
+    toggleDropdown() {
       this.showDropdown = !this.showDropdown;
     },
     logout() {
