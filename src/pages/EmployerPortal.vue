@@ -17,10 +17,36 @@
         </div>
         <div class="sidebar-section q-pt-md q-pb-none">
           <q-list class="nav-list">
-            <q-item v-for="link in links" :key="link.label" :active="selected === link.label" active-class="active-link"
-              clickable v-ripple @click="navigate(link)">
-              <q-item-section avatar> <q-icon :name="link.icon" /> </q-item-section>
-              <q-item-section> {{ link.label }} </q-item-section>
+            <q-item 
+              v-for="link in links" 
+              :key="link.label" 
+              :active="selected === link.label" 
+              active-class="active-link"
+              clickable 
+              v-ripple 
+              @click="navigate(link)"
+              class="nav-item"
+            >
+              <q-item-section avatar>
+                <q-icon :name="link.icon" />
+              </q-item-section>
+              <q-item-section>
+                <div class="row items-center">
+                  <span>{{ link.label }}</span>
+                  <q-badge 
+                    v-if="link.badge && link.badge.value" 
+                    color="red" 
+                    floating 
+                    transparent
+                    class="q-ml-sm"
+                  >
+                    {{ link.badge.value }}
+                  </q-badge>
+                </div>
+              </q-item-section>
+              <q-tooltip v-if="link.highlight" anchor="center right" self="center left" :offset="[5, 10]">
+                Post a new job opening
+              </q-tooltip>
             </q-item>
           </q-list>
         </div>
@@ -31,12 +57,49 @@
 
       <!-- Main Content -->
       <div class="content-area column q-pa-md q-pa-lg-lg">
+        <!-- Pending Approval Banner -->
+        <q-banner v-if="employer.status === 'pending'" class="bg-warning text-dark q-mb-md">
+          <template v-slot:avatar>
+            <q-icon name="pending_actions" color="dark" size="2em" />
+          </template>
+          <div class="text-weight-bold">Your company is under review</div>
+          <div>You can post jobs, but they will be marked as pending until your company is approved by our team.</div>
+        </q-banner>
+        
         <div class="row justify-between items-center q-mb-lg">
           <div>
-            <div class="text-h5 text-weight-bold content-title">Welcome back, {{ employer.name }}!</div>
-            <div class="text-subtitle1 subtitle-text">Here's your overview for {{ todaysDate }}.</div>
+            <div class="text-h5 text-weight-bold content-title">Welcome, {{ employer.name }}!</div>
+            <div class="text-subtitle1 subtitle-text">{{ employer.status === 'pending' ? 'Your account is under review. ' : '' }}Here's your overview for {{ todaysDate }}.</div>
           </div>
         </div>
+
+        <!-- Verification Status Banner -->
+        <q-banner 
+          v-if="verificationStatus === 'pending'" 
+          class="bg-blue-1 text-blue-9 q-mb-lg"
+          rounded
+        >
+          <template v-slot:avatar>
+            <q-icon name="pending" color="blue-7" size="2em" />
+          </template>
+          <div class="text-weight-medium">Your company is under review</div>
+          <div>Your company profile is currently being reviewed by our team. This process typically takes 1-2 business days. You can still post jobs, but they will be marked as pending until your company is verified.</div>
+        </q-banner>
+
+        <q-banner 
+          v-else-if="verificationStatus === 'rejected'" 
+          class="bg-red-1 text-red-9 q-mb-lg"
+          rounded
+        >
+          <template v-slot:avatar>
+            <q-icon name="warning" color="red-7" size="2em" />
+          </template>
+          <div class="text-weight-medium">Company Verification Required</div>
+          <div>Your company verification was rejected. Reason: {{ rejectionReason || 'Not specified' }}. Please update your company information and submit for review again.</div>
+          <template v-slot:action>
+            <q-btn flat color="red-8" label="Update Company Profile" to="/company-profile" />
+          </template>
+        </q-banner>
 
         <!-- Broadcast Banner -->
         <q-banner v-if="activeBroadcast" inline-actions rounded class="q-mb-lg broadcast-banner">
@@ -49,7 +112,7 @@
 
         <!-- Status Boxes -->
         <div class="row q-col-gutter-lg q-mb-lg">
-          <div class="col-12 col-sm-6 col-md-3" v-for="stat in stats" :key="stat.label">
+          <div class="col-12 col-sm-6 col-md-3" v-for="stat in dashboardStats" :key="stat.label">
             <q-card class="stat-card full-height">
               <q-card-section class="flex items-center q-pa-md">
                 <q-icon :name="stat.icon" :color="stat.iconColor" size="2.5em" class="q-mr-md" />
@@ -116,18 +179,52 @@ import { ref, computed, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { useQuasar } from 'quasar';
 import VueApexCharts from 'vue3-apexcharts';
+import { api } from 'src/boot/axios';
 import AppHeader from 'src/components/HeaderPart.vue';
+import { authHelpers } from 'src/services/auth.service';
 
 const apexchart = VueApexCharts;
 const router = useRouter();
 const $q = useQuasar();
 
-const stats = ref([
+// Stats for the dashboard cards
+const dashboardStats = ref([
   { value: 10, label: 'Total Jobs', icon: 'summarize', iconColor: 'blue-4' },
   { value: 4, label: 'Active Jobs', icon: 'fact_check', iconColor: 'blue-5' },
   { value: 87, label: 'Total Applicants', icon: 'groups', iconColor: 'blue-6' },
   { value: 2, label: 'Pending Review', icon: 'pending_actions', iconColor: 'blue-7' }
 ]);
+
+// Stats for the navigation menu
+const navStats = ref({
+  pending_jobs: 2, // This will be updated from the API
+  // Add other navigation-related stats here
+});
+
+// Fetch navigation stats when component mounts
+const fetchNavStats = async () => {
+  try {
+    const token = authHelpers.getToken();
+    if (!token) {
+      console.warn('No authentication token found');
+      return;
+    }
+    
+    const response = await api.get('/jobs/stats', {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      }
+    });
+    
+    if (response.data && response.data.pending_jobs !== undefined) {
+      navStats.value.pending_jobs = response.data.pending_jobs;
+    }
+  } catch (error) {
+    console.error('Error fetching navigation stats:', error);
+  }
+};
 
 const actionItems = ref([
   { icon: 'person_add', title: '5 New Applicants', subtitle: 'For Senior Frontend Developer', to: '/candidates?jobId=1' },
@@ -151,33 +248,137 @@ const chartOptions = computed(() => ({
   theme: { mode: $q.dark.isActive ? 'dark' : 'light' }
 }));
 
-const employer = ref({ name: 'Innovate Inc.', email: 'hr@innovate.com' });
+const employer = ref({ 
+  name: 'Innovate Inc.', 
+  email: 'hr@innovate.com',
+  status: 'pending',
+  rejectionReason: ''
+});
 const selected = ref('Dashboard Overview');
 const activeBroadcast = ref(null);
+const verificationStatus = ref('');
+const rejectionReason = ref('');
+const isLoading = ref(true);
 
-onMounted(() => {
-  const storedEmployer = localStorage.getItem('employerData');
-  if (storedEmployer) employer.value = JSON.parse(storedEmployer);
-  const storedBroadcast = localStorage.getItem('jobhubBroadcast');
-  if (storedBroadcast) {
-    const broadcast = JSON.parse(storedBroadcast);
-    if (new Date(broadcast.expiry) > new Date()) {
-      activeBroadcast.value = broadcast;
-    } else {
-      localStorage.removeItem('jobhubBroadcast');
+const fetchCompanyStatus = async () => {
+  try {
+    isLoading.value = true;
+    const token = localStorage.getItem('authToken');
+    if (!token) {
+      throw new Error('No authentication token found');
     }
+    
+    const response = await api.get('/company/status', {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      }
+    });
+    
+    if (response.data) {
+      verificationStatus.value = response.data.status || '';
+      rejectionReason.value = response.data.rejectionReason || '';
+      
+      // Update local storage with the latest status
+      const storedEmployer = localStorage.getItem('employerData');
+      if (storedEmployer) {
+        const employerData = JSON.parse(storedEmployer);
+        employerData.status = verificationStatus.value;
+        employerData.rejectionReason = rejectionReason.value;
+        localStorage.setItem('employerData', JSON.stringify(employerData));
+        employer.value = employerData;
+      }
+    }
+  } catch (error) {
+    console.error('Error fetching company status:', error);
+    // Fallback to localStorage if API fails
+    const storedEmployer = localStorage.getItem('employerData');
+    if (storedEmployer) {
+      const employerData = JSON.parse(storedEmployer);
+      verificationStatus.value = employerData.status || '';
+      rejectionReason.value = employerData.rejectionReason || '';
+    }
+  } finally {
+    isLoading.value = false;
+  }
+};
+
+onMounted(async () => {
+  try {
+    // Initialize employer data from localStorage
+    const storedEmployer = localStorage.getItem('employerData');
+    if (storedEmployer) {
+      const employerData = JSON.parse(storedEmployer);
+      employer.value = employerData;
+      verificationStatus.value = employerData.status || '';
+      rejectionReason.value = employerData.rejectionReason || '';
+    }
+    
+    // Fetch fresh status from server
+    await fetchCompanyStatus();
+    
+    // Check for broadcast messages
+    const storedBroadcast = localStorage.getItem('jobhubBroadcast');
+    if (storedBroadcast) {
+      const broadcast = JSON.parse(storedBroadcast);
+      if (new Date(broadcast.expiry) > new Date()) {
+        activeBroadcast.value = broadcast;
+      } else {
+        localStorage.removeItem('jobhubBroadcast');
+      }
+    }
+    
+    // Fetch navigation stats
+    await fetchNavStats();
+    // TODO: Replace with actual API call to fetch dashboard stats
+    // const response = await fetchEmployerStats();
+    // dashboardStats.value = response.data;
+  } catch (error) {
+    console.error('Error fetching stats:', error);
   }
 });
 
-const links = [
-  { label: 'Dashboard Overview', icon: 'dashboard', to: '/employer-portal' },
-  { label: 'Posted Jobs', icon: 'work', to: '/posted-jobs' },
-  { label: 'Post New Job', icon: 'add_box', to: '/post-job' },
-  { label: 'Candidates', icon: 'groups', to: '/candidates' },
-  { label: 'Messages', icon: 'mail', to: '/employer-messages' },
-  { label: 'Company Profile', icon: 'domain', to: '/company-profile' },
-  { label: 'Settings', icon: 'settings', to: '/employer-settings' }
-];
+// Compute navigation links with reactive properties
+const links = computed(() => [
+  { 
+    label: 'Dashboard Overview', 
+    icon: 'dashboard', 
+    to: '/employer-portal' 
+  },
+  { 
+    label: 'Posted Jobs', 
+    icon: 'work', 
+    to: '/posted-jobs',
+    badge: navStats.value.pending_jobs > 0 ? navStats.value.pending_jobs.toString() : ''
+  },
+  { 
+    label: 'Post New Job', 
+    icon: 'add_box', 
+    to: '/post-job',
+    highlight: true
+  },
+  { 
+    label: 'Candidates', 
+    icon: 'groups', 
+    to: '/candidates' 
+  },
+  { 
+    label: 'Messages', 
+    icon: 'mail', 
+    to: '/employer-messages' 
+  },
+  { 
+    label: 'Company Profile', 
+    icon: 'domain', 
+    to: '/company-profile' 
+  },
+  { 
+    label: 'Settings', 
+    icon: 'settings', 
+    to: '/employer-settings' 
+  }
+]);
 
 const navigate = (link) => {
   selected.value = link.label;

@@ -22,10 +22,10 @@
           </div>
 
           <div v-if="showDropdown" class="dropdown-menu">
-            <div v-if="user.role === 'job_seeker'" class="dropdown-item" @click="$router.push('/dashboard')">
+            <div v-if="user.role === 'job_seeker' || user.type === 'seeker'" class="dropdown-item" @click="$router.push('/dashboard')">
               Job Seeker Dashboard
             </div>
-            <div v-if="user.role === 'company'" class="dropdown-item" @click="$router.push('/employer-portal')">
+            <div v-if="user.role === 'company' || user.type === 'employer'" class="dropdown-item" @click="$router.push('/employer-portal')">
               Employer Dashboard
             </div>
             <q-separator class="q-my-xs" />
@@ -86,7 +86,6 @@ export default {
     },
   },
   methods: {
-    toggleDropdown() {
       this.showDropdown = !this.showDropdown;
     },
     logout() {

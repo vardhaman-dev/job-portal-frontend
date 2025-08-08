@@ -101,6 +101,12 @@ const routes = [
       },
     ]
   },
+  
+  {
+    path: '/registration-pending',
+    name: 'RegistrationPending',
+    component: () => import('pages/RegistrationPending.vue')
+  },
 
   {
     path: '/create-account',
@@ -144,6 +150,15 @@ const routes = [
     role: 'company'
   }
 },
+  {
+    path: '/posted-jobs',
+    name: 'EmployerPostedJobs',
+    component: () => import('pages/EmployerPostedJobs.vue'),
+    meta: {
+      requiresAuth: true,
+      role: 'company'
+    }
+  },
 
   // Admin Routes
   {
@@ -160,6 +175,12 @@ const routes = [
         path: 'dashboard',
         name: 'AdminDashboard',
         component: () => import('pages/admin/AdminDashboard.vue'),
+        meta: { requiresAuth: true, role: 'admin' }
+      },
+      {
+        path: 'companies',
+        name: 'CompaniesManagement',
+        component: () => import('pages/admin/CompaniesManagement.vue'),
         meta: { requiresAuth: true, role: 'admin' }
       }
     ]

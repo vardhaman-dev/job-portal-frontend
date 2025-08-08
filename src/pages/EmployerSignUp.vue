@@ -249,15 +249,27 @@ export default {
         if (response.success) {
           // Store employer data in local storage
           const employerData = {
-            id:formData.value.id, // Use company name as ID for simplicity
+            id: formData.value.id, // Use company name as ID for simplicity
             name: formData.value.companyName,
             email: formData.value.email,
+            status: 'pending',
             // Add any other employer data you want to store
           };
           localStorage.setItem('employerData', JSON.stringify(employerData));
+          
+          // Store auth token if available in response
+          if (response.token) {
+            localStorage.setItem('authToken', response.token);
+            localStorage.setItem('userData', JSON.stringify({
+              id: response.userId,
+              email: formData.value.email,
+              role: 'company',
+              status: 'pending'
+            }));
+          }
 
-          // Redirect to employer portal dashboard
-          router.push('/employers');
+          // Redirect to employer portal
+          router.push('/employer-portal');
         } else {
           // Handle error response from auth service
           error.value = response.error || 'Registration failed. Please check your information and try again.';
