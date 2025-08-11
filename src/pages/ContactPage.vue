@@ -110,13 +110,18 @@
     ></iframe>
   </div>
 </section>
+<AppFooter />
 
   </div>
 </template>
 
 <script>
+import AppFooter from '../components/FooterPart.vue';
 export default {
   name: 'ContactPage',
+      components: {
+    AppFooter
+  },
   data() {
     return {
       formData: {

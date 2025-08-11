@@ -295,6 +295,12 @@ export default {
   100% { background-position: 0% 50%; }
 }
 
+@keyframes breathingBackground {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
 .landing-page {
   font-family: 'Inter', sans-serif;
   color: #2a2a2a;
@@ -332,7 +338,12 @@ export default {
 }
 
 .glass-section:hover {
-  background: rgba(255, 255, 255, 0.4); /* "Slightly white" on hover */
+  /* MODIFIED: Replaced static color with an animated gradient */
+  background: linear-gradient(135deg, rgba(208, 234, 246, 0.4), rgba(174, 212, 248, 0.5), rgba(218, 200, 252, 0.5), rgba(196, 131, 252, 0.4));
+  background-size: 400% 400%; /* Makes the gradient large enough to animate */
+  animation: breathingBackground 15s ease infinite; /* Applies the breathing animation */
+
+  /* These existing properties are preserved for the glass effect */
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   border: 1px solid rgba(255, 255, 255, 0.5);

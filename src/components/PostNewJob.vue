@@ -26,9 +26,7 @@
            </q-item>
          </q-list>
        </div>
-       <div class="sidebar-section q-mt-auto">
-         <q-btn flat icon="logout" label="Logout" class="full-width logout-btn" @click="logout" />
-       </div>
+
      </div>
 
     <div class="content-area post-job-bg q-pa-md q-pa-lg-xl">
@@ -39,6 +37,47 @@
          </div>
          <q-linear-progress :value="step / 5" color="primary" track-color="white" size="8px" rounded />
        </div>
+
+      <!-- Verification Status Banner -->
+      <!-- Company Verification Status Banners -->
+      <q-banner 
+        v-if="verificationStatus === 'pending'" 
+        class="bg-blue-1 text-blue-9 q-mb-md"
+        rounded
+      >
+        <template v-slot:avatar>
+          <q-icon name="pending_actions" color="blue-7" size="2em" />
+        </template>
+        <div class="text-weight-medium">Your company is under review</div>
+        <div>You can post jobs, but they will be marked as pending until your company is verified. The verification process typically takes 1-2 business days.</div>
+      </q-banner>
+
+      <q-banner 
+        v-else-if="verificationStatus === 'rejected'" 
+        class="bg-red-1 text-red-9 q-mb-md"
+        rounded
+      >
+        <template v-slot:avatar>
+          <q-icon name="warning" color="red-7" size="2em" />
+        </template>
+        <div class="text-weight-medium">Company Verification Required</div>
+        <div>Your company verification was rejected. Reason: {{ rejectionReason || 'Not specified' }}. Please update your company information and submit for review again.</div>
+        <template v-slot:action>
+          <q-btn flat color="red-8" label="Update Company Profile" to="/company-profile" />
+        </template>
+      </q-banner>
+      
+      <q-banner 
+        v-else-if="verificationStatus === 'approved'" 
+        class="bg-green-1 text-green-9 q-mb-md"
+        rounded
+      >
+        <template v-slot:avatar>
+          <q-icon name="verified" color="green-7" size="2em" />
+        </template>
+        <div class="text-weight-medium">Your company is verified!</div>
+        <div>Your job postings will be published immediately after submission.</div>
+      </q-banner>
 
       <q-card v-if="step === 1" class="step-card">
          <q-card-section class="q-pt-lg">
@@ -199,19 +238,33 @@ import { ref, computed, onMounted } from 'vue';
 import { useQuasar } from 'quasar';
 import { useRouter } from 'vue-router';
 import jobService from '../services/jobpost.service';
-import { useAuthStore } from 'src/stores/auth.store';
+import { api } from 'boot/axios';
 import AppHeader from 'src/components/HeaderPart.vue';
 
-const authStore = useAuthStore(); 
-
+// Initialize stores and utilities
 const router = useRouter();
 const $q = useQuasar();
+
+// Refs for form state
 const step = ref(1);
 const submitted = ref(false);
 const tagInput = ref(''); // Add ref for tag input
+const loading = ref(false);
 
-const employer = ref({ name: 'Innovate Inc.', email: 'hr@innovate.com' });
+// Initialize employer with default values
+const employer = ref({ 
+  name: 'Innovate Inc.', 
+  email: 'hr@innovate.com',
+  status: 'pending',
+  rejectionReason: ''
+});
+
+// UI state
 const selected = ref('Post New Job');
+const verificationStatus = ref('');
+const rejectionReason = ref('');
+
+// Education options for the form
 const educationOptions = [
   { label: '10th (SSC)', value: '10th' },
   { label: '12th (HSC)', value: '12th' },
@@ -221,11 +274,61 @@ const educationOptions = [
   { label: 'PhD / Doctorate', value: 'PHD' }
 ];
 
-onMounted(() => {
+// Fetch company status from server
+const fetchCompanyStatus = async () => {
+  try {
+    loading.value = true;
+    const token = localStorage.getItem('authToken');
+    if (!token) {
+      throw new Error('No authentication token found');
+    }
+    
+    const response = await api.get('/employer/status', {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      }
+    });
+    
+    if (response.data) {
+      verificationStatus.value = response.data.status || '';
+      rejectionReason.value = response.data.rejectionReason || '';
+      
+      // Update local storage with the latest status
+      const storedEmployer = localStorage.getItem('employerData');
+      if (storedEmployer) {
+        const employerData = JSON.parse(storedEmployer);
+        employerData.status = verificationStatus.value;
+        employerData.rejectionReason = rejectionReason.value;
+        localStorage.setItem('employerData', JSON.stringify(employerData));
+        employer.value = employerData;
+      }
+    }
+  } catch (error) {
+    console.error('Error fetching company status:', error);
+    // Fallback to local storage data if available
+    const storedEmployer = localStorage.getItem('employerData');
+    if (storedEmployer) {
+      const employerData = JSON.parse(storedEmployer);
+      verificationStatus.value = employerData.status || '';
+      rejectionReason.value = employerData.rejectionReason || '';
+    }
+  } finally {
+    loading.value = false;
+  }
+};
+
+onMounted(async () => {
   const stored = localStorage.getItem('employerData');
   if (stored) {
-    employer.value = JSON.parse(stored);
+    const employerData = JSON.parse(stored);
+    employer.value = employerData;
+    verificationStatus.value = employerData.status || '';
+    rejectionReason.value = employerData.rejectionReason || '';
   }
+  
+  // Fetch fresh status from server
+  await fetchCompanyStatus();
 });
 
 const links = [
@@ -243,10 +346,6 @@ const navigate = (link) => {
   if (link.to) router.push(link.to);
 };
 
-const logout = () => {
-  localStorage.removeItem('employerData');
-  router.push('/employers');
-};
 
 const stepSections = [
   'Job Details', 'Candidate Requirements', 'Application Preferences', 'Screening Questions', 'Review & Submit'
@@ -283,44 +382,115 @@ const onTagKeyup = (event) => {
 
 const submitJob = async () => {
   submitted.value = true;
-
   
-  const payload = {
-    company_id: authStore.user?.id,
-    title: form.value.title,
-    description: form.value.description,
-    location: form.value.location,
-    type: form.value.type,
-    salary: form.value.salary,
-    benefits: form.value.benefits, 
-    deadline: form.value.deadline,
-    education: form.value.education,
-    skills: form.value.skills.split(',').map(s => s.trim()).filter(Boolean),
-    tags: form.value.tags,
-    status: 'open'
-  };
-
-  console.log('Payload being sent:', payload); // Debug log to verify tags
-
-  const result = await jobService.postJob(payload);
-
-  if (result.success) {
-    $q.notify({
-      type: 'positive',
-      message: `Job posted successfully!`,
-      icon: 'check_circle',
-      position: 'top'
+  // Show confirmation dialog for unverified companies
+  if (verificationStatus.value !== 'approved') {
+    $q.dialog({
+      title: 'Post Job as Pending',
+      message: 'Your company is not yet verified. The job will be saved but will not be visible to candidates until your company is approved. Continue?',
+      persistent: true,
+      ok: {
+        label: 'Yes, Post as Pending',
+        color: 'primary',
+        flat: true
+      },
+      cancel: {
+        label: 'Cancel',
+        color: 'grey',
+        flat: true
+      }
+    }).onOk(async () => {
+      await processJobSubmission();
     });
-    setTimeout(() => router.push('/employer-portal'), 1500);
   } else {
+    await processJobSubmission();
+  }
+};
+
+const processJobSubmission = async () => {
+  try {
+    loading.value = true;
+    
+    // Get the current user data from localStorage
+    const storedUser = localStorage.getItem('userData');
+    if (!storedUser) {
+      throw new Error('User not authenticated');
+    }
+    
+    const userData = JSON.parse(storedUser);
+    console.log('User data from localStorage:', userData);
+    
+    // Prepare the job data - match exactly with the working curl request
+    const jobData = {
+      title: form.value.title,
+      description: form.value.description,
+      location: form.value.location,
+      type: form.value.type,
+      salary: form.value.salary ? Number(form.value.salary) : 0,
+      deadline: form.value.deadline || null,
+      skills: Array.isArray(form.value.skills) ? form.value.skills : (form.value.skills ? [form.value.skills] : []),
+      tags: Array.isArray(form.value.tags) ? form.value.tags : (form.value.tags ? [form.value.tags] : []),
+      benefits: form.value.benefits || '',
+      education: form.value.education || '',
+      // Include company_id from the user data
+      company_id: userData.id
+    };
+    
+    console.log('Submitting job with data:', jobData);
+    console.log('User ID from auth:', userData.id);
+
+    // Submit the job
+    const response = await jobService.postJob(jobData);
+    
+    if (response.success) {
+      // Show appropriate success message based on job status
+      const isPending = response.status === 'pending';
+      
+      $q.notify({
+        type: isPending ? 'info' : 'positive',
+        message: isPending 
+          ? 'Job saved successfully! It will be reviewed once your company is verified.'
+          : 'Job posted successfully and is now live!',
+        position: 'top',
+        timeout: 5000,
+        icon: isPending ? 'pending_actions' : 'check_circle'
+      });
+      
+      // Reset the form
+      resetForm();
+      
+      // Navigate back to the employer portal
+      router.push('/employer');
+    } else {
+      // Show error message
+      $q.notify({
+        type: 'negative',
+        message: response.error || 'Failed to post job. Please try again.',
+        position: 'top',
+        timeout: 3000,
+        icon: 'error'
+      });
+    }
+  } catch (error) {
+    console.error('Error submitting job:', error);
     $q.notify({
       type: 'negative',
-      message: `Error: ${result.error}`,
-      icon: 'error',
-      position: 'top'
+      message: 'An error occurred while posting the job. Please try again.',
+      position: 'top',
+      timeout: 3000,
+      icon: 'error'
     });
-    submitted.value = false;
+  } finally {
+    loading.value = false;
   }
+};
+
+const resetForm = () => {
+  form.value = {
+    title: '', location: '', type: null, positions: 1, timeline: '', salary: '', benefits: '', description: '',
+    experience: '', skills: '', education: '', communication: ['email'], resumeRequired: true, deadline: '',
+    questions: [], tags: []
+  };
 };
 </script>
 

@@ -25,9 +25,7 @@
             </q-item>
           </q-list>
         </div>
-        <div class="sidebar-section q-mt-auto">
-          <q-btn flat icon="logout" label="Logout" class="full-width logout-btn" @click="logout" />
-        </div>
+
       </div>
 
       <div class="content-area column q-pa-lg">
@@ -52,22 +50,78 @@
           v-model:pagination="pagination" :rows-per-page-options="[5, 10, 20]">
           <template v-slot:body-cell-status="props">
             <q-td :props="props">
-              <q-badge :class="`status-${props.row.status.toLowerCase().replace(' ', '-')}`" class="status-badge">
+              <q-badge 
+                :class="`status-${getStatusClass(props.row.status)}`" 
+                class="status-badge q-pa-sm"
+                :title="props.row.rejectionReason ? `Rejection Reason: ${props.row.rejectionReason}` : ''"
+              >
                 <q-icon :name="getStatusIcon(props.row.status)" class="q-mr-xs" size="14px" />
-                {{ props.row.status }}
+                {{ formatStatus(props.row.status) }}
+                <q-tooltip v-if="props.row.rejectionReason" anchor="top middle" self="bottom middle">
+                  <div class="text-caption">
+                    <div class="text-weight-bold">Rejection Reason:</div>
+                    <div>{{ props.row.rejectionReason }}</div>
+                    <div v-if="props.row.updatedAt" class="text-caption text-italic">
+                      Updated: {{ formatDate(props.row.updatedAt) }}
+                    </div>
+                  </div>
+                </q-tooltip>
               </q-badge>
             </q-td>
           </template>
           <template v-slot:body-cell-actions="props">
             <q-td :props="props" class="text-right">
-              <q-btn flat round dense icon="groups" color="primary" @click="viewApplicants(props.row.id)">
+              <q-btn 
+                v-if="props.row.status === 'approved'" 
+                flat 
+                round 
+                dense 
+                icon="groups" 
+                color="primary" 
+                @click="viewApplicants(props.row.id)"
+              >
                 <q-tooltip>View Applicants</q-tooltip>
               </q-btn>
-              <q-btn flat round dense icon="edit" color="grey-8" @click="editJob(props.row.id)" class="q-ml-sm">
+              
+              <q-btn 
+                v-if="['draft', 'rejected'].includes(props.row.status)" 
+                flat 
+                round 
+                dense 
+                icon="edit" 
+                color="grey-8" 
+                @click="editJob(props.row)" 
+                class="q-ml-sm"
+              >
                 <q-tooltip>Edit Job</q-tooltip>
               </q-btn>
-              <q-btn flat round dense icon="delete" color="negative" @click="confirmDelete(props.row)" class="q-ml-sm">
-                <q-tooltip>Delete Job</q-tooltip>
+              
+              <q-btn 
+                flat 
+                round 
+                dense 
+                icon="delete" 
+                color="negative" 
+                @click="confirmDelete(props.row)" 
+                class="q-ml-sm"
+                :disable="props.row.status === 'approved'"
+              >
+                <q-tooltip>
+                  {{ props.row.status === 'approved' ? 'Cannot delete approved jobs' : 'Delete Job' }}
+                </q-tooltip>
+              </q-btn>
+              
+              <q-btn 
+                v-if="props.row.status === 'rejected'" 
+                flat 
+                round 
+                dense 
+                icon="info" 
+                color="warning" 
+                @click="showRejectionDetails(props.row)" 
+                class="q-ml-sm"
+              >
+                <q-tooltip>View Rejection Details</q-tooltip>
               </q-btn>
             </q-td>
           </template>
@@ -95,32 +149,51 @@
 
 <script setup>
 import { ref, onMounted, computed } from 'vue';
-import { useRouter } from 'vue-router';
-import { useQuasar } from 'quasar';
+import { useRouter, useRoute } from 'vue-router';
+import { useQuasar, date } from 'quasar';
 import AppHeader from 'src/components/HeaderPart.vue';
+import axios from 'axios';
+
+// Create axios instance
+const api = axios.create({
+  baseURL: 'http://localhost:3000',
+  withCredentials: true,
+  headers: {
+    'Content-Type': 'application/json'
+  }
+});
 
 const router = useRouter();
+const route = useRoute();
 const $q = useQuasar();
 
-const employer = ref({ name: '', email: '' });
+// State
+const employer = ref({});
 const selected = ref('Posted Jobs');
-
 const jobs = ref([]);
-const initialJobs = []; 
 const jobToDelete = ref(null);
 const showDeleteConfirm = ref(false);
 const searchQuery = ref('');
 const statusFilter = ref('All');
+const loading = ref(false);
+const showStatusBanner = ref(false);
+const statusBanner = ref({
+  message: '',
+  color: 'positive',
+  icon: 'check_circle'
+});
 
 const statusOptions = [
-  { label: 'All Statuses', value: 'All' },
-  { label: 'Approved', value: 'Approved' },
-  { label: 'Pending Review', value: 'Pending Review' },
-  { label: 'Rejected', value: 'Rejected' }
+  { label: 'All', value: 'All' },
+  { label: 'Draft', value: 'draft' },
+  { label: 'Pending Review', value: 'pending' },
+  { label: 'Approved', value: 'approved' },
+  { label: 'Rejected', value: 'rejected' },
+  { label: 'Closed', value: 'closed' }
 ];
 
 const pagination = ref({
-  sortBy: 'datePosted',
+  sortBy: 'updatedAt',
   descending: true,
   page: 1,
   rowsPerPage: 10
@@ -157,32 +230,148 @@ const filteredJobs = computed(() => {
   return filtered;
 });
 
-const getStatusIcon = (status) => {
-  switch (status) {
-    case 'Approved': return 'check_circle';
-    case 'Pending Review': return 'pending';
-    case 'Rejected': return 'cancel';
-    default: return 'help';
+const fetchJobs = async () => {
+  loading.value = true;
+  try {
+    const token = localStorage.getItem('authToken');
+    if (!token) {
+      throw new Error('No authentication token found');
+    }
+    
+    // Using the configured api instance with correct path
+    const response = await api.get('/api/jobs/employer', {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+    
+    // Map the response to match the expected frontend format if needed
+    jobs.value = response.data.jobs || [];
+    showStatusMessage('Jobs loaded successfully', 'positive', 'check_circle');
+  } catch (error) {
+    console.error('Error fetching jobs:', error);
+    showStatusMessage('Failed to load jobs', 'negative', 'error');
+  } finally {
+    loading.value = false;
   }
 };
 
-const viewApplicants = (jobId) => router.push(`/candidates?jobId=${jobId}`);
-const editJob = (jobId) => router.push(`/post-job?edit=${jobId}`);
+const showStatusMessage = (message, color = 'positive', icon = 'check_circle') => {
+  statusBanner.value = { message, color, icon };
+  showStatusBanner.value = true;
+  setTimeout(() => {
+    showStatusBanner.value = false;
+  }, 5000);
+};
+
+const viewApplicants = (jobId) => {
+  router.push(`/employer/jobs/${jobId}/applicants`);
+};
+
+const editJob = (job) => {
+  router.push(`/employer/jobs/${job.id}/edit`);
+};
+
+const showRejectionDetails = (job) => {
+  $q.dialog({
+    title: 'Rejection Details',
+    message: `
+      <div class="q-pa-md">
+        <div class="text-subtitle2 q-mb-sm">Job: <strong>${job.title}</strong></div>
+        <div class="text-caption q-mb-md">Rejected on: ${formatDate(job.updatedAt)}</div>
+        <div class="q-mt-md">
+          <div class="text-weight-medium">Rejection Reason:</div>
+          <div class="q-pa-sm bg-grey-2 rounded-borders">${job.rejectionReason || 'No reason provided'}</div>
+        </div>
+      </div>
+    `,
+    html: true,
+    ok: {
+      label: 'Close',
+      flat: true
+    }
+  });
+};
 
 const confirmDelete = (job) => {
   jobToDelete.value = job;
-  showDeleteConfirm.value = true;
+  $q.dialog({
+    title: 'Confirm Delete',
+    message: `Are you sure you want to delete the job "${job.title}"?\nThis action cannot be undone.`,
+    persistent: true,
+    ok: {
+      label: 'Delete',
+      color: 'negative',
+      flat: true
+    },
+    cancel: {
+      label: 'Cancel',
+      flat: true
+    }
+  }).onOk(() => deleteJob());
 };
 
-const deleteJob = () => {
-  const index = jobs.value.findIndex(j => j.id === jobToDelete.value.id);
-  if (index > -1) {
-    jobs.value.splice(index, 1);
-    localStorage.setItem('jobhubJobs', JSON.stringify(jobs.value));
-    $q.notify({ type: 'positive', message: `Job "${jobToDelete.value.title}" deleted.`, icon: 'delete_sweep' });
+const deleteJob = async () => {
+  if (!jobToDelete.value) return;
+  
+  try {
+    await api.delete(`/employer/jobs/${jobToDelete.value.id}`);
+    jobs.value = jobs.value.filter(job => job.id !== jobToDelete.value.id);
+    showStatusMessage('Job deleted successfully', 'positive', 'delete');
+  } catch (error) {
+    console.error('Error deleting job:', error);
+    showStatusMessage('Failed to delete job', 'negative', 'error');
+  } finally {
+    jobToDelete.value = null;
   }
-  showDeleteConfirm.value = false;
-  jobToDelete.value = null;
+};
+
+const getStatusIcon = (status) => {
+  const icons = {
+    'draft': 'drafts',
+    'pending': 'schedule',
+    'approved': 'check_circle',
+    'rejected': 'warning',
+    'closed': 'lock_clock'
+  };
+  return icons[status] || 'help_outline';
+};
+
+const formatDate = (dateString) => {
+  if (!dateString) return 'N/A';
+  try {
+    return date.formatDate(dateString, 'MMM D, YYYY [at] h:mm A');
+  } catch (e) {
+    console.error('Error formatting date:', e);
+    return 'Invalid date';
+  }
+};
+
+const formatStatus = (status) => {
+  const statusMap = {
+    'draft': 'Draft',
+    'pending': 'Pending Review',
+    'approved': 'Active',
+    'rejected': 'Rejected',
+    'closed': 'Closed',
+    'expired': 'Expired',
+    'pending_review': 'Pending Review'
+  };
+  return statusMap[status] || status;
+};
+
+const getStatusClass = (status) => {
+  const classMap = {
+    'draft': 'draft',
+    'pending': 'pending',
+    'pending_review': 'pending',
+    'approved': 'active',
+    'active': 'active',
+    'rejected': 'rejected',
+    'closed': 'closed',
+    'expired': 'expired'
+  };
+  return classMap[status] || 'draft';
 };
 
 const navigate = (link) => {
@@ -190,21 +379,25 @@ const navigate = (link) => {
   if (link.to) router.push(link.to);
 };
 
-const logout = () => {
-  localStorage.removeItem('employerData');
-  router.push('/employers');
-};
 
-onMounted(() => {
+onMounted(async () => {
   const storedEmployer = localStorage.getItem('employerData');
   if (storedEmployer) employer.value = JSON.parse(storedEmployer);
-
-  const storedJobs = localStorage.getItem('jobhubJobs');
-  if (storedJobs) {
-    jobs.value = JSON.parse(storedJobs);
-  } else {
-    jobs.value = initialJobs;
-    localStorage.setItem('jobhubJobs', JSON.stringify(initialJobs));
+  await fetchJobs();
+  
+  // Check for any job status changes in the URL query params
+  if (route.query.jobStatus) {
+    const jobId = route.query.jobId;
+    const job = jobs.value.find(j => j.id === jobId);
+    if (job) {
+      showStatusMessage(
+        `Job "${job.title}" has been ${job.status}`,
+        job.status === 'approved' ? 'positive' : 'warning',
+        job.status === 'approved' ? 'check_circle' : 'info'
+      );
+      // Remove query params after showing the message
+      router.replace({ query: {} });
+    }
   }
 });
 </script>
@@ -295,7 +488,54 @@ onMounted(() => {
 .jobs-table {
   border-radius: 8px;
   box-shadow: none;
-  border: 1px solid #e0e0e0;
+}
+
+/* Status Badge Styles */
+.status-badge {
+  font-size: 12px;
+  font-weight: 500;
+  border-radius: 4px;
+  padding: 2px 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-transform: capitalize;
+}
+
+.status-draft {
+  background-color: #e0e0e0;
+  color: #424242;
+}
+
+.status-pending {
+  background-color: #fff3e0;
+  color: #e65100;
+}
+
+.status-active {
+  background-color: #e8f5e9;
+  color: #2e7d32;
+}
+
+.status-rejected {
+  background-color: #ffebee;
+  color: #c62828;
+}
+
+.status-closed {
+  background-color: #f5f5f5;
+  color: #616161;
+}
+
+.status-expired {
+  background-color: #f3e5f5;
+  color: #6a1b9a;
+}
+
+/* Hover effects for status badges */
+.status-badge:hover {
+  filter: brightness(95%);
+  cursor: default;
 }
 
 .jobs-table :deep(th) {

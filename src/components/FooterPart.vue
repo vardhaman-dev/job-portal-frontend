@@ -32,7 +32,7 @@
           <router-link to="/about">About Us</router-link>
           <router-link to="/contact">Contact</router-link>
           <router-link to="/privacy-policy">Privacy Policy</router-link>
-          <a href="#">Terms of Service</a>
+          <router-link to="/terms-and-conditions">Terms of Service</router-link>
         </div>
       </div>
     </div>

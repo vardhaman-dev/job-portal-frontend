@@ -415,6 +415,7 @@
 
 <script>
 import AppHeader from '../components/HeaderPart.vue';
+import axios from 'axios';
 
 export default {
   name: 'ApplicationForm',
@@ -445,7 +446,7 @@ export default {
         availability: { interviewTime: '', joiningDate: '' },
         additional: { whyInterested: '', relocate: null, legalRight: null, source: '' }
       },
-      qualifications: ['High School', 'Diploma', 'Bachelor\'s Degree', 'Master\'s Degree', 'Ph.D.'],
+      qualifications: ['High School', 'Diploma', "Bachelor's Degree", "Master's Degree", 'Ph.D.'],
       experienceYears: ['Fresher', '1 Year', '2 Years', '3 Years', '4 Years', '5+ Years'],
       noticePeriods: ['Immediate', '15 Days', '1 Month', '2 Months', '3 Months'],
       yesNoOptions: [
@@ -471,36 +472,52 @@ export default {
       this.resumeError = false;
       this.loading = true;
       try {
-        // Validate resume upload
-        if (!this.$refs.resumeUploader.files || !this.$refs.resumeUploader.files.length) {
-          this.resumeError = true;
-          this.$q.notify({ type: 'negative', message: 'Please upload a resume.' });
-          console.log('Validation failed: No resume');
+        // Basic required fields check
+        if (
+          !this.form.firstName ||
+          !this.form.lastName ||
+          !this.form.email ||
+          !this.form.phone ||
+          !this.form.additional.whyInterested ||
+          !this.$refs.resumeUploader.files.length
+        ) {
+          this.$q.notify({ type: 'negative', message: 'Please fill out all required fields.' });
+          this.loading = false;
           return;
         }
 
-        const resumeFiles = this.$refs.resumeUploader.files;
-        const coverFiles = this.$refs.coverUploader.files || [];
+        const token = localStorage.getItem('authToken');
+        const formData = new FormData();
 
-        console.log('Form Submitted', {
-          jobId: this.jobId,
-          ...this.form,
-          resume: resumeFiles,
-          coverLetter: coverFiles
+        // Append mandatory fields
+        formData.append('job_id', this.jobId);
+        formData.append('cover_letter', this.form.additional.whyInterested);
+
+        // Append resume file
+        const resumeFile = this.$refs.resumeUploader.files[0];
+        formData.append('resume', resumeFile);
+
+        // You can append other optional form fields here as needed, example:
+        // formData.append('firstName', this.form.firstName);
+        // formData.append('lastName', this.form.lastName);
+        // etc...
+
+        const res = await axios.post('http://localhost:3000/api/apply', formData, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'multipart/form-data'
+          }
         });
 
-        // Simulate API call
-        await new Promise(resolve => setTimeout(resolve, 1000));
-
-        this.$q.notify({ type: 'positive', message: 'Application submitted successfully!' });
-        console.log('Redirecting to success page');
-        this.$router.push({
-          name: 'ApplicationSuccess',
-          query: { jobTitle: 'Senior Frontend Developer' }
-        });
+        if (res.data.success) {
+          this.$q.notify({ type: 'positive', message: 'Application submitted successfully!' });
+          this.$router.push('/dashboard');
+        } else {
+          throw new Error(res.data.message || 'Submission failed');
+        }
       } catch (error) {
-        this.$q.notify({ type: 'negative', message: 'Error submitting application. Please try again.' });
         console.error('Submission error:', error);
+        this.$q.notify({ type: 'negative', message: 'Error submitting application. Please try again.' });
       } finally {
         this.loading = false;
       }
@@ -508,6 +525,11 @@ export default {
   }
 };
 </script>
+
+
+
+
+
 
 <style scoped>
 .application-form-page {

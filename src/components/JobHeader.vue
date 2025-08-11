@@ -52,6 +52,18 @@
               <q-tooltip>Share</q-tooltip>
             </template>
           </q-btn>
+
+          <!-- Settings Button -->
+          <q-btn
+            flat
+            round
+            dense
+            icon="settings"
+            color="grey"
+            @click="openSettings"
+          >
+            <q-tooltip>Settings</q-tooltip>
+          </q-btn>
         </div>
       </div>
     </div>
@@ -125,11 +137,16 @@ const toggleBookmark = async () => {
   }
 }
 
+const openSettings = () => {
+  // Add logic for settings action (e.g., open a modal or navigate to settings page)
+  console.log('Settings clicked for job:', job.value.id)
+  // Example: router.push('/job-settings/' + job.value.id)
+}
+
 onMounted(() => {
   checkBookmark()
 })
 </script>
-
 
 <style scoped>
 .transition-all {

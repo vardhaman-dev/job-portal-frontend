@@ -1,53 +1,50 @@
 <template>
   <div class="job-seeker-page">
-    <!-- Fixed Header -->
-    <div class="fixed-header">
+    <!-- Static App Header -->
+    <div class="static-header">
       <AppHeader />
+    </div>
+
+    <!-- Scrollable Body -->
+    <div class="scrollable-body">
+      <!-- Job Seeker Welcome Header (scrolls with page) -->
       <JobSeekerHeader
         :userName="userName"
         @open-profile="showProfileModal = true"
         @go-resume="goToResume"
       />
-    </div>
 
-    <!-- Main Layout -->
-    <div class="main-layout">
-      <!-- Fixed Sidebar -->
-      <div class="sidebar">
-        <JobSeekerSidebar :selectedSection="selectedSection" @navigate="selectedSection = $event" />
-      </div>
+      <!-- Main Layout: Sidebar + Content -->
+      <div class="main-layout">
+        <!-- Scrollable Sidebar -->
+        <div class="sidebar">
+          <JobSeekerSidebar :selectedSection="selectedSection" @navigate="selectedSection = $event" />
+        </div>
 
-      <!-- Scrollable Content -->
-      <div class="main-content">
-        <!-- MY APPLICATIONS SECTION -->
-        <template v-if="selectedSection === 'applications'">
-          <MyApplications />
-        </template>
-
-        <!-- BOOKMARKED JOBS SECTION -->
-        <template v-else-if="selectedSection === 'bookmarks'">
-          <BookmarkedJobs :jobs="bookmarkedJobs" @remove="handleRemove" />
-        </template>
-
-        <!-- PROFILE SECTION -->
-        <template v-else-if="selectedSection === 'profile'">
-          <UserProfile />
-        </template>
-
-        <template v-else-if="selectedSection === 'notifications'">
-          <NotificationComponent />
-        </template>
-
-        <template v-else-if="selectedSection === 'settings'">
-          <SettingsComponent />
-        </template>
+        <!-- Scrollable Content Area -->
+        <div class="main-content">
+          <template v-if="selectedSection === 'applications'">
+            <MyApplications />
+          </template>
+          <template v-else-if="selectedSection === 'bookmarks'">
+            <BookmarkedJobs :jobs="bookmarkedJobs" @remove="handleRemove" />
+          </template>
+          <template v-else-if="selectedSection === 'profile'">
+            <UserProfile />
+          </template>
+          <template v-else-if="selectedSection === 'notifications'">
+            <NotificationComponent />
+          </template>
+          <template v-else-if="selectedSection === 'settings'">
+            <SettingsComponent />
+          </template>
+        </div>
       </div>
     </div>
 
     <CompleteProfileModal v-model="showProfileModal" />
   </div>
 </template>
-
 
 <script setup>
 import AppHeader from '../components/HeaderPart.vue'
@@ -122,46 +119,48 @@ onMounted(() => {
 <style scoped>
 /* Root Layout */
 .job-seeker-page {
-  height: 100vh;
   display: flex;
   flex-direction: column;
+  height: 100vh;
   overflow: hidden;
   font-family: 'Inter', sans-serif;
-  background-color: #f8f9fa;
-  color: #1f2937;
 }
 
-/* Fixed Header */
-.fixed-header {
-  position: sticky;
-  top: 0;
-  z-index: 100;
+/* Static App Header */
+.static-header {
+  flex-shrink: 0;
   background-color: white;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+  z-index: 100;
+  position: sticky;
+  top: 0;
 }
 
-/* Main layout */
+/* Scrollable Body Section */
+.scrollable-body {
+  flex: 1;
+  overflow-y: auto;
+  background-color: #f8f9fa;
+}
+
+/* Main Layout: sidebar + content */
 .main-layout {
   display: flex;
-  flex: 1;
+  height: calc(100vh - 120px); /* adjust this if header height changes */
   overflow: hidden;
-  height: calc(100vh - 120px); /* adjust based on header height */
-  background-color: #f8faff;
 }
 
-/* Sidebar */
+/* Sidebar - independently scrollable */
 .sidebar {
-  width: 260px;
+  width: 300px;
+  flex-shrink: 0;
   background: white;
   border-right: 1px solid #e5e7eb;
-  position: sticky;
-  top: 120px;
-  height: calc(100vh - 120px);
   overflow-y: auto;
   padding: 16px;
 }
 
-/* Scrollable Main Content */
+/* Main Content - independently scrollable */
 .main-content {
   flex: 1;
   overflow-y: auto;
@@ -270,5 +269,17 @@ h6, .text-h6 {
 .nav-btn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+}
+
+
+/* Scrollbar Styling */
+.sidebar::-webkit-scrollbar,
+.main-content::-webkit-scrollbar {
+  width: 8px;
+}
+.sidebar::-webkit-scrollbar-thumb,
+.main-content::-webkit-scrollbar-thumb {
+  background-color: #cbd5e1;
+  border-radius: 4px;
 }
 </style>

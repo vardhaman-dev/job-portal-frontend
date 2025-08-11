@@ -104,13 +104,18 @@
         <button class="btn outline" @click="goToPostJob">Post a Job</button>
       </div>
     </section>
+    <AppFooter />
 
   </div>
 </template>
 
 <script>
+import AppFooter from '../components/FooterPart.vue';
 export default {
   name: 'AboutUs',
+    components: {
+    AppFooter
+  },
   data() {
     return {
       teamMembers: [

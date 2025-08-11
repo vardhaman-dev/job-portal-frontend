@@ -1,28 +1,22 @@
 <template>
-  <q-page class="flex flex-center bg-grey-1">
-    <q-card
-      class="q-pa-xl q-mx-sm"
-      style="width: 100%; max-width: 500px; border-radius: 16px;"
-    >
-      <!-- Back to Home -->
+  <div class="signup-bg flex flex-center">
+    <q-card class="glass-card q-pa-xl">
       <div
-        class="q-mb-lg row items-center text-grey-6 cursor-pointer"
+        class="row items-center q-mb-lg cursor-pointer interactive-link"
         @click="goBack"
-        style="font-size: 14px;"
       >
         <q-icon name="arrow_back" size="20px" class="q-mr-sm" />
         <span class="text-weight-medium">Back to Home</span>
       </div>
 
-      <!-- Avatar and Title -->
       <div class="q-mb-lg text-center">
-        <q-avatar size="72px" class="bg-blue-1 q-mb-sm">
-          <q-icon name="work" size="38px" color="#1565c0" />
+        <q-avatar size="72px" class="bg-primary text-white q-mb-sm">
+          <q-icon name="person_add" size="38px" />
         </q-avatar>
-        <div class="text-h5 text-weight-bold text-grey-9">Create Your Account</div>
-        <div class="text-subtitle2 text-grey-6">Join our community of job seekers</div>
+        <div class="text-h5 text-weight-bold text-dark dark:text-white">Create Your Account</div>
+        <div class="text-subtitle2 text-grey-8 dark:text-grey-3">Join our community of job seekers</div>
       </div>
-      <!-- Error Message -->
+
       <q-banner
         v-if="authStore.error"
         class="bg-red-1 text-red q-mb-md"
@@ -34,45 +28,39 @@
         </template>
       </q-banner>
 
-      <!-- Form -->
-      <q-form @submit.prevent="handleSubmit" class="q-gutter-md">
-        <!-- Name Fields -->
-        <div class="row q-col-gutter-sm">
-          <div class="col">
+      <q-form @submit.prevent="handleSubmit" class="q-gutter-y-md">
+        <div class="row q-col-gutter-md">
+          <div class="col-12 col-sm-6">
             <q-input
-              filled
+              outlined
               dense
               label="First name"
               v-model="formData.firstName"
-              class="bg-grey-2"
-              borderless
+              :dark="$q.dark.isActive"
               :rules="[val => !!val || 'First name is required']"
               :disable="authStore.loading"
             />
           </div>
-          <div class="col">
+          <div class="col-12 col-sm-6">
             <q-input
-              filled
+              outlined
               dense
               label="Last name"
               v-model="formData.lastName"
-              class="bg-grey-2"
-              borderless
+              :dark="$q.dark.isActive"
               :rules="[val => !!val || 'Last name is required']"
               :disable="authStore.loading"
             />
           </div>
         </div>
 
-        <!-- Email -->
         <q-input
-          filled
+          outlined
           dense
           label="Email address"
           v-model="formData.email"
           type="email"
-          class="bg-grey-2"
-          borderless
+          :dark="$q.dark.isActive"
           :rules="[
             val => !!val || 'Email is required',
             val => /.+@.+\..+/.test(val) || 'Please enter a valid email'
@@ -81,15 +69,13 @@
           :disable="authStore.loading"
         />
 
-        <!-- Phone -->
         <q-input
-          filled
+          outlined
           dense
           label="Phone number"
           v-model="formData.phone"
-          class="bg-grey-2"
-          borderless
           mask="(###) ### - ####"
+          :dark="$q.dark.isActive"
           :rules="[val => !!val || 'Phone number is required']"
           :disable="authStore.loading"
         >
@@ -98,15 +84,13 @@
           </template>
         </q-input>
 
-        <!-- Password -->
         <q-input
-          filled
+          outlined
           dense
           label="Password"
           v-model="formData.password"
           :type="showPassword ? 'text' : 'password'"
-          class="bg-grey-2"
-          borderless
+          :dark="$q.dark.isActive"
           :rules="[
             val => !!val || 'Password is required',
             val => val.length >= 8 || 'Password must be at least 8 characters'
@@ -119,20 +103,17 @@
               :name="showPassword ? 'visibility_off' : 'visibility'"
               class="cursor-pointer"
               @click="showPassword = !showPassword"
-              color="grey-6"
             />
           </template>
         </q-input>
 
-        <!-- Confirm Password -->
         <q-input
-          filled
+          outlined
           dense
           label="Confirm Password"
           v-model="formData.confirmPassword"
           :type="showConfirmPassword ? 'text' : 'password'"
-          class="bg-grey-2 q-mb-sm"
-          borderless
+          :dark="$q.dark.isActive"
           :rules="[
             val => !!val || 'Please confirm your password',
             val => val === formData.password || 'Passwords do not match'
@@ -145,12 +126,10 @@
               :name="showConfirmPassword ? 'visibility_off' : 'visibility'"
               class="cursor-pointer"
               @click="showConfirmPassword = !showConfirmPassword"
-              color="grey-6"
             />
           </template>
         </q-input>
 
-        <!-- Terms and Conditions -->
         <q-checkbox
           v-model="formData.termsAccepted"
           label="I agree to the Terms of Service and Privacy Policy"
@@ -159,14 +138,16 @@
           :disable="authStore.loading"
         />
 
-        <!-- Submit Button -->
         <q-btn
           label="Create Account"
           type="submit"
-          class="full-width bg-custom-blue text-white"
+          color="primary"
+          class="full-width q-mt-lg"
           size="lg"
-          :loading="authStore.loading"
+          no-caps
+          rounded
           unelevated
+          :loading="authStore.loading"
         >
           <template v-slot:loading>
             <q-spinner-oval class="on-left" />
@@ -175,23 +156,22 @@
         </q-btn>
       </q-form>
 
-      <!-- Login Link -->
       <div class="text-center q-mt-lg">
-        <span class="text-grey-7">Already have an account? </span>
+        <span class="text-grey-8 dark:text-grey-4">Already have an account? </span>
         <q-btn
           flat
           label="Sign In"
-          class="q-pa-none text-weight-medium"
-          style="color: #1565c0;"
+          class="q-pa-none text-weight-medium interactive-link"
           @click="goToLogin"
           :disable="authStore.loading"
         />
       </div>
     </q-card>
-  </q-page>
+  </div>
 </template>
 
 <script setup>
+// UNCHANGED: The script logic remains exactly as you provided it.
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { useQuasar } from 'quasar';
@@ -201,7 +181,6 @@ const $q = useQuasar();
 const router = useRouter();
 const authStore = useAuthStore();
 
-// Form data
 const formData = ref({
   firstName: '',
   lastName: '',
@@ -215,7 +194,6 @@ const formData = ref({
 const showPassword = ref(false);
 const showConfirmPassword = ref(false);
 
-// Handle form submission
 const handleSubmit = async () => {
   try {
     const result = await authStore.register({
@@ -234,7 +212,6 @@ const handleSubmit = async () => {
         timeout: 2000,
       });
 
-      // Auto-login after registration
       const loginResult = await authStore.login({
         email: formData.value.email,
         password: formData.value.password,
@@ -260,7 +237,6 @@ const handleSubmit = async () => {
   }
 };
 
-// Navigation methods
 const goBack = () => {
   router.push('/');
 };
@@ -271,28 +247,76 @@ const goToLogin = () => {
 </script>
 
 <style scoped>
-.bg-custom-blue {
-  background: #1565c0 !important;
-  color: white !important;
+/* --- Page Background --- */
+.signup-bg {
+  min-height: 100vh;
+  padding: 48px 16px;
+  background-image:
+    linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)),
+    url('https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&w=1200&q=80');
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
 }
 
-:deep(.q-field--filled .q-field__control) {
-  border-radius: 8px !important;
+/* --- Frosted Glass Card UI --- */
+.glass-card {
+  width: 100%;
+  max-width: 550px;
+  border-radius: 20px;
+  background-color: rgba(255, 255, 255, 0.49);
+  backdrop-filter: blur(25px);
+  -webkit-backdrop-filter: blur(25px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  padding: 32px 40px;
+  transition: background-color 0.3s ease, border 0.3s ease;
+}
+.body--dark .glass-card {
+  background-color: rgba(30, 30, 30, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.15);
 }
 
-:deep(.q-field--disabled) {
-  opacity: 0.7;
+/* --- Input Field Styling --- */
+:deep(.q-field--outlined .q-field__control) {
+  border-radius: 10px !important;
+}
+:deep(.q-field--outlined.q-field--focused .q-field__control:after) {
+  border-color: #1976d2 !important;
+  border-width: 2px;
 }
 
-:deep(.q-field--filled .q-field__control:before) {
-  border: 1px solid rgba(0, 0, 0, 0.12);
+/* --- Interactivity & Attractiveness --- */
+.q-btn {
+  transition: transform 0.2s ease-out, box-shadow 0.2s ease-out;
+}
+.q-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
 }
 
-:deep(.q-field--filled .q-field__control:hover:before) {
-  border-color: #1565c0;
+.interactive-link, .router-link-active, .router-link-exact-active {
+  color: #1976d2;
+  text-decoration: none;
+  transition: all 0.2s ease-out;
+}
+.interactive-link:hover, .router-link-active:hover, .router-link-exact-active:hover {
+  filter: brightness(1.2);
+  text-decoration: underline;
+}
+.body--dark .interactive-link,
+.body--dark .router-link-active,
+.body--dark .router-link-exact-active {
+  color: #64b5f6;
 }
 
-:deep(.q-checkbox__inner) {
-  font-size: 14px;
+/* --- Base Text & Color Overrides --- */
+.text-primary {
+  color: #1976d2 !important;
+}
+.body--dark .text-dark {
+  color: #fff !important;
+}
+.dark-card .text-grey-8 {
+  color: #bbb !important;
 }
 </style>
