@@ -56,7 +56,7 @@
                   label="Phone Number *"
                   type="tel"
                   v-model="form.phone"
-                  class="col-12 col-md-6 input-field"
+                  class="col-12 col-md-6 input-field short-field"
                   :rules="[val => !!val || 'Phone number is required', val => /^[\d\s-+()]+$/.test(val) || 'Enter a valid phone number']"
                   aria-required="true"
                 >
@@ -120,8 +120,8 @@
                   label="Year of Passing *"
                   type="number"
                   v-model="form.education.passingYear"
-                  class="col-12 col-md-6 input-field"
-                  :rules="[val => !!val || 'Year is required', val => val >= 1900 && val <= new Date().getFullYear() || 'Enter a valid year']"
+                  class="col-12 col-md-6 input-field short-field"
+                  :rules="[val => !!val || 'Year is required', val => val >= 1900 && val <= new Date().getFullYear() + 5 || 'Enter a valid year']"
                   aria-required="true"
                 />
                 <q-input
@@ -138,7 +138,7 @@
                   dense
                   label="CGPA / Percentage"
                   v-model="form.education.cgpa"
-                  class="col-12 input-field"
+                  class="col-12 col-md-6 input-field short-field"
                   aria-label="CGPA or percentage"
                 />
               </div>
@@ -205,7 +205,7 @@
                   type="number"
                   prefix="$"
                   v-model="form.experience.currentSalary"
-                  class="col-12 col-md-3 input-field"
+                  class="col-12 col-md-3 input-field short-field"
                   aria-label="Current salary"
                 />
                 <q-input
@@ -215,7 +215,7 @@
                   type="number"
                   prefix="$"
                   v-model="form.experience.expectedSalary"
-                  class="col-12 col-md-3 input-field"
+                  class="col-12 col-md-3 input-field short-field"
                   aria-label="Expected salary"
                 />
               </div>
@@ -277,7 +277,7 @@
                   label="Earliest Joining Date"
                   type="date"
                   v-model="form.availability.joiningDate"
-                  class="col-12 col-md-6 input-field"
+                  class="col-12 col-md-6 input-field short-field"
                   aria-label="Earliest joining date"
                 />
               </div>
@@ -306,25 +306,35 @@
                 <div class="row q-col-gutter-md">
                   <div class="col-12 col-md-6">
                     <div class="text-subtitle1 q-mb-sm">Are you willing to relocate? *</div>
-                    <q-option-group
+                    <q-field
                       v-model="form.additional.relocate"
-                      :options="yesNoOptions"
-                      type="radio"
-                      inline
                       :rules="[val => val !== null || 'Please select an option']"
+                      borderless
                       aria-required="true"
-                    />
+                    >
+                      <q-option-group
+                        v-model="form.additional.relocate"
+                        :options="yesNoOptions"
+                        type="radio"
+                        inline
+                      />
+                    </q-field>
                   </div>
                   <div class="col-12 col-md-6">
                     <div class="text-subtitle1 q-mb-sm">Do you have the legal right to work in this country? *</div>
-                    <q-option-group
+                    <q-field
                       v-model="form.additional.legalRight"
-                      :options="yesNoOptions"
-                      type="radio"
-                      inline
                       :rules="[val => val !== null || 'Please select an option']"
+                      borderless
                       aria-required="true"
-                    />
+                    >
+                      <q-option-group
+                        v-model="form.additional.legalRight"
+                        :options="yesNoOptions"
+                        type="radio"
+                        inline
+                      />
+                    </q-field>
                   </div>
                 </div>
                 <q-select
@@ -359,6 +369,9 @@
                   :hide-upload-btn="true"
                   class="uploader-style"
                   aria-required="true"
+                  :error="resumeError"
+                  error-message="Resume is required"
+                  @added="onResumeAdded"
                 />
                 <small class="text-grey-7">PDF, DOC, DOCX files only. Max 5MB.</small>
               </div>
@@ -440,28 +453,34 @@ export default {
         { label: 'No', value: 'No' }
       ],
       sources: ['LinkedIn', 'Company Website', 'Job Portal', 'Social Media', 'Referral', 'Other'],
-      loading: false
+      loading: false,
+      resumeError: false
     };
   },
   mounted() {
     console.log('Applying for Job ID:', this.jobId);
   },
   methods: {
+    onResumeAdded(files) {
+      // Reset error when a file is added
+      this.resumeError = false;
+      console.log('Resume files added:', files);
+    },
     async submitForm() {
+      console.log('submitForm called');
+      this.resumeError = false;
       this.loading = true;
       try {
-        // Validate required fields
-        if (!this.form.firstName || !this.form.lastName || !this.form.email || !this.form.phone ||
-            !this.form.education.qualification || !this.form.education.passingYear ||
-            !this.form.education.institution || !this.form.experience.totalYears ||
-            !this.form.additional.whyInterested || this.form.additional.relocate === null ||
-            this.form.additional.legalRight === null || !this.$refs.resumeUploader.getFiles().length) {
-          this.$q.notify({ type: 'negative', message: 'Please fill out all required fields.' });
+        // Validate resume upload
+        if (!this.$refs.resumeUploader.files || !this.$refs.resumeUploader.files.length) {
+          this.resumeError = true;
+          this.$q.notify({ type: 'negative', message: 'Please upload a resume.' });
+          console.log('Validation failed: No resume');
           return;
         }
 
-        const resumeFiles = this.$refs.resumeUploader.getFiles();
-        const coverFiles = this.$refs.coverUploader.getFiles();
+        const resumeFiles = this.$refs.resumeUploader.files;
+        const coverFiles = this.$refs.coverUploader.files || [];
 
         console.log('Form Submitted', {
           jobId: this.jobId,
@@ -470,11 +489,15 @@ export default {
           coverLetter: coverFiles
         });
 
-        // Simulate API call (replace with actual API call)
+        // Simulate API call
         await new Promise(resolve => setTimeout(resolve, 1000));
 
         this.$q.notify({ type: 'positive', message: 'Application submitted successfully!' });
-        this.$router.push('/dashboard'); // Redirect after submission
+        console.log('Redirecting to success page');
+        this.$router.push({
+          name: 'ApplicationSuccess',
+          query: { jobTitle: 'Senior Frontend Developer' }
+        });
       } catch (error) {
         this.$q.notify({ type: 'negative', message: 'Error submitting application. Please try again.' });
         console.error('Submission error:', error);
@@ -529,37 +552,50 @@ export default {
   padding-bottom: 0.5rem;
 }
 
-.input-field .q-field__control {
+.input-field {
+  max-width: 400px;
+  width: 100%;
+}
+
+.input-field.short-field {
+  max-width: 200px;
+}
+
+.input-field .q-field__control,
+.input-field .q-select__control {
   border-radius: 8px;
   background-color: #f9fafb;
   border: 1px solid #d1d5db;
   transition: all 0.2s ease-in-out;
 }
 
-.input-field .q-field__control:hover {
+.input-field .q-field__control:hover,
+.input-field .q-select__control:hover {
   border-color: #2563eb;
   background-color: #ffffff;
 }
 
 .input-field.q-field--focused .q-field__control,
-.input-field.q-field--highlighted .q-field__control {
+.input-field.q-field--highlighted .q-field__control,
+.input-field.q-field--focused .q-select__control,
+.input-field.q-field--highlighted .q-select__control {
   border-color: #2563eb;
   background-color: #ffffff;
   box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
 }
 
-.input-field.q-field--error .q-field__control {
+.input-field.q-field--error .q-field__control,
+.input-field.q-field--error .q-select__control {
   border-color: #ef4444;
   background-color: #fef2f2;
 }
 
-/* Standardize textarea dimensions */
 .input-field.q-input--textarea .q-field__control {
   width: 100%;
-  min-height: 120px; /* Consistent height for all textareas */
-  height: 120px; /* Fixed height to ensure uniformity */
-  resize: vertical; /* Allow vertical resize only */
-  padding: 0.5rem; /* Consistent padding */
+  min-height: 120px;
+  height: 120px;
+  resize: vertical;
+  padding: 0.5rem;
 }
 
 .uploader-style {
@@ -567,6 +603,8 @@ export default {
   background-color: #f9fafb;
   border: 2px dashed #d1d5db;
   transition: border-color 0.2s ease-in-out;
+  max-width: 600px;
+  width: 100%;
 }
 
 .uploader-style:hover {
@@ -581,6 +619,8 @@ export default {
   background: linear-gradient(90deg, #1565c0, #1e40af);
   color: white;
   transition: all 0.3s ease-in-out;
+  max-width: 400px;
+  margin: 0 auto;
 }
 
 .submit-btn:hover {
@@ -605,7 +645,6 @@ small {
   font-size: 0.9rem;
 }
 
-/* Responsive Adjustments */
 @media (max-width: 768px) {
   .container {
     padding: 1rem;
@@ -619,21 +658,33 @@ small {
     margin-bottom: 1rem;
   }
 
-  .submit-btn {
-    padding: 0.5rem 1rem;
-    font-size: 1rem;
+  .input-field {
+    max-width: 100%;
+  }
+
+  .input-field.short-field {
+    max-width: 150px;
   }
 
   .input-field.q-input--textarea .q-field__control {
-    min-height: 100px; /* Slightly smaller height on mobile for better fit */
+    min-height: 100px;
     height: 100px;
+  }
+
+  .uploader-style {
+    max-width: 100%;
+  }
+
+  .submit-btn {
+    padding: 0.5rem 1rem;
+    font-size: 1rem;
+    max-width: 100%;
   }
 }
 
-/* Required Field Labels */
 .input-field[aria-required="true"] .q-field__label::after,
 .q-select[aria-required="true"] .q-field__label::after,
-.q-option-group[aria-required="true"] + .q-field__label::after {
+.q-field[aria-required="true"] .q-field__label::after {
   content: ' *';
   color: #ef4444;
 }

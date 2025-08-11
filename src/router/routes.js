@@ -60,6 +60,31 @@ const routes = [
         component: () => import('pages/ApplicationForm.vue'),
         props: true
       },
+       {
+        path: '/application-success',
+        name: 'ApplicationSuccess',
+        component: () => import('pages/ApplicationSuccess.vue')
+      },
+      {
+        path: '/test-instructions',
+        name: 'TestInstructions',
+        component: () => import('../pages/TestInstructions.vue')
+      },
+      {
+        path: '/test',           
+        name: 'TestPage',        
+        component: () => import('../pages/TestPage.vue')      
+      },
+      {
+        path: '/test-under-review',
+        name: 'TestUnderReview',
+        component: () => import('../components/TestUnderReview.vue')
+      },
+      {
+        path: "/application-status",
+        name: "ApplicationStatus",
+        component: () => import('../pages/ApplicationStatus.vue')
+      },
        {path: '/resume-builder',
         component: () => import('../components/resume-builder.vue') }
     ]
