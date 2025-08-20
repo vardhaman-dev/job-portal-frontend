@@ -90,8 +90,11 @@ const routes = [
         name: "ApplicationStatus",
         component: () => import('../pages/ApplicationStatus.vue')
       },
-       {path: '/resume-builder',
-        component: () => import('../components/resume-builder.vue') }
+      {
+        path: '/resume-builder',
+        name: 'ResumeBuilder',
+        component: () => import('../components/UltimateResumeBuilder.vue')
+      }
     ]
   },
 {

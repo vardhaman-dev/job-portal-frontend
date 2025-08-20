@@ -193,7 +193,7 @@ const company = ref({
   email: 'public@innovate.com',
   website: 'https://innovate.com',
   address: '123 Innovation Park, Tech City, 12345',
-  about: 'Innovate Inc. is a leading tech company focusing on smart AI solutions for a better future. We thrive on creativity and collaboration.',
+  about: 'Innovate Inc. is a leading tech company focusing on smart solutions for a better future. We thrive on creativity and collaboration.',
   logoUrl: null, // This will hold the URL for the displayed logo
   industry: 'Artificial Intelligence',
   companySize: '51-200 employees',

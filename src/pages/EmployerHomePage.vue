@@ -4,7 +4,7 @@
     <section class="employer-hero">
       <div class="hero-text">
         <h1 class="tagline">Hire the Best Talent <span class="handwritten">Faster</span></h1>
-        <p>Connect with over <strong>500,000</strong> pre‑screened professionals. Use AI-powered matching to find your perfect candidate in days, not months.</p>
+        <p>Connect with over <strong>500,000</strong> pre‑screened professionals. Use intelligent matching to find your perfect candidate in days, not months.</p>
         <div class="hero-buttons">
           <button class="btn primary" @click="goToEmployerLogin">Post a Job Now</button>
           <button class="btn outline" @click="scrollToPricing">View Plans</button>

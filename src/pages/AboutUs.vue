@@ -19,7 +19,7 @@
 
     <section class="our-story glass-section">
       <h2>Our Story</h2>
-      <p>Founded in 2023 in Pune, India, JobHub was born from a simple observation: hiring was broken. Companies spent months searching for the right candidates, while talented professionals struggled to find roles where they could truly thrive. We envisioned a smarter way—a platform powered by technology but centered on people. Today, JobHub leverages AI and a deep understanding of the job market to create perfect matches, transforming the future of work.</p>
+      <p>Founded in 2023 in Pune, India, JobHub was born from a simple observation: hiring was broken. Companies spent months searching for the right candidates, while talented professionals struggled to find roles where they could truly thrive. We envisioned a smarter way—a platform powered by technology but centered on people. Today, JobHub leverages advanced algorithms and a deep understanding of the job market to create perfect matches, transforming the future of work.</p>
     </section>
 
     <section class="mission-vision glass-section">
@@ -43,7 +43,7 @@
         <div class="features-grid">
             <div class="feature-card">
                 <div class="feature-icon">✨</div>
-                <h4>AI-Powered Matching</h4>
+                <h4>Smart Matching</h4>
                 <p>Our intelligent algorithms connect the right people to the right roles, saving time for everyone.</p>
             </div>
             <div class="feature-card">
@@ -143,7 +143,7 @@ export default {
       // Added Testimonials data
       testimonials: [
         {
-          quote: "JobHub's AI matching is phenomenal. We filled our Senior Developer role in just two weeks, a process that used to take months. The quality of candidates was outstanding.",
+          quote: "JobHub's smart matching is phenomenal. We filled our Senior Developer role in just two weeks, a process that used to take months. The quality of candidates was outstanding.",
           name: 'Sarah Chen',
           title: 'CTO, Innovate Inc.',
           img: 'https://randomuser.me/api/portraits/women/44.jpg'
